@@ -1,5 +1,7 @@
 #include "../window/window.hpp"
 #include "../renderer/renderer.hpp"
+#include "../renderer/hud.hpp"
+#include "../renderer/font.hpp"
 #include "../input/input.hpp"
 #include "../pixel/pixel.hpp"
 #include "../timer/timer.hpp"
@@ -10,10 +12,7 @@ struct Player
     float y = 300.0f;
 };
 
-int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE,
-                   LPSTR,
-                   int)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     Window window;
     if (!window.create(L"Pixel Engine", 800, 600, hInstance))
@@ -30,6 +29,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
     timer.init();
 
     const float moveSpeed = 200.0f; // pixels per second
+
+    AsciiFont ascii_font;
+    Hud hud;
 
     while(window.processMessages())
     {
@@ -64,7 +66,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
         // -----------------------------------
         renderer.clear(Pixel(0, 0, 0, 0));
 
-        renderer.drawNumber(10, 10, timer.fps, Pixel(0, 255, 0, 0));
+        hud.drawText(renderer, 10, 10, std::to_string(timer.fps).c_str(), Pixel(0, 255, 0, 0), ascii_font);
+        hud.drawText(renderer, 10, 20, "hello this is jason", Pixel(0, 255, 0, 0), ascii_font);
 
         renderer.drawFilledRect(
             (int)player.x,
