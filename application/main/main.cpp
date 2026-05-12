@@ -2,12 +2,12 @@
 #include "../renderer/renderer.hpp"
 #include "../input/input.hpp"
 #include "../pixel/pixel.hpp"
+#include "../timer/timer.hpp"
 
 struct Player
 {
-    int x = 400;
-    int y = 300;
-    int speed = 5;
+    float x = 400.0f;
+    float y = 300.0f;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -26,46 +26,57 @@ int WINAPI WinMain(HINSTANCE hInstance,
     window.m_input = &input;
 
     Player player;
+    Timer timer;
+    timer.init();
 
-    while (window.processMessages())
+    const float moveSpeed = 200.0f; // pixels per second
+
+    while(window.processMessages())
     {
         // -----------------------------------
-        // Input frame start (IMPORTANT)
+        // Timing
+        // -----------------------------------
+        timer.tick();
+        float dt = timer.deltaTime;
+
+        // -----------------------------------
+        // Input frame start
         // -----------------------------------
         input.beginFrame();
 
         // -----------------------------------
-        // Movement (input → game logic)
+        // Movement (frame-independent)
         // -----------------------------------
         if (input.isKeyDown(VK_LEFT) || input.isKeyDown('A'))
-            player.x -= player.speed;
+            player.x -= moveSpeed * dt;
 
         if (input.isKeyDown(VK_RIGHT) || input.isKeyDown('D'))
-            player.x += player.speed;
+            player.x += moveSpeed * dt;
 
         if (input.isKeyDown(VK_UP) || input.isKeyDown('W'))
-            player.y -= player.speed;
+            player.y -= moveSpeed * dt;
 
         if (input.isKeyDown(VK_DOWN) || input.isKeyDown('S'))
-            player.y += player.speed;
+            player.y += moveSpeed * dt;
 
         // -----------------------------------
         // Render
         // -----------------------------------
         renderer.clear(Pixel(0, 0, 0, 0));
 
+        renderer.drawNumber(10, 10, timer.fps, Pixel(0, 255, 0, 0));
+
         renderer.drawFilledRect(
-            player.x,
-            player.y,
+            (int)player.x,
+            (int)player.y,
             50,
             50,
             Pixel(0, 255, 0, 0)
         );
 
-        // optional debug shape
         renderer.drawCircle(
-            player.x + 25,
-            player.y + 25,
+            (int)player.x + 25,
+            (int)player.y + 25,
             25,
             Pixel(0, 0, 255, 0)
         );
