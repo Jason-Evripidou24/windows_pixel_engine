@@ -107,11 +107,93 @@ void Renderer::drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color)
 /*
 -   Each Vec3_f represents a screen coord vertex (x == x_screen_coord, y == y_screen_coord, z == depth)
 */
-void Renderer::drawTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color)
+void Renderer::drawWireframeTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color)
 {
     this->drawLine(a, b, color);
     this->drawLine(b, c, color);
     this->drawLine(c, a, color);
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Renderer::drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2, const Pixel& color)
+{
+    float x0 = v0.m_data[0];
+    float y0 = v0.m_data[1];
+    float z0 = v0.m_data[2];
+
+    float x1 = v1.m_data[0];
+    float y1 = v1.m_data[1];
+    float z1 = v1.m_data[2];
+
+    float x2 = v2.m_data[0];
+    float y2 = v2.m_data[1];
+    float z2 = v2.m_data[2];
+
+    // Bounding box
+    int minX = (int)std::floor(x0);
+    if (x1 < minX) { minX = (int)std::floor(x1); }
+    if (x2 < minX) { minX = (int)std::floor(x2); }
+
+    int maxX = (int)std::ceil(x0);
+    if (x1 > maxX) { maxX = (int)std::ceil(x1); }
+    if (x2 > maxX) { maxX = (int)std::ceil(x2); }
+
+    int minY = (int)std::floor(y0);
+    if (y1 < minY) { minY = (int)std::floor(y1); }
+    if (y2 < minY) { minY = (int)std::floor(y2); }
+
+    int maxY = (int)std::ceil(y0);
+    if (y1 > maxY) { maxY = (int)std::ceil(y1); }
+    if (y2 > maxY) { maxY = (int)std::ceil(y2); }
+
+    // Clamp to framebuffer
+    if (minX < 0) minX = 0;
+    if (minY < 0) minY = 0;
+    if (maxX >= m_backbuffer->m_width)  maxX = m_backbuffer->m_width - 1;
+    if (maxY >= m_backbuffer->m_height) maxY = m_backbuffer->m_height - 1;
+
+    // Signed area
+    float area =
+        (x1 - x0) * (y2 - y0) -
+        (y1 - y0) * (x2 - x0);
+
+    if (area == 0.0f)
+        return;
+
+    float invArea = 1.0f / area;
+
+    for (int y = minY; y <= maxY; ++y)
+    {
+        for (int x = minX; x <= maxX; ++x)
+        {
+            float px = (float)x + 0.5f;
+            float py = (float)y + 0.5f;
+
+            float w0 =
+                ((x1 - px) * (y2 - py) -
+                 (y1 - py) * (x2 - px)) * invArea;
+
+            float w1 =
+                ((x2 - px) * (y0 - py) -
+                 (y2 - py) * (x0 - px)) * invArea;
+
+            float w2 =
+                1.0f - w0 - w1;
+
+            // Inside test
+            if (w0 >= 0.0f && w1 >= 0.0f && w2 >= 0.0f)
+            {
+                float depth =
+                    (z0 * w0) +
+                    (z1 * w1) +
+                    (z2 * w2);
+
+                this->drawPixel(x, y, depth, color);
+            }
+        }
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

@@ -91,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         }
         for(int i = 0; i < 6; i += 3)
         {
-            renderer.drawTrigngle
+            renderer.drawTriangle
             (
                 screen[indices[i + 0]],
                 screen[indices[i + 1]],
