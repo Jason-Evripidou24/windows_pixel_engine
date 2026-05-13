@@ -22,7 +22,8 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Backbuffer::Backbuffer()
 {
-    m_memory = nullptr;
+    m_color_buffer = nullptr;
+    m_depth_buffer = nullptr;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -38,10 +39,17 @@ Backbuffer::~Backbuffer()
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Backbuffer::free()
 {
-    if(m_memory == nullptr) { return; }
+    if(m_color_buffer != nullptr)
+    {
+        VirtualFree(m_color_buffer, 0, MEM_RELEASE);
+        m_color_buffer = nullptr;
+    }
 
-    VirtualFree(m_memory, 0, MEM_RELEASE);
-    m_memory = nullptr;
+    if(m_depth_buffer != nullptr)
+    {
+        VirtualFree(m_depth_buffer, 0, MEM_RELEASE);
+        m_depth_buffer = nullptr;
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -63,12 +71,20 @@ void Backbuffer::resize(int width, int height)
     m_bitmapinfo.bmiHeader.biBitCount = 32;
     m_bitmapinfo.bmiHeader.biCompression = BI_RGB;
 
-    size_t size = width * height * sizeof(Pixel);
-
-    m_memory = (Pixel*)VirtualAlloc
+    size_t color_buffer_size = width * height * sizeof(Pixel);
+    m_color_buffer = (Pixel*)VirtualAlloc
     (
         0,
-        size,
+        color_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
+
+    size_t depth_buffer_size = width * height * sizeof(float);
+    m_depth_buffer = (float*)VirtualAlloc
+    (
+        0,
+        depth_buffer_size,
         MEM_COMMIT | MEM_RESERVE,
         PAGE_READWRITE
     );
@@ -83,18 +99,25 @@ void Backbuffer::clear(Pixel color)
 
     for(int i = 0; i < count; i++)
     {
-        m_memory[i] = color;
+        m_color_buffer[i] = color;
+        m_depth_buffer[i] = 1.0f; // far plane.
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Backbuffer::setPixel(int x, int y, Pixel color)
+void Backbuffer::setPixel(int x, int y, float depth, Pixel color)
 {
     if( (x < 0) || (x >= m_width) || (y < 0) || (y >= m_height) ) { return; }
 
-    m_memory[(y * m_width) + x] = color;
+    int index = (y * m_width) + x;
+    
+    if(depth < m_depth_buffer[index])
+    {
+        m_color_buffer[(y * m_width) + x] = color;
+        m_depth_buffer[(y * m_width) + x] = depth;
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -102,7 +125,7 @@ void Backbuffer::setPixel(int x, int y, Pixel color)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Pixel& Backbuffer::getPixel(int x, int y)
 {
-    return m_memory[y * m_width + x];
+    return m_color_buffer[y * m_width + x];
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -121,7 +144,7 @@ void Backbuffer::present(HDC dc, int window_width, int window_height)
         0,
         m_width,
         m_height,
-        m_memory,
+        m_color_buffer,
         &m_bitmapinfo,
         DIB_RGB_COLORS,
         SRCCOPY

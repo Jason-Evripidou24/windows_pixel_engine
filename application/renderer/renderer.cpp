@@ -3,6 +3,7 @@
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include <algorithm>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -36,72 +37,81 @@ void Renderer::clear(const Pixel& color)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawPixel(int x, int y, const Pixel& color)
+void Renderer::drawPixel(int x, int y, float depth, const Pixel& color)
 {
-    m_backbuffer->setPixel(x, y, color);
+    m_backbuffer->setPixel(x, y, depth, color);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawLine(int x0, int y0, int x1, int y1, const Pixel& color)
+/*
+-   Each Vec3_f represents a screen coord vertex (x_screen, y_screen, z == depth)
+*/
+void Renderer::drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color)
 {
-    int dx = std::abs(x1 - x0);
-    int dy = std::abs(y1 - y0);
+    int ax = (int)std::round(a.m_data[0]);
+    int ay = (int)std::round(a.m_data[1]);
 
-    int sx = (x0 < x1) ? 1 : -1;
-    int sy = (y0 < y1) ? 1 : -1;
+    int bx = (int)std::round(b.m_data[0]);
+    int by = (int)std::round(b.m_data[1]);
+
+    float az = a.m_data[2];
+    float bz = b.m_data[2];
+
+    int dx = std::abs(bx - ax);
+    int dy = std::abs(by - ay);
+
+    int sx = (ax < bx) ? 1 : -1;
+    int sy = (ay < by) ? 1 : -1;
 
     int err = dx - dy;
 
-    while (true)
-    {
-        this->drawPixel(x0, y0, color);
+    int steps = dx; if(dy > dx) { steps = dy; }
 
-        if (x0 == x1 && y0 == y1)
+    float t = 0.0f;
+    float dt = (steps == 0) ? 0.0f : 1.0f / steps;
+
+    while(true)
+    {
+        float depth = az + (bz - az) * t;
+
+        this->drawPixel(ax, ay, depth, color);
+
+        if( (ax == bx) && (ay == by) )
+        {
             break;
+        }
 
         int e2 = 2 * err;
 
-        if (e2 > -dy)
+        if(e2 > -dy)
         {
             err -= dy;
-            x0 += sx;
+            ax += sx;
         }
 
-        if (e2 < dx)
+        if(e2 < dx)
         {
             err += dx;
-            y0 += sy;
+            ay += sy;
         }
+
+        t += dt;
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawRect(int x, int y, int w, int h, const Pixel& color)
+/*
+-   Each Vec3_f represents a screen coord vertex (x == x_screen_coord, y == y_screen_coord, z == depth)
+*/
+void Renderer::drawTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color)
 {
-    this->drawLine(x,     y,     x + w, y,     color); // top
-    this->drawLine(x + w, y,     x + w, y + h, color); // right
-    this->drawLine(x + w, y + h, x,     y + h, color); // bottom
-    this->drawLine(x,     y + h, x,     y,     color); // left
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawFilledRect(int x, int y, int w, int h, const Pixel& color)
-{
-    for(int j = 0; j < h; j++)
-    {
-        int py = y + j;
-
-        for(int i = 0; i < w; i++)
-        {
-            this->drawPixel(x + i, py, color);
-        }
-    }
+    this->drawLine(a, b, color);
+    this->drawLine(b, c, color);
+    this->drawLine(c, a, color);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -116,14 +126,14 @@ void Renderer::drawCircle(int cx, int cy, int r, const Pixel& color)
     while (x >= y)
     {
         // 8-way symmetry
-        this->drawPixel(cx + x, cy + y, color);
-        this->drawPixel(cx + y, cy + x, color);
-        this->drawPixel(cx - y, cy + x, color);
-        this->drawPixel(cx - x, cy + y, color);
-        this->drawPixel(cx - x, cy - y, color);
-        this->drawPixel(cx - y, cy - x, color);
-        this->drawPixel(cx + y, cy - x, color);
-        this->drawPixel(cx + x, cy - y, color);
+        this->drawPixel(cx + x, cy + y, 0.0f, color);
+        this->drawPixel(cx + y, cy + x, 0.0f, color);
+        this->drawPixel(cx - y, cy + x, 0.0f, color);
+        this->drawPixel(cx - x, cy + y, 0.0f, color);
+        this->drawPixel(cx - x, cy - y, 0.0f, color);
+        this->drawPixel(cx - y, cy - x, 0.0f, color);
+        this->drawPixel(cx + y, cy - x, 0.0f, color);
+        this->drawPixel(cx + x, cy - y, 0.0f, color);
 
         y++;
 
@@ -154,7 +164,7 @@ void Renderer::drawFilledCircle(int cx, int cy, int r, const Pixel& color)
 
         for (int x = xStart; x <= xEnd; x++)
         {
-            drawPixel(x, py, color);
+            drawPixel(x, py, 0.0f, color);
         }
     }
 }

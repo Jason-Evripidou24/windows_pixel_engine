@@ -20,6 +20,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../backbuffer/backbuffer.hpp"
 #include "../pixel/pixel.hpp"
+#include "../math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -39,12 +40,10 @@ struct Renderer
     void init(Backbuffer* backbuffer);
     void clear(const Pixel& color);
 
-    void drawPixel(int x, int y, const Pixel& color);
+    void drawPixel(int x, int y, float depth, const Pixel& color);
 
-    void drawLine(int x0, int y0, int x1, int y1, const Pixel& color);
-
-    void drawRect(int x, int y, int w, int h, const Pixel& color);
-    void drawFilledRect(int x, int y, int w, int h, const Pixel& color);
+    void drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color);
+    void drawTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color);
 
     void drawCircle(int cx, int cy, int r, const Pixel& color);
     void drawFilledCircle(int cx, int cy, int r, const Pixel& color);

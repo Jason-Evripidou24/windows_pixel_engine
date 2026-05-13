@@ -5,6 +5,8 @@
 #include "../input/input.hpp"
 #include "../pixel/pixel.hpp"
 #include "../timer/timer.hpp"
+#include "../math/vec2/vec2_f.hpp"
+#include "../math/math.hpp"
 
 struct Player
 {
@@ -49,17 +51,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         // -----------------------------------
         // Movement (frame-independent)
         // -----------------------------------
-        if (input.isKeyDown(VK_LEFT) || input.isKeyDown('A'))
-            player.x -= moveSpeed * dt;
-
-        if (input.isKeyDown(VK_RIGHT) || input.isKeyDown('D'))
-            player.x += moveSpeed * dt;
-
-        if (input.isKeyDown(VK_UP) || input.isKeyDown('W'))
-            player.y -= moveSpeed * dt;
-
-        if (input.isKeyDown(VK_DOWN) || input.isKeyDown('S'))
-            player.y += moveSpeed * dt;
+        if(input.isKeyDown(VK_LEFT) || input.isKeyDown('A')) { player.x -= moveSpeed * dt; }
+        if(input.isKeyDown(VK_RIGHT) || input.isKeyDown('D')) { player.x += moveSpeed * dt; }
+        if(input.isKeyDown(VK_UP) || input.isKeyDown('W')) { player.y -= moveSpeed * dt; }
+        if(input.isKeyDown(VK_DOWN) || input.isKeyDown('S')) { player.y += moveSpeed * dt; }
 
         // -----------------------------------
         // Render
@@ -69,21 +64,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         hud.drawText(renderer, 10, 10, std::to_string(timer.fps).c_str(), Pixel(0, 255, 0, 0), ascii_font);
         hud.drawText(renderer, 10, 20, "hello this is jason", Pixel(0, 255, 0, 0), ascii_font);
 
-        renderer.drawFilledRect(
-            (int)player.x,
-            (int)player.y,
-            50,
-            50,
-            Pixel(0, 255, 0, 0)
-        );
+        renderer.drawCircle( (int)player.x + 25, (int)player.y + 25, 25, Pixel(0, 0, 255, 0) );
 
-        renderer.drawCircle(
-            (int)player.x + 25,
-            (int)player.y + 25,
-            25,
-            Pixel(0, 0, 255, 0)
-        );
+        Vec3_f vertices[4] =
+        {
+            { -0.5f, -0.5f, 0.5f },
+            {  0.5f, -0.5f, 0.5f },
+            {  0.5f,  0.5f, 0.5f },
+            { -0.5f,  0.5f, 0.5f }
+        };
+        int indices[6] =
+        {
+            0, 1, 2,   // triangle 1
+            2, 3, 0    // triangle 2
+        };
 
+        Vec3_f screen[4];
+        for (int i = 0; i < 4; i++)
+        {
+            screen[i] = Math::normalisedDeviceCoordsToScreenCoords
+            (
+                vertices[i],
+                window.m_backbuffer.m_width,
+                window.m_backbuffer.m_height
+            );
+        }
+        for(int i = 0; i < 6; i += 3)
+        {
+            renderer.drawTrigngle
+            (
+                screen[indices[i + 0]],
+                screen[indices[i + 1]],
+                screen[indices[i + 2]],
+                Pixel(0, 255, 255, 0)
+            );
+        }
+    
         window.present();
     }
 

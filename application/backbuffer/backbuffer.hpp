@@ -32,7 +32,8 @@ struct Backbuffer
     //---------------------------------------------------------------------------------------------------------------------//
     BITMAPINFO m_bitmapinfo;
 
-    Pixel* m_memory;
+    Pixel* m_color_buffer;
+    float* m_depth_buffer;
 
     int m_width;
     int m_height;
@@ -49,7 +50,7 @@ struct Backbuffer
     void resize(int width, int height);
 
     void clear(Pixel color);
-    void setPixel(int x, int y, Pixel color);
+    void setPixel(int x, int y, float depth, Pixel color);
     Pixel& getPixel(int x, int y);
 
     void present(HDC dc, int w, int h);
