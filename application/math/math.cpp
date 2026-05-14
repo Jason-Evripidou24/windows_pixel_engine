@@ -118,8 +118,6 @@ Mat4_f Math::scaleMat4_f(const float x, const float y, const float z)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Mat4_f Math::perspectiveMat4_f(const float fov_radians, const float aspect_ratio, const float near, const float far)
 {
-    return Math::identityMat4_f();
-    /*
     if( (near <= 0.0f) || (far <= near) ) { return Math::identityMat4_f(); }
 
     Mat4_f new_mat;
@@ -139,15 +137,14 @@ Mat4_f Math::perspectiveMat4_f(const float fov_radians, const float aspect_ratio
     new_mat.m_data[8]  = 0.0f;
     new_mat.m_data[9]  = 0.0f;
     new_mat.m_data[10] = (far + near) / (near - far);
-    new_mat.m_data[11] = -1.0f;
+    new_mat.m_data[11] = (2.0f * far * near) / (near - far);
 
     new_mat.m_data[12] = 0.0f;
     new_mat.m_data[13] = 0.0f;
-    new_mat.m_data[14] = (2.0f * far * near) / (near - far);
+    new_mat.m_data[14] = -1.0f;
     new_mat.m_data[15] = 0.0f;
 
     return new_mat;
-    */
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

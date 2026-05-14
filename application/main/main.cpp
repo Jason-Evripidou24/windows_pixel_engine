@@ -83,16 +83,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Math testing.
         //-----------------------------------------------------------------------------------------------------------------//
-        Mat4_f identity = Math::identityMat4_f();
-        hud.drawMat4_f(renderer, 10, 40, identity, Pixel(0, 255, 0, 0), ascii_font);
-
         static float x_pos = 0.0f;
         static float y_pos = 0.0f;
+        static float z_pos = 0.0f;
         if(input.isKeyDown('A')) { x_pos -= dt; }
         if(input.isKeyDown('D')) { x_pos += dt; }
         if(input.isKeyDown('W')) { y_pos += dt; }
         if(input.isKeyDown('S')) { y_pos -= dt; }
-        Mat4_f translate = Math::translationMat4_f(x_pos, y_pos, 0.0f);
+        if(input.isKeyDown('Q')) { z_pos += dt; }
+        if(input.isKeyDown('E')) { z_pos -= dt; }
+        Mat4_f translate = Math::translationMat4_f(x_pos, y_pos, z_pos);
         hud.drawMat4_f(renderer, 10, 90, translate, Pixel(0, 255, 0, 0), ascii_font);
 
         static float scale_factor = 1.0f;
@@ -103,13 +103,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         hud.drawMat4_f(renderer, 10, 140, scale, Pixel(0, 255, 0, 0), ascii_font);
 
         static float theta_rads = 0.0f;
-        if(input.isKeyDown('Q')) { theta_rads += dt; }
-        if(input.isKeyDown('E')) { theta_rads -= dt; }
+        if(input.isKeyDown(VK_LEFT)) { theta_rads += dt; }
+        if(input.isKeyDown(VK_RIGHT)) { theta_rads -= dt; }
         if(theta_rads >= 6.2831853f) { theta_rads -= 6.2831853f; }
         if(theta_rads <= -6.2831853f) { theta_rads += 6.2831853f; }
-        //Mat4_f rotate = Math::rotationMat4_f(0.0f, 0.0f, 1.0f, theta_rads);
-        Mat4_f rotate = Math::rotationMat4_f(0.0f, 1.0f, 0.0f, theta_rads);
-        //Mat4_f rotate = Math::rotationMat4_f(0.0f, 0.0f, 1.0f, theta_rads);
+        Mat4_f rotate = Math::rotationMat4_f(1.0f, 0.0f, 0.0f, theta_rads);
         hud.drawMat4_f(renderer, 10, 190, rotate, Pixel(0, 255, 0, 0), ascii_font);
 
         Mat4_f model = Math::multiply(Math::multiply(translate, scale), rotate);
@@ -117,12 +115,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Mat4_f perspective = Math::perspectiveMat4_f
         (
             0.785398f,
-            window.m_backbuffer.m_height / window.m_backbuffer.m_width,
+            window.m_backbuffer.m_width / window.m_backbuffer.m_height,
             0.1f,
             100.0f
         );
 
-        Mat4_f transform = model;
+        //Mat4_f transform = Math::multiply(model, perspective);
+        Mat4_f transform = Math::multiply(perspective, model);
         //-----------------------------------------------------------------------------------------------------------------//
 
         Vec4_f clip_vertices[4];
