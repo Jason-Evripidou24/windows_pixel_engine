@@ -61,17 +61,17 @@ void Backbuffer::resize(int width, int height)
 
     m_width  = width;
     m_height = height;
-    m_pitch  = width * sizeof(Pixel);
+    m_pitch  = m_width * sizeof(Pixel);
 
     m_bitmapinfo = {};
     m_bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    m_bitmapinfo.bmiHeader.biWidth = width;
-    m_bitmapinfo.bmiHeader.biHeight = -height; // top-down
+    m_bitmapinfo.bmiHeader.biWidth = m_width;
+    m_bitmapinfo.bmiHeader.biHeight = -m_height; // top-down
     m_bitmapinfo.bmiHeader.biPlanes = 1;
     m_bitmapinfo.bmiHeader.biBitCount = 32;
     m_bitmapinfo.bmiHeader.biCompression = BI_RGB;
 
-    size_t color_buffer_size = width * height * sizeof(Pixel);
+    size_t color_buffer_size = m_width * m_height * sizeof(Pixel);
     m_color_buffer = (Pixel*)VirtualAlloc
     (
         0,
@@ -80,7 +80,7 @@ void Backbuffer::resize(int width, int height)
         PAGE_READWRITE
     );
 
-    size_t depth_buffer_size = width * height * sizeof(float);
+    size_t depth_buffer_size = m_width * m_height * sizeof(float);
     m_depth_buffer = (float*)VirtualAlloc
     (
         0,
