@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         hud.drawText(renderer, 10, 10, "FPS:", Pixel(0, 255, 0, 0), ascii_font);
         hud.drawText(renderer, 60, 10, std::to_string(timer.fps).c_str(), Pixel(0, 255, 0, 0), ascii_font);
 
-        renderer.drawFilledCircle( (int)player.x + 25, (int)player.y + 25, 25, Pixel(0, 0, 255, 0) );
+        //renderer.drawFilledCircle( (int)player.x + 25, (int)player.y + 25, 25, Pixel(0, 0, 255, 0) );
 
         Vec4_f vertices[4] =
         {
@@ -125,9 +125,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             0.1f,
             100.0f
         );
+        hud.drawMat4_f(renderer, 10, 240, perspective, Pixel(0, 255, 0, 0), ascii_font);
 
         //Mat4_f transform = Math::multiply(model, perspective);
         Mat4_f transform = Math::multiply(perspective, model);
+        hud.drawMat4_f(renderer, 10, 290, transform, Pixel(0, 255, 0, 0), ascii_font);
         //-----------------------------------------------------------------------------------------------------------------//
 
         Vec4_f clip_vertices[4];
