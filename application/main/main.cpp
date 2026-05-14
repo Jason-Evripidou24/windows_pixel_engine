@@ -87,10 +87,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Mat4_f identity = Math::identityMat4_f();
         hud.drawMat4_f(renderer, 10, 40, identity, Pixel(0, 255, 0, 0), ascii_font);
 
-        Mat4_f translate = Math::translationMat4_f(0.0f, 0.0f, 0.0f);
+        Mat4_f translate = Math::translationMat4_f(0.5f, -0.5f, 0.0f);
         hud.drawMat4_f(renderer, 10, 90, translate, Pixel(0, 255, 0, 0), ascii_font);
 
-        Mat4_f scale = Math::scaleMat4_f(0.5f, 0.5f, 0.5f);
+        Mat4_f scale = Math::scaleMat4_f(1.0f, 1.0f, 1.0f);
         hud.drawMat4_f(renderer, 10, 140, scale, Pixel(0, 255, 0, 0), ascii_font);
 
         static float theta_rads = 0.0f;
@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Mat4_f rotate = Math::rotationMat4_f(0.0f, 0.0f, 1.0f, theta_rads);
         hud.drawMat4_f(renderer, 10, 190, rotate, Pixel(0, 255, 0, 0), ascii_font);
 
-        Mat4_f transform = Math::multiply(scale, rotate);
+        Mat4_f transform = Math::multiply(Math::multiply(scale, translate), rotate);
         //-----------------------------------------------------------------------------------------------------------------//
 
         Vec4_f clip_vertices[4];
@@ -107,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         {
             clip_vertices[i] =
             (
-                Math::multiply(vertices[i], transform)
+                Math::multiply(transform, vertices[i])
             );
         }
 
