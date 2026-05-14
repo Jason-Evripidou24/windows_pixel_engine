@@ -7,6 +7,7 @@
 #include "../timer/timer.hpp"
 #include "../math/vec2/vec2_f.hpp"
 #include "../math/math.hpp"
+#include "../object/object.hpp"
 
 struct Player
 {
@@ -35,6 +36,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     AsciiFont ascii_font;
     Hud hud;
+
+    Object cube_object = Object::createCube();
 
     while(window.processMessages())
     {
@@ -92,6 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(input.isKeyDown('S')) { y_pos -= dt; }
         if(input.isKeyDown('Q')) { z_pos += dt; }
         if(input.isKeyDown('E')) { z_pos -= dt; }
+        cube_object.m_position = Vec3_f(x_pos, y_pos, z_pos);
         Mat4_f translate = Math::translationMat4_f(x_pos, y_pos, z_pos);
         hud.drawMat4_f(renderer, 10, 90, translate, Pixel(0, 255, 0, 0), ascii_font);
 
@@ -99,6 +103,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(input.isKeyDown(VK_UP)) { scale_factor += dt; }
         if(input.isKeyDown(VK_DOWN)) { scale_factor -= dt; }
         if(scale_factor < 0.1f) { scale_factor = 0.1f; } 
+        cube_object.m_scale = Vec3_f(scale_factor, scale_factor, scale_factor);
         Mat4_f scale = Math::scaleMat4_f(scale_factor, scale_factor, scale_factor);
         hud.drawMat4_f(renderer, 10, 140, scale, Pixel(0, 255, 0, 0), ascii_font);
 
@@ -107,6 +112,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(input.isKeyDown(VK_RIGHT)) { theta_rads -= dt; }
         if(theta_rads >= 6.2831853f) { theta_rads -= 6.2831853f; }
         if(theta_rads <= -6.2831853f) { theta_rads += 6.2831853f; }
+        cube_object.m_rotation_theta_radians = theta_rads;
         Mat4_f rotate = Math::rotationMat4_f(1.0f, 0.0f, 0.0f, theta_rads);
         hud.drawMat4_f(renderer, 10, 190, rotate, Pixel(0, 255, 0, 0), ascii_font);
 
@@ -163,6 +169,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
                 Pixel(0, 255, 255, 0)
             );
         }
+
+        renderer.drawObject(cube_object, Math::identityMat4_f(), perspective, Pixel(123, 39, 221, 0));
     
         window.present();
     }

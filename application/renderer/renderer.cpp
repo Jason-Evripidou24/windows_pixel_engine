@@ -78,10 +78,7 @@ void Renderer::drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color)
 
         this->drawPixel(ax, ay, depth, color);
 
-        if( (ax == bx) && (ay == by) )
-        {
-            break;
-        }
+        if( (ax == bx) && (ay == by) ) { break; }
 
         int e2 = 2 * err;
 
@@ -149,18 +146,14 @@ void Renderer::drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2
     if (y2 > maxY) { maxY = (int)std::ceil(y2); }
 
     // Clamp to framebuffer
-    if (minX < 0) minX = 0;
-    if (minY < 0) minY = 0;
-    if (maxX >= m_backbuffer->m_width)  maxX = m_backbuffer->m_width - 1;
-    if (maxY >= m_backbuffer->m_height) maxY = m_backbuffer->m_height - 1;
+    if(minX < 0) { minX = 0; }
+    if(minY < 0) { minY = 0; }
+    if(maxX >= m_backbuffer->m_width)  { maxX = m_backbuffer->m_width - 1; }
+    if(maxY >= m_backbuffer->m_height) { maxY = m_backbuffer->m_height - 1; }
 
     // Signed area
-    float area =
-        (x1 - x0) * (y2 - y0) -
-        (y1 - y0) * (x2 - x0);
-
-    if (area == 0.0f)
-        return;
+    float area = ((x1 - x0) * (y2 - y0)) - ((y1 - y0) * (x2 - x0));
+    if(area == 0.0f) { return; }
 
     float invArea = 1.0f / area;
 
@@ -171,28 +164,58 @@ void Renderer::drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2
             float px = (float)x + 0.5f;
             float py = (float)y + 0.5f;
 
-            float w0 =
-                ((x1 - px) * (y2 - py) -
-                 (y1 - py) * (x2 - px)) * invArea;
+            float w0 = (((x1 - px) * (y2 - py)) - ((y1 - py) * (x2 - px))) * invArea;
 
-            float w1 =
-                ((x2 - px) * (y0 - py) -
-                 (y2 - py) * (x0 - px)) * invArea;
+            float w1 = (((x2 - px) * (y0 - py)) - ((y2 - py) * (x0 - px))) * invArea;
 
-            float w2 =
-                1.0f - w0 - w1;
+            float w2 = 1.0f - w0 - w1;
 
             // Inside test
-            if (w0 >= 0.0f && w1 >= 0.0f && w2 >= 0.0f)
+            if(w0 >= 0.0f && w1 >= 0.0f && w2 >= 0.0f)
             {
-                float depth =
-                    (z0 * w0) +
-                    (z1 * w1) +
-                    (z2 * w2);
-
+                float depth = (z0 * w0) + (z1 * w1) + (z2 * w2);
                 this->drawPixel(x, y, depth, color);
             }
         }
+    }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Renderer::drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat, const Pixel& color)
+{
+    const Mat4_f model_mat = object.calcModelMatrix();
+
+    Mat4_f transform = Math::multiply(proj_mat, model_mat);
+
+    for(int i = 0; i < object.m_vertex_count; i++)
+    {
+        object.m_clip[i] = Math::multiply(transform, object.m_vertices[i]);
+    }
+    for(int i = 0; i < object.m_vertex_count; i++)
+    {
+        object.m_ndc[i] = Math::clipCoordsToNormalisedDeviceCoords(object.m_clip[i]);
+    }
+    for(int i = 0; i < object.m_vertex_count; i++)
+    {
+        object.m_screen[i] = Math::normalisedDeviceCoordsToScreenCoords
+        (
+            object.m_ndc[i],
+            m_backbuffer->m_width,
+            m_backbuffer->m_height
+        );
+    }
+
+    for(int i = 0; i < object.m_index_count; i += 3)
+    {
+        this->drawWireframeTrigngle
+        (
+            object.m_screen[object.m_indices[i + 0]],
+            object.m_screen[object.m_indices[i + 1]],
+            object.m_screen[object.m_indices[i + 2]],
+            color
+        );
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
