@@ -183,38 +183,38 @@ void Renderer::drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat, const Pixel& color)
+void Renderer::drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat)
 {
     const Mat4_f model_mat = object.calcModelMatrix();
 
     Mat4_f transform = Math::multiply(proj_mat, model_mat);
 
-    for(int i = 0; i < object.m_vertex_count; i++)
+    for(int i = 0; i < object.m_mesh->m_vertex_count; i++)
     {
-        object.m_clip[i] = Math::multiply(transform, object.m_vertices[i]);
+        object.m_mesh->m_clip[i] = Math::multiply(transform, object.m_mesh->m_vertices[i]);
     }
-    for(int i = 0; i < object.m_vertex_count; i++)
+    for(int i = 0; i < object.m_mesh->m_vertex_count; i++)
     {
-        object.m_ndc[i] = Math::clipCoordsToNormalisedDeviceCoords(object.m_clip[i]);
+        object.m_mesh->m_ndc[i] = Math::clipCoordsToNormalisedDeviceCoords(object.m_mesh->m_clip[i]);
     }
-    for(int i = 0; i < object.m_vertex_count; i++)
+    for(int i = 0; i < object.m_mesh->m_vertex_count; i++)
     {
-        object.m_screen[i] = Math::normalisedDeviceCoordsToScreenCoords
+        object.m_mesh->m_screen[i] = Math::normalisedDeviceCoordsToScreenCoords
         (
-            object.m_ndc[i],
+            object.m_mesh->m_ndc[i],
             m_backbuffer->m_width,
             m_backbuffer->m_height
         );
     }
 
-    for(int i = 0; i < object.m_index_count; i += 3)
+    for(int i = 0; i < object.m_mesh->m_index_count; i += 3)
     {
         this->drawWireframeTrigngle
         (
-            object.m_screen[object.m_indices[i + 0]],
-            object.m_screen[object.m_indices[i + 1]],
-            object.m_screen[object.m_indices[i + 2]],
-            color
+            object.m_mesh->m_screen[object.m_mesh->m_indices[i + 0]],
+            object.m_mesh->m_screen[object.m_mesh->m_indices[i + 1]],
+            object.m_mesh->m_screen[object.m_mesh->m_indices[i + 2]],
+            object.m_color
         );
     }
 }

@@ -46,7 +46,7 @@ struct Renderer
     void drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color);
     void drawWireframeTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color);
     void drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2, const Pixel& color);
-    void drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat, const Pixel& color);
+    void drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat);
 
     void drawCircle(int cx, int cy, int r, const Pixel& color);
     void drawFilledCircle(int cx, int cy, int r, const Pixel& color);

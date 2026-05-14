@@ -8,6 +8,7 @@
 #include "../math/vec2/vec2_f.hpp"
 #include "../math/math.hpp"
 #include "../object/object.hpp"
+#include "../object/mesh.hpp"
 
 struct Player
 {
@@ -37,7 +38,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     AsciiFont ascii_font;
     Hud hud;
 
-    Object cube_object = Object::createCube();
+    Mesh cube_mesh = Mesh::createCubeMesh();
+    Object cube_object = Object(&cube_mesh);
 
     while(window.processMessages())
     {
@@ -68,23 +70,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         hud.drawText(renderer, 10, 10, "FPS:", Pixel(0, 255, 0, 0), ascii_font);
         hud.drawText(renderer, 60, 10, std::to_string(timer.fps).c_str(), Pixel(0, 255, 0, 0), ascii_font);
 
-        //renderer.drawFilledCircle( (int)player.x + 25, (int)player.y + 25, 25, Pixel(0, 0, 255, 0) );
-
-        Vec4_f vertices[4] =
-        {
-            { -0.5f, -0.5f, 0.0f, 1.0f },
-            {  0.5f, -0.5f, 0.0f, 1.0f },
-            {  0.5f,  0.5f, 0.0f, 1.0f },
-            { -0.5f,  0.5f, 0.0f, 1.0f }
-        };
-        int indices[6] =
-        {
-            0, 1, 2,   // triangle 1
-            2, 3, 0    // triangle 2
-        };
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        // Math testing.
         //-----------------------------------------------------------------------------------------------------------------//
         static float x_pos = 0.0f;
         static float y_pos = 0.0f;
@@ -96,16 +81,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(input.isKeyDown('Q')) { z_pos += dt; }
         if(input.isKeyDown('E')) { z_pos -= dt; }
         cube_object.m_position = Vec3_f(x_pos, y_pos, z_pos);
-        Mat4_f translate = Math::translationMat4_f(x_pos, y_pos, z_pos);
-        hud.drawMat4_f(renderer, 10, 90, translate, Pixel(0, 255, 0, 0), ascii_font);
 
         static float scale_factor = 1.0f;
         if(input.isKeyDown(VK_UP)) { scale_factor += dt; }
         if(input.isKeyDown(VK_DOWN)) { scale_factor -= dt; }
         if(scale_factor < 0.1f) { scale_factor = 0.1f; } 
         cube_object.m_scale = Vec3_f(scale_factor, scale_factor, scale_factor);
-        Mat4_f scale = Math::scaleMat4_f(scale_factor, scale_factor, scale_factor);
-        hud.drawMat4_f(renderer, 10, 140, scale, Pixel(0, 255, 0, 0), ascii_font);
 
         static float theta_rads = 0.0f;
         if(input.isKeyDown(VK_LEFT)) { theta_rads += dt; }
@@ -113,10 +94,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(theta_rads >= 6.2831853f) { theta_rads -= 6.2831853f; }
         if(theta_rads <= -6.2831853f) { theta_rads += 6.2831853f; }
         cube_object.m_rotation_theta_radians = theta_rads;
-        Mat4_f rotate = Math::rotationMat4_f(1.0f, 0.0f, 0.0f, theta_rads);
-        hud.drawMat4_f(renderer, 10, 190, rotate, Pixel(0, 255, 0, 0), ascii_font);
-
-        Mat4_f model = Math::multiply(Math::multiply(translate, scale), rotate);
 
         Mat4_f perspective = Math::perspectiveMat4_f
         (
@@ -125,56 +102,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             0.1f,
             100.0f
         );
-        hud.drawMat4_f(renderer, 10, 240, perspective, Pixel(0, 255, 0, 0), ascii_font);
 
-        //Mat4_f transform = Math::multiply(model, perspective);
-        Mat4_f transform = Math::multiply(perspective, model);
-        hud.drawMat4_f(renderer, 10, 290, transform, Pixel(0, 255, 0, 0), ascii_font);
-        //-----------------------------------------------------------------------------------------------------------------//
-
-        Vec4_f clip_vertices[4];
-        for(int i = 0; i < 4; i++)
-        {
-            clip_vertices[i] =
-            (
-                Math::multiply(transform, vertices[i])
-            );
-        }
-
-        Vec3_f ndc_vertices[4];
-        for(int i = 0; i < 4; i++)
-        {
-            ndc_vertices[i] =
-            (
-                Math::clipCoordsToNormalisedDeviceCoords(clip_vertices[i])
-            );
-        }
-
-        Vec3_f screen[4];
-        for(int i = 0; i < 4; i++)
-        {
-            screen[i] = Math::normalisedDeviceCoordsToScreenCoords
-            (
-                ndc_vertices[i],
-                window.m_backbuffer.m_width,
-                window.m_backbuffer.m_height
-            );
-        }
-        
-        for(int i = 0; i < 6; i += 3)
-        {
-            renderer.drawWireframeTrigngle
-            (
-                screen[indices[i + 0]],
-                screen[indices[i + 1]],
-                screen[indices[i + 2]],
-                Pixel(0, 255, 255, 0)
-            );
-        }
-
-        renderer.drawObject(cube_object, Math::identityMat4_f(), perspective, Pixel(123, 39, 221, 0));
+        renderer.drawObject(cube_object, Math::identityMat4_f(), perspective);
     
         window.present();
+        //-----------------------------------------------------------------------------------------------------------------//
     }
 
     window.destroy();
