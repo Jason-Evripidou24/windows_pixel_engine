@@ -45,6 +45,7 @@ namespace Math
     Mat4_f translationMat4_f(const float x, const float y, const float z);
     Mat4_f rotationMat4_f(const float axis_x, const float axis_y, const float axis_z, const float theta_rad);
     Mat4_f scaleMat4_f(const float x, const float y, const float z);
+    Mat4_f perspectiveMat4_f(const float fov_radians, const float aspect_ratio, const float near, const float far);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

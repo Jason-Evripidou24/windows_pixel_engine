@@ -7,7 +7,6 @@
 #include "../timer/timer.hpp"
 #include "../math/vec2/vec2_f.hpp"
 #include "../math/math.hpp"
-#include <iostream>
 
 struct Player
 {
@@ -70,10 +69,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         Vec4_f vertices[4] =
         {
-            { -0.5f, -0.5f, 0.5f, 1.0f },
-            {  0.5f, -0.5f, 0.5f, 1.0f },
-            {  0.5f,  0.5f, 0.5f, 1.0f },
-            { -0.5f,  0.5f, 0.5f, 1.0f }
+            { -0.5f, -0.5f, 0.0f, 1.0f },
+            {  0.5f, -0.5f, 0.0f, 1.0f },
+            {  0.5f,  0.5f, 0.0f, 1.0f },
+            { -0.5f,  0.5f, 0.0f, 1.0f }
         };
         int indices[6] =
         {
@@ -87,19 +86,43 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Mat4_f identity = Math::identityMat4_f();
         hud.drawMat4_f(renderer, 10, 40, identity, Pixel(0, 255, 0, 0), ascii_font);
 
-        Mat4_f translate = Math::translationMat4_f(0.5f, -0.5f, 0.0f);
+        static float x_pos = 0.0f;
+        static float y_pos = 0.0f;
+        if(input.isKeyDown('A')) { x_pos -= dt; }
+        if(input.isKeyDown('D')) { x_pos += dt; }
+        if(input.isKeyDown('W')) { y_pos += dt; }
+        if(input.isKeyDown('S')) { y_pos -= dt; }
+        Mat4_f translate = Math::translationMat4_f(x_pos, y_pos, 0.0f);
         hud.drawMat4_f(renderer, 10, 90, translate, Pixel(0, 255, 0, 0), ascii_font);
 
-        Mat4_f scale = Math::scaleMat4_f(1.0f, 1.0f, 1.0f);
+        static float scale_factor = 1.0f;
+        if(input.isKeyDown(VK_UP)) { scale_factor += dt; }
+        if(input.isKeyDown(VK_DOWN)) { scale_factor -= dt; }
+        if(scale_factor < 0.1f) { scale_factor = 0.1f; } 
+        Mat4_f scale = Math::scaleMat4_f(scale_factor, scale_factor, scale_factor);
         hud.drawMat4_f(renderer, 10, 140, scale, Pixel(0, 255, 0, 0), ascii_font);
 
         static float theta_rads = 0.0f;
-        theta_rads += dt;
+        if(input.isKeyDown('Q')) { theta_rads += dt; }
+        if(input.isKeyDown('E')) { theta_rads -= dt; }
         if(theta_rads >= 6.2831853f) { theta_rads -= 6.2831853f; }
-        Mat4_f rotate = Math::rotationMat4_f(0.0f, 0.0f, 1.0f, theta_rads);
+        if(theta_rads <= -6.2831853f) { theta_rads += 6.2831853f; }
+        //Mat4_f rotate = Math::rotationMat4_f(0.0f, 0.0f, 1.0f, theta_rads);
+        Mat4_f rotate = Math::rotationMat4_f(0.0f, 1.0f, 0.0f, theta_rads);
+        //Mat4_f rotate = Math::rotationMat4_f(0.0f, 0.0f, 1.0f, theta_rads);
         hud.drawMat4_f(renderer, 10, 190, rotate, Pixel(0, 255, 0, 0), ascii_font);
 
-        Mat4_f transform = Math::multiply(Math::multiply(scale, translate), rotate);
+        Mat4_f model = Math::multiply(Math::multiply(translate, scale), rotate);
+
+        Mat4_f perspective = Math::perspectiveMat4_f
+        (
+            0.785398f,
+            window.m_backbuffer.m_height / window.m_backbuffer.m_width,
+            0.1f,
+            100.0f
+        );
+
+        Mat4_f transform = model;
         //-----------------------------------------------------------------------------------------------------------------//
 
         Vec4_f clip_vertices[4];

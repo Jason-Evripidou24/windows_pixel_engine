@@ -116,6 +116,43 @@ Mat4_f Math::scaleMat4_f(const float x, const float y, const float z)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Mat4_f Math::perspectiveMat4_f(const float fov_radians, const float aspect_ratio, const float near, const float far)
+{
+    return Math::identityMat4_f();
+    /*
+    if( (near <= 0.0f) || (far <= near) ) { return Math::identityMat4_f(); }
+
+    Mat4_f new_mat;
+
+    float focal_length = 1.0f / tanf(fov_radians * 0.5f);
+
+    new_mat.m_data[0]  = focal_length / aspect_ratio;
+    new_mat.m_data[1]  = 0.0f;
+    new_mat.m_data[2]  = 0.0f;
+    new_mat.m_data[3]  = 0.0f;
+
+    new_mat.m_data[4]  = 0.0f;
+    new_mat.m_data[5]  = focal_length;
+    new_mat.m_data[6]  = 0.0f;
+    new_mat.m_data[7]  = 0.0f;
+
+    new_mat.m_data[8]  = 0.0f;
+    new_mat.m_data[9]  = 0.0f;
+    new_mat.m_data[10] = (far + near) / (near - far);
+    new_mat.m_data[11] = -1.0f;
+
+    new_mat.m_data[12] = 0.0f;
+    new_mat.m_data[13] = 0.0f;
+    new_mat.m_data[14] = (2.0f * far * near) / (near - far);
+    new_mat.m_data[15] = 0.0f;
+
+    return new_mat;
+    */
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Vec3_f Math::add(const Vec3_f& vec_l, const Vec3_f& vec_r)
 {
     Vec3_f new_vec;
