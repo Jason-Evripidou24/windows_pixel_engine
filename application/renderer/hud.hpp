@@ -21,6 +21,8 @@
 #include "font.hpp"
 #include "renderer.hpp"
 #include "../pixel/pixel.hpp"
+#include "../math/mat4/mat4_f.hpp"
+#include "../math/vec4/vec4_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -33,6 +35,10 @@ struct Hud
     //---------------------------------------------------------------------------------------------------------------------//
     void drawCharacter(Renderer& renderer, int x, int y, char character, const Pixel& color, AsciiFont& font) const;
     void drawText(Renderer& renderer, int x, int y, const char* text, const Pixel& color, AsciiFont& font) const;
+
+    void drawMat4_f(Renderer& renderer, int x, int y, const Mat4_f& mat, const Pixel& color, AsciiFont& font) const;
+    void drawVec4_fRow(Renderer& renderer, int x, int y, const Vec4_f& vec, const Pixel& color, AsciiFont& font) const;
+    void drawVec4_fCol(Renderer& renderer, int x, int y, const Vec4_f& vec, const Pixel& color, AsciiFont& font) const;
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

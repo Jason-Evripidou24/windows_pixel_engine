@@ -62,3 +62,69 @@ void Hud::drawText(Renderer& renderer, int x, int y, const char* text, const Pix
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Hud::drawMat4_f(Renderer& renderer, int x, int y, const Mat4_f& mat, const Pixel& color, AsciiFont& font) const
+{
+    char buffer[64];
+
+    for(int row = 0; row < 4; row++)
+    {
+        // Build one row as a string
+        // Example:
+        // [  1.00  0.00  0.00  0.50 ]
+        std::snprintf
+        (
+            buffer,
+            sizeof(buffer),
+            "[ %6.2f %6.2f %6.2f %6.2f ]",
+            mat.m_data[row * 4 + 0],
+            mat.m_data[row * 4 + 1],
+            mat.m_data[row * 4 + 2],
+            mat.m_data[row * 4 + 3]
+        );
+
+        // Draw the row
+        this->drawText(renderer, x, y + row * (font.glyph_height + 2), buffer, color, font);
+    }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Hud::drawVec4_fRow(Renderer& renderer, int x, int y, const Vec4_f& vec, const Pixel& color, AsciiFont& font) const
+{
+    char buffer[64];
+
+    std::snprintf
+    (
+        buffer,
+        sizeof(buffer),
+        "[ %6.2f %6.2f %6.2f %6.2f ]",
+        vec.m_data[0],
+        vec.m_data[1],
+        vec.m_data[2],
+        vec.m_data[3]
+    );
+
+    this->drawText(renderer, x, y, buffer, color, font);
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Hud::drawVec4_fCol(Renderer& renderer, int x, int y, const Vec4_f& vec, const Pixel& color, AsciiFont& font) const
+{
+    char buffer[32];
+
+    for (int row = 0; row < 4; row++)
+    {
+        // Format one value per line
+        std::snprintf(buffer, sizeof(buffer), "| %6.2f |", vec.m_data[row]);
+
+        // Draw this value on its own line
+        this->drawText(renderer, x, y + row * (font.glyph_height + 2), buffer, color, font);
+    }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
