@@ -150,6 +150,40 @@ Mat4_f Math::perspectiveMat4_f(const float fov_radians, const float aspect_ratio
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Mat4_f Math::lookAtMat4_f(const Vec3_f& position, const Vec3_f& front, const Vec3_f& right, const Vec3_f& up)
+{
+    Mat4_f new_mat;
+
+    float front_dot_pos = Math::dotProduct(front, position);
+    float right_dot_pos = Math::dotProduct(right, position);
+    float up_dot_pos = Math::dotProduct(up, position);
+
+    new_mat.m_data[0]   = right.m_data[0];
+    new_mat.m_data[1]   = right.m_data[1];
+    new_mat.m_data[2]   = right.m_data[2];
+    new_mat.m_data[3]   = -right_dot_pos;
+
+    new_mat.m_data[4]   = up.m_data[0];
+    new_mat.m_data[5]   = up.m_data[1];
+    new_mat.m_data[6]   = up.m_data[2];
+    new_mat.m_data[7]   = -up_dot_pos;
+
+    new_mat.m_data[8]   = -front.m_data[0];
+    new_mat.m_data[9]   = -front.m_data[1];
+    new_mat.m_data[10]  = -front.m_data[2];
+    new_mat.m_data[11]  = front_dot_pos;
+
+    new_mat.m_data[12]  = 0.0f;
+    new_mat.m_data[13]  = 0.0f;
+    new_mat.m_data[14]  = 0.0f;
+    new_mat.m_data[15]  = 1.0f;
+
+    return new_mat;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Vec3_f Math::add(const Vec3_f& vec_l, const Vec3_f& vec_r)
 {
     Vec3_f new_vec;

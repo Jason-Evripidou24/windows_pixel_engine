@@ -25,7 +25,7 @@ Object::Object(Mesh* mesh)
 {
     m_mesh = mesh;
 
-    m_position = {0.0f, 0.0f, -2.0f};
+    m_position = {0.0f, 0.0f, 0.0f};
     m_rotation = {0.0f, 0.0f, 1.0f};
     m_rotation_theta_radians = 0.0f;
     m_scale = {1.0f, 1.0f, 1.0f};

@@ -32,9 +32,11 @@ struct Mesh
 {
     //---------------------------------------------------------------------------------------------------------------------//
     std::vector<Vec4_f> m_vertices;
+
     std::vector<Vec4_f> m_clip;
     std::vector<Vec3_f> m_ndc;
     std::vector<Vec3_f> m_screen;
+
     int m_vertex_count;
 
     std::vector<int> m_indices;

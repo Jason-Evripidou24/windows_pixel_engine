@@ -61,6 +61,7 @@ void Backbuffer::resize(int width, int height)
 
     m_width  = width;
     m_height = height;
+    m_aspect_ratio = m_width / m_height;
     m_pitch  = m_width * sizeof(Pixel);
 
     m_bitmapinfo = {};

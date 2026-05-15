@@ -8,6 +8,7 @@
 #include "../math/vec2/vec2_f.hpp"
 #include "../math/math.hpp"
 #include "../object/object.hpp"
+#include "../camera/camera.hpp"
 #include "../object/mesh.hpp"
 
 struct Player
@@ -40,6 +41,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Mesh cube_mesh = Mesh::createCubeMesh();
     Object cube_object = Object(&cube_mesh);
+    cube_object.m_position.m_data[2] = -3.0f;
+
+    Camera camera(Vec3_f(0.0f, 0.0f, 0.0f), 0.0f, 1.5707963f, 0.0f, 0.785398f, 0.1f, 100.0f, Vec3_f(0.0f, 1.0f, 0.0f));
 
     while(window.processMessages())
     {
@@ -71,16 +75,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         hud.drawText(renderer, 60, 10, std::to_string(timer.fps).c_str(), Pixel(0, 255, 0, 0), ascii_font);
 
         //-----------------------------------------------------------------------------------------------------------------//
-        static float x_pos = 0.0f;
-        static float y_pos = 0.0f;
-        static float z_pos = 0.0f;
-        if(input.isKeyDown('A')) { x_pos -= dt; }
-        if(input.isKeyDown('D')) { x_pos += dt; }
-        if(input.isKeyDown('W')) { y_pos += dt; }
-        if(input.isKeyDown('S')) { y_pos -= dt; }
-        if(input.isKeyDown('Q')) { z_pos += dt; }
-        if(input.isKeyDown('E')) { z_pos -= dt; }
-        cube_object.m_position = Vec3_f(x_pos, y_pos, z_pos);
+        const float camera_speed = 2.0f;
+        if(input.isKeyDown('A')) { camera.moveRight(-(camera_speed * dt)); }
+        if(input.isKeyDown('D')) { camera.moveRight(camera_speed * dt); }
+        if(input.isKeyDown('W')) { camera.moveForward(camera_speed * dt); }
+        if(input.isKeyDown('S')) { camera.moveForward(-(camera_speed * dt)); }
+        if(input.isKeyDown('Q')) { camera.moveUp(camera_speed * dt); }
+        if(input.isKeyDown('E')) { camera.moveUp(-(camera_speed * dt)); }
 
         static float scale_factor = 1.0f;
         if(input.isKeyDown(VK_UP)) { scale_factor += dt; }
@@ -95,15 +96,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(theta_rads <= -6.2831853f) { theta_rads += 6.2831853f; }
         cube_object.m_rotation_theta_radians = theta_rads;
 
+        /*
         Mat4_f perspective = Math::perspectiveMat4_f
         (
             0.785398f,
-            window.m_backbuffer.m_width / window.m_backbuffer.m_height,
+            window.m_backbuffer.m_aspect_ratio,
             0.1f,
             100.0f
         );
+        */
 
-        renderer.drawObject(cube_object, Math::identityMat4_f(), perspective);
+        camera.updateVectors();
+        Mat4_f perspective = camera.calcProjectionMatrix(window.m_backbuffer.m_aspect_ratio);
+        Mat4_f view = camera.calcViewMatrix();
+
+        renderer.drawObject(cube_object, view, perspective);
     
         window.present();
         //-----------------------------------------------------------------------------------------------------------------//
