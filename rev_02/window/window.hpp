@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -13,43 +13,52 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <windows.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../backbuffer/backbuffer.hpp"
-#include "../pixel/pixel.hpp"
-#include "../math/math.hpp"
-#include "../object/object.hpp"
+#include "backbuffer/backbuffer.hpp"
+#include "input/input.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct Renderer
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+struct Window
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Data.
     //---------------------------------------------------------------------------------------------------------------------//
-    Backbuffer* m_backbuffer = nullptr;
+    int m_width  = 0;
+    int m_height = 0;
+
+    int m_backbuffer_pixel_size = 1;
+
+    HWND m_hwnd = nullptr;
+    HDC  m_dc   = nullptr;
+
+    Backbuffer m_backbuffer;
+    Input m_input;
+
+    bool m_running = true;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Functions.
     //---------------------------------------------------------------------------------------------------------------------//
-    void init(Backbuffer* backbuffer);
-    void clear(const Pixel& color);
+    Window();
+    ~Window();
 
-    void drawPixel(int x, int y, float depth, const Pixel& color);
+    void onResize(int width, int height);
 
-    void drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color);
-    void drawWireframeTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color);
-    void drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2, const Pixel& color);
-    void drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat);
-
-    void drawCircle(int cx, int cy, int r, const Pixel& color);
-    void drawFilledCircle(int cx, int cy, int r, const Pixel& color);
+    bool create(const wchar_t* title, int width, int height, int backbuffer_pixel_size, HINSTANCE h_instance);
+    void destroy();
+    bool processMessages();
+    void present();
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

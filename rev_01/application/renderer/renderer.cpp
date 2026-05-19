@@ -183,18 +183,11 @@ void Renderer::drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawObject(Object& object, const Mat4_f& view_mat, const Mat4_f& proj_mat)
+void Renderer::drawObject(Object& object, const Mat4_f& proj_view_mat)
 {
     const Mat4_f model_mat = object.calcModelMatrix();
 
-    //Mat4_f transform = Math::multiply(proj_mat, model_mat);
-
-    //Mat4_f transform = Math::multiply(view_mat, Math::multiply(proj_mat, model_mat));
-    //Mat4_f transform = Math::multiply(view_mat, Math::multiply(model_mat, proj_mat));
-    //Mat4_f transform = Math::multiply(model_mat, Math::multiply(view_mat, proj_mat));
-    //Mat4_f transform = Math::multiply(model_mat, Math::multiply(proj_mat, view_mat)); //
-    Mat4_f transform = Math::multiply(proj_mat, Math::multiply(model_mat, view_mat));
-    //Mat4_f transform = Math::multiply(proj_mat, Math::multiply(view_mat, model_mat));
+    Mat4_f transform = Math::multiply(proj_view_mat, model_mat);
 
     for(int i = 0; i < object.m_mesh->m_vertex_count; i++)
     {

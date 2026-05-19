@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef CAMERA_HPP
-#define CAMERA_HPP
+#ifndef RENDERER_HPP
+#define RENDERER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,67 +8,48 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <windows.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../math/mat4/mat4_f.hpp"
-#include "../math/vec3/vec3_f.hpp"
-#include "../math/vec4/vec4_f.hpp"
+#include "../backbuffer/backbuffer.hpp"
+#include "../pixel/pixel.hpp"
+#include "../math/math.hpp"
+#include "../object/object.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct Camera
+struct Renderer
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Vec3_f m_position;
-
-    float m_pitch_rads;
-    float m_yaw_rads;
-    float m_roll_rads;
-
-    float m_fov_rads;
-    float m_near_plane;
-    float m_far_plane;
-
-    Vec3_f m_world_up;
-
-    Vec3_f  m_front;
-    Vec3_f  m_right;
-    Vec3_f  m_up;
+    // Data.
+    //---------------------------------------------------------------------------------------------------------------------//
+    Backbuffer* m_backbuffer = nullptr;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    Camera
-    (
-        const Vec3_f& position,
-        const float pitch_rads,
-        const float yaw_rads,
-        const float roll_rads,
-        const float fov_rads,
-        const float near_plane,
-        const float far_plane,
-        const Vec3_f& world_up
-    );
+    // Functions.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void init(Backbuffer* backbuffer);
+    void clear(const Pixel& color);
 
-    void updateVectors();
+    void drawPixel(int x, int y, float depth, const Pixel& color);
 
-    void moveForward(const float offset);
-    void moveRight(const float offset);
-    void moveUp(const float offset);
+    void drawLine(const Vec3_f& a, const Vec3_f& b, const Pixel& color);
+    void drawWireframeTrigngle(const Vec3_f& a, const Vec3_f& b, const Vec3_f& c, const Pixel& color);
+    void drawTriangle(const Vec3_f& v0, const Vec3_f& v1, const Vec3_f& v2, const Pixel& color);
+    void drawObject(Object& object, const Mat4_f& proj_view_mat);
 
-    Mat4_f calcProjectionMatrix(const float aspect_ratio) const;
-    Mat4_f calcViewMatrix() const;
+    void drawCircle(int cx, int cy, int r, const Pixel& color);
+    void drawFilledCircle(int cx, int cy, int r, const Pixel& color);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

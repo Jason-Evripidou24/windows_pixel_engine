@@ -11,11 +11,6 @@
 #include "../camera/camera.hpp"
 #include "../object/mesh.hpp"
 
-struct Player
-{
-    float x = 400.0f;
-    float y = 300.0f;
-};
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
@@ -30,7 +25,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Input input;
     window.m_input = &input;
 
-    Player player;
     Timer timer;
     timer.init();
 
@@ -41,7 +35,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Mesh cube_mesh = Mesh::createCubeMesh();
     Object cube_object = Object(&cube_mesh);
-    cube_object.m_position.m_data[2] = -3.0f;
+    cube_object.m_position = Vec3_f(-2.0f, -1.0f, -5.0f);
 
     Camera camera(Vec3_f(0.0f, 0.0f, 0.0f), 0.0f, 1.5707963f, 0.0f, 0.785398f, 0.1f, 100.0f, Vec3_f(0.0f, 1.0f, 0.0f));
 
@@ -57,14 +51,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         // Input frame start
         // -----------------------------------
         input.beginFrame();
-
-        // -----------------------------------
-        // Movement (frame-independent)
-        // -----------------------------------
-        if(input.isKeyDown(VK_LEFT) || input.isKeyDown('A')) { player.x -= moveSpeed * dt; }
-        if(input.isKeyDown(VK_RIGHT) || input.isKeyDown('D')) { player.x += moveSpeed * dt; }
-        if(input.isKeyDown(VK_UP) || input.isKeyDown('W')) { player.y -= moveSpeed * dt; }
-        if(input.isKeyDown(VK_DOWN) || input.isKeyDown('S')) { player.y += moveSpeed * dt; }
 
         // -----------------------------------
         // Render
@@ -84,16 +70,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(input.isKeyDown('E')) { camera.moveUp(-(camera_speed * dt)); }
 
         static float scale_factor = 1.0f;
-        if(input.isKeyDown(VK_UP)) { scale_factor += dt; }
-        if(input.isKeyDown(VK_DOWN)) { scale_factor -= dt; }
-        if(scale_factor < 0.1f) { scale_factor = 0.1f; } 
+        static bool add_scale = true;
+        if(scale_factor > 1.2f) { add_scale = false; }
+        else if(scale_factor < 1.0f) { add_scale = true; }
+        if(add_scale == true) { scale_factor += (0.25f * dt); }
+        else { scale_factor -= (0.25f * dt); }
         cube_object.m_scale = Vec3_f(scale_factor, scale_factor, scale_factor);
 
         static float theta_rads = 0.0f;
-        if(input.isKeyDown(VK_LEFT)) { theta_rads += dt; }
-        if(input.isKeyDown(VK_RIGHT)) { theta_rads -= dt; }
+        theta_rads += dt;
         if(theta_rads >= 6.2831853f) { theta_rads -= 6.2831853f; }
-        if(theta_rads <= -6.2831853f) { theta_rads += 6.2831853f; }
         cube_object.m_rotation_theta_radians = theta_rads;
 
         /*
@@ -109,8 +95,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         camera.updateVectors();
         Mat4_f perspective = camera.calcProjectionMatrix(window.m_backbuffer.m_aspect_ratio);
         Mat4_f view = camera.calcViewMatrix();
+        Mat4_f perspective_view = Math::multiply(view, perspective);
 
-        renderer.drawObject(cube_object, view, perspective);
+        renderer.drawObject(cube_object, perspective_view);
     
         window.present();
         //-----------------------------------------------------------------------------------------------------------------//
