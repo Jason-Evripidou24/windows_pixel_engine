@@ -269,6 +269,8 @@ bool Window::processMessages()
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Window::present()
 {
+    if(m_dc == nullptr) { return; }
+
     m_backbuffer.present
     (
         m_dc,

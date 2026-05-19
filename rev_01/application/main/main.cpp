@@ -14,7 +14,7 @@
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
-{    
+{
     Window window;
     if (!window.create(L"Pixel Engine", 800, 600, hInstance))
         return -1;

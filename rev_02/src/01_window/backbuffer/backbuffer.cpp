@@ -15,7 +15,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "backbuffer.hpp"
 
-#include "../../pixel/pixel.hpp"
+#include "../../00_primitive_types/pixel/pixel.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -179,7 +179,7 @@ void Backbuffer::setPixel(float x, float y, float depth, Pixel color)
     if(buffers_x_coord < 0)             { buffers_x_coord = 0; }
     else if(buffers_x_coord >= m_width) { buffers_x_coord = m_width - 1; }
 
-    int buffers_y_coord = (y + 1.0f) * m_height * 0.5f;
+    int buffers_y_coord = (-y + 1.0f) * m_height * 0.5f;
     if(buffers_y_coord < 0)              { buffers_y_coord = 0; }
     else if(buffers_y_coord >= m_height) { buffers_y_coord = m_height - 1; }
 
