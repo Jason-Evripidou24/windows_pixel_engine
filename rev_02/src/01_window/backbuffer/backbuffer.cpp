@@ -157,18 +157,18 @@ void Backbuffer::clear(Pixel color)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Backbuffer::setPixel(float x, float y, float z, Pixel color)
+void Backbuffer::setPixel(int x, int y, float z, Pixel color)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     if
     (
         (m_color_buffer == nullptr) ||
         (m_depth_buffer == nullptr) ||
-        (x < -1.0f)                 ||
-        (x > 1.0f)                  ||
-        (y < -1.0f)                 ||
-        (y > 1.0f)                  ||
-        (z < -1.0f)             ||
+        (x < 0)                     ||
+        (x >= m_width)              ||
+        (y < 0)                     ||
+        (y >= m_height)             ||
+        (z < -1.0f)                 ||
         (z > 1.0f)
     )
     {
@@ -176,15 +176,7 @@ void Backbuffer::setPixel(float x, float y, float z, Pixel color)
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
-    int buffers_x_coord = (x + 1.0f) * m_width * 0.5f;
-    if(buffers_x_coord < 0)             { buffers_x_coord = 0; }
-    else if(buffers_x_coord >= m_width) { buffers_x_coord = m_width - 1; }
-
-    int buffers_y_coord = (-y + 1.0f) * m_height * 0.5f;
-    if(buffers_y_coord < 0)              { buffers_y_coord = 0; }
-    else if(buffers_y_coord >= m_height) { buffers_y_coord = m_height - 1; }
-
-    int buffers_index = (buffers_y_coord * m_width) + buffers_x_coord;
+    int buffers_index = (y * m_width) + x;
     
     if(z > m_depth_buffer[buffers_index])
     {

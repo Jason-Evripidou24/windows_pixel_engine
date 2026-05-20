@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef LINE3_F_HPP
+#define LINE3_F_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -18,29 +18,78 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../00_types/level_00/pixel/pixel.hpp"
-#include "../00_types/level_00/vec3/vec3_f.hpp"
+#include "../../level_00/vec3/vec3_f.hpp"
 
-#include "../00_types/level_01/vertex3_f/vertex3_f.hpp"
-
-#include "../01_window/backbuffer/backbuffer.hpp"
+#include "../../level_01/vertex3_f/vertex3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct Renderer
+struct Line3_f
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Functions.
+    Vertex3_f m_start_pos;
+    Vertex3_f m_end_pos;
     //---------------------------------------------------------------------------------------------------------------------//
-    void clear(Backbuffer* backbuffer, const Pixel& color);
 
-    void drawPixel(Backbuffer* backbuffer, float x, float y, float z, const Pixel& color);
 
-    void drawLine(Backbuffer* backbuffer, Vertex3_f& vert0, Vertex3_f& vert1);
+    //---------------------------------------------------------------------------------------------------------------------//
+    Line3_f(Vertex3_f& start_pos, Vertex3_f& end_pos) { m_start_pos = start_pos; m_end_pos = end_pos; }
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    void drawWireframeTriangle(Backbuffer* backbuffer, Vertex3_f& v0, Vertex3_f& v1, Vertex3_f& v2);
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    bool boundToNormalisedCoords()
+    {
+        float t0 = 0.0f;
+        float t1 = 1.0f;
+
+        Vec3_f A = m_start_pos.m_position;
+        Vec3_f B = m_end_pos.m_position;
+        Vec3_f d(B.m_data[0] - A.m_data[0], B.m_data[1] - A.m_data[1], B.m_data[2] - A.m_data[2]);
+
+        auto clip = [&](float p, float q) -> bool
+        {
+            if (p == 0.0f)
+            {
+                return q >= 0.0f;
+            }
+
+            float r = q / p;
+
+            if (p < 0.0f)
+            {
+                if (r > t1) return false;
+                if (r > t0) t0 = r;
+            }
+            else
+            {
+                if (r < t0) return false;
+                if (r < t1) t1 = r;
+            }
+
+            return true;
+        };
+
+        // X
+        if (!clip(-d.m_data[0], A.m_data[0] + 1)) return false;
+        if (!clip( d.m_data[0], 1 - A.m_data[0])) return false;
+
+        // Y
+        if (!clip(-d.m_data[1], A.m_data[1] + 1)) return false;
+        if (!clip( d.m_data[1], 1 - A.m_data[1])) return false;
+
+        // Z
+        if (!clip(-d.m_data[2], A.m_data[2] + 1)) return false;
+        if (!clip( d.m_data[2], 1 - A.m_data[2])) return false;
+
+        // Apply clipped segment
+        m_start_pos.m_position = Vec3_f(A.m_data[0] + d.m_data[0] * t0, A.m_data[1] + d.m_data[1] * t0, A.m_data[2] + d.m_data[2] * t0);
+        m_end_pos.m_position =Vec3_f(A.m_data[0] + d.m_data[0] * t1, A.m_data[1] + d.m_data[1] * t1, A.m_data[2] + d.m_data[2] * t1);
+
+        return true;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

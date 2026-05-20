@@ -43,21 +43,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     while(window.processMessages())
     {
-        Vertex3_f triangle_top;
-        triangle_top.m_position = Vec3_f(0.0f, 0.5f, 0.0f);
-        triangle_top.m_color = Pixel(0, 0, 255, 0);
+        Vertex3_f square_top_left;
+        square_top_left.m_position = Vec3_f(-0.5f, 0.5f, 0.0f);
+        square_top_left.m_color = Pixel(255, 255, 0, 255);
 
-        Vertex3_f triangle_bot_left;
-        triangle_bot_left.m_position = Vec3_f(-0.5f, -0.5f, 0.0f);
-        triangle_bot_left.m_color = Pixel(0, 255, 0, 0);
+        Vertex3_f square_top_right;
+        square_top_right.m_position = Vec3_f(0.5f, 0.5f, 0.0f);
+        square_top_right.m_color = Pixel(0, 255, 255, 255);
 
-        Vertex3_f triangle_bot_right;
-        triangle_bot_right.m_position = Vec3_f(0.5f, -0.5f, 0.0f);
-        triangle_bot_right.m_color = Pixel(255, 0, 0, 0);
+        Vertex3_f square_bot_left;
+        square_bot_left.m_position = Vec3_f(-0.5f, -0.5f, 0.0f);
+        square_bot_left.m_color = Pixel(255, 0, 255, 255);
+
+        Vertex3_f square_bot_right;
+        square_bot_right.m_position = Vec3_f(0.5f, -0.5f, 0.0f);
+        square_bot_right.m_color = Pixel(255, 255, 255, 255);
 
         renderer.clear(&(window.m_backbuffer), Pixel(0, 0, 0, 0));
 
-        renderer.drawWireframeTriangle(&(window.m_backbuffer), triangle_top, triangle_bot_left, triangle_bot_right, 0.01f);
+        renderer.drawWireframeTriangle(&(window.m_backbuffer), square_top_left, square_top_right, square_bot_left);
+        renderer.drawWireframeTriangle(&(window.m_backbuffer), square_bot_left, square_top_right, square_bot_right);
 
         window.present();
     }

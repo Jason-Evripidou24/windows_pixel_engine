@@ -53,7 +53,7 @@ struct Backbuffer
     void resize(int width, int height);
 
     void clear(Pixel color);
-    void setPixel(float x, float y, float z, Pixel color);
+    void setPixel(int x, int y, float z, Pixel color);
 
     void present(HDC dc, int window_width, int window_height);
     //---------------------------------------------------------------------------------------------------------------------//
