@@ -15,7 +15,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "backbuffer.hpp"
 
-#include "../../00_primitive_types/pixel/pixel.hpp"
+#include "../../00_types/level_00/pixel/pixel.hpp"
+#include "../../00_types/level_01/vertex3_f/vertex3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -156,7 +157,7 @@ void Backbuffer::clear(Pixel color)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Backbuffer::setPixel(float x, float y, float depth, Pixel color)
+void Backbuffer::setPixel(float x, float y, float z, Pixel color)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     if
@@ -167,8 +168,8 @@ void Backbuffer::setPixel(float x, float y, float depth, Pixel color)
         (x > 1.0f)                  ||
         (y < -1.0f)                 ||
         (y > 1.0f)                  ||
-        (depth < -1.0f)             ||
-        (depth > 1.0f)
+        (z < -1.0f)             ||
+        (z > 1.0f)
     )
     {
         return;
@@ -185,10 +186,10 @@ void Backbuffer::setPixel(float x, float y, float depth, Pixel color)
 
     int buffers_index = (buffers_y_coord * m_width) + buffers_x_coord;
     
-    if(depth > m_depth_buffer[buffers_index])
+    if(z > m_depth_buffer[buffers_index])
     {
         m_color_buffer[buffers_index] = color;
-        m_depth_buffer[buffers_index] = depth;
+        m_depth_buffer[buffers_index] = z;
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

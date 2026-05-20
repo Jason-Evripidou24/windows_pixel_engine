@@ -18,8 +18,10 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../00_primitive_types/math/vec3/vec3_f.hpp"
-#include "../00_primitive_types/pixel/pixel.hpp"
+#include "../00_types/level_00/pixel/pixel.hpp"
+#include "../00_types/level_00/vec3/vec3_f.hpp"
+
+#include "../00_types/level_01/vertex3_f/vertex3_f.hpp"
 
 #include "../01_window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -36,24 +38,9 @@ struct Renderer
 
     void drawPixel(Backbuffer* backbuffer, float x, float y, float depth, const Pixel& color);
 
-    void drawLine
-    (
-        Backbuffer* backbuffer,
-        const Vec3_f& v0,
-        const Vec3_f& v1,
-        const Pixel& color,
-        int steps
-    );
+    void drawLine(Backbuffer* backbuffer, Vertex3_f& vert0, Vertex3_f& vert1, float step);
 
-    void drawWireframeTrigngle
-    (
-        Backbuffer* backbuffer,
-        const Vec3_f& v0,
-        const Vec3_f& v1,
-        const Vec3_f& v2,
-        const Pixel& color,
-        int steps
-    );
+    void drawWireframeTriangle(Backbuffer* backbuffer, Vertex3_f& v0, Vertex3_f& v1, Vertex3_f& v2, float step);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

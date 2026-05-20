@@ -15,8 +15,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "renderer.hpp"
 
-#include "../00_primitive_types/math/vec3/vec3_f.hpp"
-#include "../00_primitive_types/pixel/pixel.hpp"
+#include "../00_types/level_00/pixel/pixel.hpp"
+#include "../00_types/level_00/vec3/vec3_f.hpp"
 
 #include "../01_window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -43,40 +43,45 @@ void Renderer::drawPixel(Backbuffer* backbuffer, float x, float y, float depth, 
 /*
 -   Each Vec3_f represents an (z, y, z) coordinate between [-1, 1]
 */
-void Renderer::drawLine(Backbuffer* backbuffer, const Vec3_f& v0, const Vec3_f& v1, const Pixel& color, int steps)
+void Renderer::drawLine(Backbuffer* backbuffer, Vertex3_f& vert0, Vertex3_f& vert1, float step)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    if(steps < 2) { return; }
+    if(step <= 0.0001f) { return; }
 
-    float v0_x = v0.m_data[0];
-    float v0_y = v0.m_data[1];
-    float v0_z = v0.m_data[2];
+    float x0 = vert0.m_position.m_data[0];
+    float y0 = vert0.m_position.m_data[1];
+    float z0 = vert0.m_position.m_data[2];
 
-    float v1_x = v1.m_data[0];
-    float v1_y = v1.m_data[1];
-    float v1_z = v1.m_data[2];
+    float x1 = vert1.m_position.m_data[0];
+    float y1 = vert1.m_position.m_data[1];
+    float z1 = vert1.m_position.m_data[2];
 
-    float dx = v0_x - v1_x;
-    float dy = v0_y - v1_y;
-    float dz = v0_z - v1_z;
+    float colB0 = (float)vert0.m_color.getB();
+    float colG0 = (float)vert0.m_color.getG();
+    float colR0 = (float)vert0.m_color.getR();
+    float colA0 = (float)vert0.m_color.getA();
 
-    float x_inc = dx / steps;
-    float y_inc = dy / steps;
-    float z_inc = dz / steps;
+    float colB1 = (float)vert1.m_color.getB();
+    float colG1 = (float)vert1.m_color.getG();
+    float colR1 = (float)vert1.m_color.getR();
+    float colA1 = (float)vert1.m_color.getA();
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    float curr_x = v0_x;
-    float curr_y = v0_y;
-    float curr_z = v0_z;
-
-    for(int i = 0; i <= steps; i++)
+    for(float t = 0.0f; t <= 1.0f; t += step)
     {
+        float curr_x = (x0 * (1.0f - t)) + (x1 * t);
+        float curr_y = (y0 * (1.0f - t)) + (y1 * t);
+        float curr_z = (z0 * (1.0f - t)) + (z1 * t);
+
+        uint8_t curr_col_b = (uint8_t)((colB0 * (1.0f - t)) + (colB1 * t));
+        uint8_t curr_col_g = (uint8_t)((colG0 * (1.0f - t)) + (colG1 * t));
+        uint8_t curr_col_r = (uint8_t)((colR0 * (1.0f - t)) + (colR1 * t));
+        uint8_t curr_col_a = (uint8_t)((colA0 * (1.0f - t)) + (colA1 * t));
+        Pixel color(curr_col_b, curr_col_g, curr_col_r, curr_col_a);
+
         backbuffer->setPixel(curr_x, curr_y, curr_z, color);
 
-        curr_x -= x_inc;
-        curr_y -= y_inc;
-        curr_z -= z_inc;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }
@@ -87,18 +92,10 @@ void Renderer::drawLine(Backbuffer* backbuffer, const Vec3_f& v0, const Vec3_f& 
 /*
 -   Each Vec3_f represents a screen coord vertex (x == x_screen_coord, y == y_screen_coord, z == depth)
 */
-void Renderer::drawWireframeTrigngle
-(
-    Backbuffer* backbuffer,
-    const Vec3_f& v0,
-    const Vec3_f& v1,
-    const Vec3_f& v2,
-    const Pixel& color,
-    int steps
-)
+void Renderer::drawWireframeTriangle(Backbuffer* backbuffer, Vertex3_f& v0, Vertex3_f& v1, Vertex3_f& v2, float step)
 {
-    this->drawLine(backbuffer, v0, v1, color, steps);
-    this->drawLine(backbuffer, v1, v2, color, steps);
-    this->drawLine(backbuffer, v2, v0, color, steps);
+    this->drawLine(backbuffer, v0, v1, step);
+    this->drawLine(backbuffer, v0, v2, step);
+    this->drawLine(backbuffer, v1, v2, step);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

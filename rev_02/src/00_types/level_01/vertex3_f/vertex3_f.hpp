@@ -1,4 +1,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef VERTEX3_F_HPP
+#define VERTEX3_F_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -12,56 +18,21 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "00_types/level_00/pixel/pixel.hpp"
-#include "00_types/level_00/mat4/mat4_f.hpp"
-#include "00_types/level_00/vec2/vec2_f.hpp"
-#include "00_types/level_00/vec2/vec2_i.hpp"
-#include "00_types/level_00/vec3/vec3_f.hpp"
-#include "00_types/level_00/vec4/vec4_f.hpp"
-
-#include "00_types/level_01/vertex3_f/vertex3_f.hpp"
-
-#include "01_window/window.hpp"
-#include "01_window/backbuffer/backbuffer.hpp"
-#include "01_window/input/input.hpp"
-
-#include "02_rendering/renderer.hpp"
+#include "../../level_00/pixel/pixel.hpp"
+#include "../../level_00/vec3/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
+struct Vertex3_f
 {
-    Window window;
-    if(!window.create(L"Pixel Engine", 800, 600, 4, hInstance))
-    {
-        return -1;
-    }
+    Vec3_f m_position;
+    Pixel m_color;
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
-    Renderer renderer;
 
-    while(window.processMessages())
-    {
-        Vertex3_f triangle_top;
-        triangle_top.m_position = Vec3_f(0.0f, 0.5f, 0.0f);
-        triangle_top.m_color = Pixel(0, 0, 255, 0);
-
-        Vertex3_f triangle_bot_left;
-        triangle_bot_left.m_position = Vec3_f(-0.5f, -0.5f, 0.0f);
-        triangle_bot_left.m_color = Pixel(0, 255, 0, 0);
-
-        Vertex3_f triangle_bot_right;
-        triangle_bot_right.m_position = Vec3_f(0.5f, -0.5f, 0.0f);
-        triangle_bot_right.m_color = Pixel(255, 0, 0, 0);
-
-        renderer.clear(&(window.m_backbuffer), Pixel(0, 0, 0, 0));
-
-        renderer.drawWireframeTriangle(&(window.m_backbuffer), triangle_top, triangle_bot_left, triangle_bot_right, 0.01f);
-
-        window.present();
-    }
-
-    window.destroy();
-    return EXIT_SUCCESS;
-}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
