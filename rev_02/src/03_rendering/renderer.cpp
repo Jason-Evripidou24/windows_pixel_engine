@@ -144,3 +144,194 @@ void Renderer::drawWireframeTriangle(Backbuffer* backbuffer, Vertex3_f& v0, Vert
     this->drawLine(backbuffer, v1, v2);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   Each Vertex3_f contains NDC coordinates:
+    x, y, z ∈ [-1, 1]
+
+-   This function:
+    1. Converts vertices to screen coordinates.
+    2. Computes a screen-space bounding box.
+    3. Uses barycentric coordinates to determine whether each pixel is inside.
+    4. Interpolates depth and color.
+    5. Writes pixels through the depth buffer.
+*/
+void Renderer::drawFilledTriangle
+(
+    Backbuffer* backbuffer,
+    Vertex3_f& v0,
+    Vertex3_f& v1,
+    Vertex3_f& v2
+)
+{
+    //-----------------------------------------------------------------------------------------------------------------//
+    if(backbuffer == nullptr)
+    {
+        return;
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Convert NDC to screen coordinates.
+    //-----------------------------------------------------------------------------------------------------------------//
+    int x0 = (v0.m_position.m_data[0] + 1.0f) * backbuffer->m_width * 0.5f;
+    int y0 = (-v0.m_position.m_data[1] + 1.0f) * backbuffer->m_height * 0.5f;
+    float z0 = v0.m_position.m_data[2];
+
+    int x1 = (v1.m_position.m_data[0] + 1.0f) * backbuffer->m_width * 0.5f;
+    int y1 = (-v1.m_position.m_data[1] + 1.0f) * backbuffer->m_height * 0.5f;
+    float z1 = v1.m_position.m_data[2];
+
+    int x2 = (v2.m_position.m_data[0] + 1.0f) * backbuffer->m_width * 0.5f;
+    int y2 = (-v2.m_position.m_data[1] + 1.0f) * backbuffer->m_height * 0.5f;
+    float z2 = v2.m_position.m_data[2];
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Edge function.
+    //-----------------------------------------------------------------------------------------------------------------//
+    auto edge = [](int ax, int ay, int bx, int by, int px, int py) -> float
+    {
+        return static_cast<float>
+        (
+            (px - ax) * (by - ay) -
+            (py - ay) * (bx - ax)
+        );
+    };
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Triangle area.
+    //-----------------------------------------------------------------------------------------------------------------//
+    float area = edge(x0, y0, x1, y1, x2, y2);
+
+    // Degenerate triangle.
+    if(area == 0.0f)
+    {
+        return;
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Compute bounding box.
+    //-----------------------------------------------------------------------------------------------------------------//
+    int min_x = x0;
+    if(x1 < min_x) { min_x = x1; }
+    if(x2 < min_x) { min_x = x2; }
+
+    int max_x = x0;
+    if(x1 > max_x) { max_x = x1; }
+    if(x2 > max_x) { max_x = x2; }
+
+    int min_y = y0;
+    if(y1 < min_y) { min_y = y1; }
+    if(y2 < min_y) { min_y = y2; }
+
+    int max_y = y0;
+    if(y1 > max_y) { max_y = y1; }
+    if(y2 > max_y) { max_y = y2; }
+
+    // Clamp bounding box to the backbuffer.
+    if(min_x < 0) { min_x = 0; }
+    if(min_y < 0) { min_y = 0; }
+
+    if(max_x >= backbuffer->m_width)
+    {
+        max_x = backbuffer->m_width - 1;
+    }
+
+    if(max_y >= backbuffer->m_height)
+    {
+        max_y = backbuffer->m_height - 1;
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Rasterize all pixels inside the bounding box.
+    //-----------------------------------------------------------------------------------------------------------------//
+    for(int y = min_y; y <= max_y; y++)
+    {
+        for(int x = min_x; x <= max_x; x++)
+        {
+            // Compute barycentric edge values.
+            float w0 = edge(x1, y1, x2, y2, x, y);
+            float w1 = edge(x2, y2, x0, y0, x, y);
+            float w2 = edge(x0, y0, x1, y1, x, y);
+
+            // Accept either winding order.
+            bool all_non_negative =
+            (
+                (w0 >= 0.0f) &&
+                (w1 >= 0.0f) &&
+                (w2 >= 0.0f)
+            );
+
+            bool all_non_positive =
+            (
+                (w0 <= 0.0f) &&
+                (w1 <= 0.0f) &&
+                (w2 <= 0.0f)
+            );
+
+            if(!(all_non_negative || all_non_positive))
+            {
+                continue;
+            }
+
+            // Normalize barycentric coordinates.
+            w0 /= area;
+            w1 /= area;
+            w2 /= area;
+
+            //-----------------------------------------------------------------//
+            // Interpolate depth.
+            //-----------------------------------------------------------------//
+            float z =
+                (z0 * w0) +
+                (z1 * w1) +
+                (z2 * w2);
+
+            //-----------------------------------------------------------------//
+            // Interpolate color.
+            //-----------------------------------------------------------------//
+            uint8_t b = static_cast<uint8_t>
+            (
+                v0.m_color.getB() * w0 +
+                v1.m_color.getB() * w1 +
+                v2.m_color.getB() * w2
+            );
+
+            uint8_t g = static_cast<uint8_t>
+            (
+                v0.m_color.getG() * w0 +
+                v1.m_color.getG() * w1 +
+                v2.m_color.getG() * w2
+            );
+
+            uint8_t r = static_cast<uint8_t>
+            (
+                v0.m_color.getR() * w0 +
+                v1.m_color.getR() * w1 +
+                v2.m_color.getR() * w2
+            );
+
+            uint8_t a = static_cast<uint8_t>
+            (
+                v0.m_color.getA() * w0 +
+                v1.m_color.getA() * w1 +
+                v2.m_color.getA() * w2
+            );
+
+            Pixel color(b, g, r, a);
+
+            //-----------------------------------------------------------------//
+            // Write pixel.
+            //-----------------------------------------------------------------//
+            backbuffer->setPixel(x, y, z, color);
+        }
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

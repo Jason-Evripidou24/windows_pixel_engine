@@ -41,6 +41,14 @@ struct Renderer
     void drawLine(Backbuffer* backbuffer, Vertex3_f& vert0, Vertex3_f& vert1);
 
     void drawWireframeTriangle(Backbuffer* backbuffer, Vertex3_f& v0, Vertex3_f& v1, Vertex3_f& v2);
+
+    void drawFilledTriangle
+    (
+        Backbuffer* backbuffer,
+        Vertex3_f& v0,
+        Vertex3_f& v1,
+        Vertex3_f& v2
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

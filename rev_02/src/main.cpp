@@ -50,21 +50,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     float totalTime = 0.0f;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    Vertex4_f square_top_left;
-    square_top_left.m_position = Vec4_f(-0.5f, 0.5f, 0.0f, 1.0f);
-    square_top_left.m_color = Pixel(255, 255, 0, 255);
+    Vertex4_f cube_front_top_left;
+    cube_front_top_left.m_position = Vec4_f(-0.5f, 0.5f, 0.5f, 1.0f);
+    cube_front_top_left.m_color = Pixel(255, 255, 0, 255);
 
-    Vertex4_f square_top_right;
-    square_top_right.m_position = Vec4_f(0.5f, 0.5f, 0.0f, 1.0f);
-    square_top_right.m_color = Pixel(0, 255, 255, 255);
+    Vertex4_f cube_front_top_right;
+    cube_front_top_right.m_position = Vec4_f(0.5f, 0.5f, 0.5f, 1.0f);
+    cube_front_top_right.m_color = Pixel(255, 255, 0, 255);
 
-    Vertex4_f square_bot_left;
-    square_bot_left.m_position = Vec4_f(-0.5f, -0.5f, 0.0f, 1.0f);
-    square_bot_left.m_color = Pixel(255, 0, 255, 255);
+    Vertex4_f cube_front_bot_left;
+    cube_front_bot_left.m_position = Vec4_f(-0.5f, -0.5f, 0.5f, 1.0f);
+    cube_front_bot_left.m_color = Pixel(255, 255, 0, 255);
 
-    Vertex4_f square_bot_right;
-    square_bot_right.m_position = Vec4_f(0.5f, -0.5f, 0.0f, 1.0f);
-    square_bot_right.m_color = Pixel(255, 255, 255, 255);
+    Vertex4_f cube_front_bot_right;
+    cube_front_bot_right.m_position = Vec4_f(0.5f, -0.5f, 0.5f, 1.0f);
+    cube_front_bot_right.m_color = Pixel(255, 255, 0, 255);
+
+    Vertex4_f cube_back_top_left;
+    cube_back_top_left.m_position = Vec4_f(-0.5f, 0.5f, -0.5f, 1.0f);
+    cube_back_top_left.m_color = Pixel(255, 0, 255, 255);
+
+    Vertex4_f cube_back_top_right;
+    cube_back_top_right.m_position = Vec4_f(0.5f, 0.5f, -0.5f, 1.0f);
+    cube_back_top_right.m_color = Pixel(255, 0, 255, 255);
+
+    Vertex4_f cube_back_bot_left;
+    cube_back_bot_left.m_position = Vec4_f(-0.5f, -0.5f, -0.5f, 1.0f);
+    cube_back_bot_left.m_color = Pixel(255, 0, 255, 255);
+
+    Vertex4_f cube_back_bot_right;
+    cube_back_bot_right.m_position = Vec4_f(0.5f, -0.5f, -0.5f, 1.0f);
+    cube_back_bot_right.m_color = Pixel(255, 0, 255, 255);
     //---------------------------------------------------------------------------------------------------------------------//
 
     while(window.processMessages())
@@ -98,26 +114,123 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Mat4_f transform = Math::multiply(Math::multiply(perspective, view), model);
 
 
-        Vertex3_f square_top_left_ndc;
-        square_top_left_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, square_top_left.m_position));
-        square_top_left_ndc.m_color = square_top_left.m_color;
+        Vertex3_f cube_front_top_left_ndc;
+        cube_front_top_left_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_front_top_left.m_position));
+        cube_front_top_left_ndc.m_color = cube_front_top_left.m_color;
 
-        Vertex3_f square_top_right_ndc;
-        square_top_right_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, square_top_right.m_position));
-        square_top_right_ndc.m_color = square_top_right.m_color;
+        Vertex3_f cube_front_top_right_ndc;
+        cube_front_top_right_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_front_top_right.m_position));
+        cube_front_top_right_ndc.m_color = cube_front_top_right.m_color;
 
-        Vertex3_f square_bot_left_ndc;
-        square_bot_left_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, square_bot_left.m_position));
-        square_bot_left_ndc.m_color = square_bot_left.m_color;
+        Vertex3_f cube_front_bot_left_ndc;
+        cube_front_bot_left_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_front_bot_left.m_position));
+        cube_front_bot_left_ndc.m_color = cube_front_bot_left.m_color;
 
-        Vertex3_f square_bot_right_ndc;
-        square_bot_right_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, square_bot_right.m_position));
-        square_bot_right_ndc.m_color = square_bot_right.m_color;
+        Vertex3_f cube_front_bot_right_ndc;
+        cube_front_bot_right_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_front_bot_right.m_position));
+        cube_front_bot_right_ndc.m_color = cube_front_bot_right.m_color;
+
+        Vertex3_f cube_back_top_left_ndc;
+        cube_back_top_left_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_back_top_left.m_position));
+        cube_back_top_left_ndc.m_color = cube_back_top_left.m_color;
+
+        Vertex3_f cube_back_top_right_ndc;
+        cube_back_top_right_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_back_top_right.m_position));
+        cube_back_top_right_ndc.m_color = cube_back_top_right.m_color;
+
+        Vertex3_f cube_back_bot_left_ndc;
+        cube_back_bot_left_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_back_bot_left.m_position));
+        cube_back_bot_left_ndc.m_color = cube_back_bot_left.m_color;
+
+        Vertex3_f cube_back_bot_right_ndc;
+        cube_back_bot_right_ndc.m_position = Math::clipCoordsToNormalisedDeviceCoords(Math::multiply(transform, cube_back_bot_right.m_position));
+        cube_back_bot_right_ndc.m_color = cube_back_bot_right.m_color;
 
         renderer.clear(&(window.m_backbuffer), Pixel(0, 0, 0, 0));
 
-        renderer.drawWireframeTriangle(&(window.m_backbuffer), square_top_left_ndc, square_top_right_ndc, square_bot_left_ndc);
-        renderer.drawWireframeTriangle(&(window.m_backbuffer), square_bot_left_ndc, square_top_right_ndc, square_bot_right_ndc);
+        // Front face
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_top_left_ndc,
+            cube_front_top_right_ndc,
+            cube_front_bot_left_ndc
+        );
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_bot_left_ndc,
+            cube_front_top_right_ndc,
+            cube_front_bot_right_ndc
+        );
+
+        // Back face
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_back_top_left_ndc,
+            cube_back_top_right_ndc,
+            cube_back_bot_left_ndc
+        );
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_back_bot_left_ndc,
+            cube_back_top_right_ndc,
+            cube_back_bot_right_ndc
+        );
+
+        // Left face
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_top_left_ndc,
+            cube_back_top_left_ndc,
+            cube_front_bot_left_ndc
+        );
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_bot_left_ndc,
+            cube_back_top_left_ndc,
+            cube_back_bot_left_ndc
+        );
+
+        // Right face
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_top_right_ndc,
+            cube_back_top_right_ndc,
+            cube_front_bot_right_ndc
+        );
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_bot_right_ndc,
+            cube_back_top_right_ndc,
+            cube_back_bot_right_ndc
+        );
+
+        // Top face
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_top_left_ndc,
+            cube_front_top_right_ndc,
+            cube_back_top_left_ndc
+        );
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_back_top_left_ndc,
+            cube_front_top_right_ndc,
+            cube_back_top_right_ndc
+        );
+
+        // Bottom face
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_front_bot_left_ndc,
+            cube_front_bot_right_ndc,
+            cube_back_bot_left_ndc
+        );
+        renderer.drawFilledTriangle(
+            &(window.m_backbuffer),
+            cube_back_bot_left_ndc,
+            cube_front_bot_right_ndc,
+            cube_back_bot_right_ndc
+        );
 
         window.present();
     }

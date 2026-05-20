@@ -150,7 +150,7 @@ void Backbuffer::clear(Pixel color)
     for(int i = 0; i < count; i++)
     {
         m_color_buffer[i] = color;
-        m_depth_buffer[i] = -1.0f;
+        m_depth_buffer[i] = 1.0f;
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -178,7 +178,7 @@ void Backbuffer::setPixel(int x, int y, float z, Pixel color)
 
     int buffers_index = (y * m_width) + x;
     
-    if(z > m_depth_buffer[buffers_index])
+    if(z < m_depth_buffer[buffers_index])
     {
         m_color_buffer[buffers_index] = color;
         m_depth_buffer[buffers_index] = z;
