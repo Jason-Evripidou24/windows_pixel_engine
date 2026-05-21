@@ -12,52 +12,44 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "mesh.hpp"
-#include "../math/mat4/mat4_f.hpp"
-#include "../math/math.hpp"
+#include "object.hpp"
+
+#include "../01_utils/math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Mesh Mesh::createCubeMesh()
+Object::Object(Mesh* mesh)
 {
-    Mesh cube_mesh;
-    
-    cube_mesh.m_vertex_count = 8;
-    cube_mesh.m_index_count = 36;
+    m_mesh = mesh;
 
-    cube_mesh.m_vertices = std::vector<Vec4_f>(cube_mesh.m_vertex_count);
-    cube_mesh.m_clip     = std::vector<Vec4_f>(cube_mesh.m_vertex_count);
-    cube_mesh.m_ndc      = std::vector<Vec3_f>(cube_mesh.m_vertex_count);
-    cube_mesh.m_screen   = std::vector<Vec3_f>(cube_mesh.m_vertex_count);
+    m_position = {0.0f, 0.0f, 0.0f};
+    m_rotation_axis = {0.0f, 1.0f, 0.0f};
+    m_rotation_theta_radians = 0.0f;
+    m_scale = {1.0f, 1.0f, 1.0f};
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
-    cube_mesh.m_indices = std::vector<int>(cube_mesh.m_index_count);
 
-    cube_mesh.m_vertices[0] = {-0.5f,-0.5f,-0.5f, 1.0f};
-    cube_mesh.m_vertices[1] = { 0.5f,-0.5f,-0.5f, 1.0f};
-    cube_mesh.m_vertices[2] = { 0.5f, 0.5f,-0.5f, 1.0f};
-    cube_mesh.m_vertices[3] = {-0.5f, 0.5f,-0.5f, 1.0f};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Mat4_f Object::calcModelMatrix() const
+{
+    Mat4_f translate = Math::translationMat4_f(m_position.m_data[0], m_position.m_data[1], m_position.m_data[2]);
 
-    cube_mesh.m_vertices[4] = {-0.5f,-0.5f, 0.5f, 1.0f};
-    cube_mesh.m_vertices[5] = { 0.5f,-0.5f, 0.5f, 1.0f};
-    cube_mesh.m_vertices[6] = { 0.5f, 0.5f, 0.5f, 1.0f};
-    cube_mesh.m_vertices[7] = {-0.5f, 0.5f, 0.5f, 1.0f};
+    Vec3_f rotation_axis_normalised = Math::normalise(m_rotation_axis);
+    Mat4_f rotate = Math::rotationMat4_f
+    (
+        rotation_axis_normalised.m_data[0],
+        rotation_axis_normalised.m_data[1],
+        rotation_axis_normalised.m_data[2],
+        m_rotation_theta_radians
+    );
 
-    int idx[] =
-    {
-        0, 1, 2,  2, 3, 0,
-        4, 5, 6,  6, 7, 4,
-        0, 3, 7,  7, 4, 0,
-        1, 5, 6,  6, 2, 1,
-        0, 1, 5,  5, 4, 0,
-        3, 2, 6,  6, 7, 3
-    };
-    for(int i = 0; i < cube_mesh.m_index_count; i++)
-    {
-        cube_mesh.m_indices[i] = idx[i];
-    }
+    Mat4_f scale = Math::scaleMat4_f(m_scale.m_data[0], m_scale.m_data[1], m_scale.m_data[2]);
 
-    return cube_mesh;
+    Mat4_f model = Math::multiply(Math::multiply(translate, rotate), scale);
+
+    return model;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

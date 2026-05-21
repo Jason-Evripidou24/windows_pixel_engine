@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef OBJECT_HPP
+#define OBJECT_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -18,53 +18,30 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../00_types/level_00/pixel/pixel.hpp"
+#include "../00_types/level_00/mat4/mat4_f.hpp"
 #include "../00_types/level_00/vec3/vec3_f.hpp"
 
-#include "../00_types/level_01/vertex3_f/vertex3_f.hpp"
-
-#include "../02_window/backbuffer/backbuffer.hpp"
-
-#include "../04_object/object.hpp"
+#include "../00_types/level_02/mesh/mesh.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct Renderer
+struct Object
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Functions.
+    Mesh* m_mesh = nullptr;
+
+    Vec3_f m_position;
+    Vec3_f m_rotation_axis;
+    float m_rotation_theta_radians;
+    Vec3_f m_scale;
     //---------------------------------------------------------------------------------------------------------------------//
-    void clear(Backbuffer* backbuffer, const Pixel& color);
 
-    void drawPixel(Backbuffer* backbuffer, float x, float y, float z, const Pixel& color);
-
-    void drawLine(Backbuffer* backbuffer, Vertex3_f& vert0, Vertex3_f& vert1);
-
-    void drawWireframeTriangle(Backbuffer* backbuffer, Vertex3_f& v0, Vertex3_f& v1, Vertex3_f& v2);
-
-    void drawFilledTriangle
-    (
-        Backbuffer* backbuffer,
-        Vertex3_f& v0,
-        Vertex3_f& v1,
-        Vertex3_f& v2
-    );
-
-    void drawWireframeObject
-    (
-        Backbuffer* backbuffer,
-        const Object& object,
-        const Mat4_f& view_projection
-    );
-
-    void drawFilledObject
-    (
-        Backbuffer* backbuffer,
-        const Object& object,
-        const Mat4_f& view_projection
-    );
+    //---------------------------------------------------------------------------------------------------------------------//
+    Object(Mesh* mesh);
+    
+    Mat4_f calcModelMatrix() const;
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

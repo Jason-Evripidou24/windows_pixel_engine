@@ -19,6 +19,8 @@
 #include "../00_types/level_00/vec3/vec3_f.hpp"
 
 #include "../02_window/backbuffer/backbuffer.hpp"
+
+#include "../01_utils/math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -331,6 +333,180 @@ void Renderer::drawFilledTriangle
             //-----------------------------------------------------------------//
             backbuffer->setPixel(x, y, z, color);
         }
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+// Draws every indexed triangle in the mesh as a wireframe.
+void Renderer::drawWireframeObject
+(
+    Backbuffer* backbuffer,
+    const Object& object,
+    const Mat4_f& view_projection
+)
+{
+    //-----------------------------------------------------------------------------------------------------------------//
+    if
+    (
+        (backbuffer == nullptr) ||
+        (object.m_mesh == nullptr)
+    )
+    {
+        return;
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Final transform = ViewProjection * Model
+    //-----------------------------------------------------------------------------------------------------------------//
+    Mat4_f model = object.calcModelMatrix();
+    Mat4_f transform = Math::multiply(view_projection, model);
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Draw each indexed triangle.
+    //-----------------------------------------------------------------------------------------------------------------//
+    for(int i = 0; i < object.m_mesh->m_index_count; i += 3)
+    {
+        // Indices for one triangle.
+        int index0 = object.m_mesh->m_indices[i + 0];
+        int index1 = object.m_mesh->m_indices[i + 1];
+        int index2 = object.m_mesh->m_indices[i + 2];
+
+        // Source vertices (object space).
+        const Vertex4_f& src_v0 = object.m_mesh->m_vertices[index0];
+        const Vertex4_f& src_v1 = object.m_mesh->m_vertices[index1];
+        const Vertex4_f& src_v2 = object.m_mesh->m_vertices[index2];
+
+        //---------------------------------------------------------------------//
+        // Transform to clip space.
+        //---------------------------------------------------------------------//
+        Vec4_f clip_pos0 = Math::multiply(transform, src_v0.m_position);
+        Vec4_f clip_pos1 = Math::multiply(transform, src_v1.m_position);
+        Vec4_f clip_pos2 = Math::multiply(transform, src_v2.m_position);
+
+        //---------------------------------------------------------------------//
+        // Skip vertices behind the camera or invalid for perspective divide.
+        //---------------------------------------------------------------------//
+        if
+        (
+            (clip_pos0.m_data[3] == 0.0f) ||
+            (clip_pos1.m_data[3] == 0.0f) ||
+            (clip_pos2.m_data[3] == 0.0f)
+        )
+        {
+            continue;
+        }
+
+        //---------------------------------------------------------------------//
+        // Convert clip coordinates to NDC.
+        //---------------------------------------------------------------------//
+        Vertex3_f ndc_v0;
+        ndc_v0.m_position = Math::clipCoordsToNormalisedDeviceCoords(clip_pos0);
+        ndc_v0.m_color = src_v0.m_color;
+
+        Vertex3_f ndc_v1;
+        ndc_v1.m_position = Math::clipCoordsToNormalisedDeviceCoords(clip_pos1);
+        ndc_v1.m_color = src_v1.m_color;
+
+        Vertex3_f ndc_v2;
+        ndc_v2.m_position = Math::clipCoordsToNormalisedDeviceCoords(clip_pos2);
+        ndc_v2.m_color = src_v2.m_color;
+
+        //---------------------------------------------------------------------//
+        // Draw triangle edges.
+        //---------------------------------------------------------------------//
+        this->drawWireframeTriangle(backbuffer, ndc_v0, ndc_v1, ndc_v2);
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+// Draws every indexed triangle in the mesh as a wireframe.
+void Renderer::drawFilledObject
+(
+    Backbuffer* backbuffer,
+    const Object& object,
+    const Mat4_f& view_projection
+)
+{
+    //-----------------------------------------------------------------------------------------------------------------//
+    if
+    (
+        (backbuffer == nullptr) ||
+        (object.m_mesh == nullptr)
+    )
+    {
+        return;
+    }
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Final transform = ViewProjection * Model
+    //-----------------------------------------------------------------------------------------------------------------//
+    Mat4_f model = object.calcModelMatrix();
+    Mat4_f transform = Math::multiply(view_projection, model);
+    //-----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------------------------------------------------------------------------------------------//
+    // Draw each indexed triangle.
+    //-----------------------------------------------------------------------------------------------------------------//
+    for(int i = 0; i < object.m_mesh->m_index_count; i += 3)
+    {
+        // Indices for one triangle.
+        int index0 = object.m_mesh->m_indices[i + 0];
+        int index1 = object.m_mesh->m_indices[i + 1];
+        int index2 = object.m_mesh->m_indices[i + 2];
+
+        // Source vertices (object space).
+        const Vertex4_f& src_v0 = object.m_mesh->m_vertices[index0];
+        const Vertex4_f& src_v1 = object.m_mesh->m_vertices[index1];
+        const Vertex4_f& src_v2 = object.m_mesh->m_vertices[index2];
+
+        //---------------------------------------------------------------------//
+        // Transform to clip space.
+        //---------------------------------------------------------------------//
+        Vec4_f clip_pos0 = Math::multiply(transform, src_v0.m_position);
+        Vec4_f clip_pos1 = Math::multiply(transform, src_v1.m_position);
+        Vec4_f clip_pos2 = Math::multiply(transform, src_v2.m_position);
+
+        //---------------------------------------------------------------------//
+        // Skip vertices behind the camera or invalid for perspective divide.
+        //---------------------------------------------------------------------//
+        if
+        (
+            (clip_pos0.m_data[3] == 0.0f) ||
+            (clip_pos1.m_data[3] == 0.0f) ||
+            (clip_pos2.m_data[3] == 0.0f)
+        )
+        {
+            continue;
+        }
+
+        //---------------------------------------------------------------------//
+        // Convert clip coordinates to NDC.
+        //---------------------------------------------------------------------//
+        Vertex3_f ndc_v0;
+        ndc_v0.m_position = Math::clipCoordsToNormalisedDeviceCoords(clip_pos0);
+        ndc_v0.m_color = src_v0.m_color;
+
+        Vertex3_f ndc_v1;
+        ndc_v1.m_position = Math::clipCoordsToNormalisedDeviceCoords(clip_pos1);
+        ndc_v1.m_color = src_v1.m_color;
+
+        Vertex3_f ndc_v2;
+        ndc_v2.m_position = Math::clipCoordsToNormalisedDeviceCoords(clip_pos2);
+        ndc_v2.m_color = src_v2.m_color;
+
+        //---------------------------------------------------------------------//
+        // Draw triangle edges.
+        //---------------------------------------------------------------------//
+        this->drawFilledTriangle(backbuffer, ndc_v0, ndc_v1, ndc_v2);
     }
     //-----------------------------------------------------------------------------------------------------------------//
 }
