@@ -425,7 +425,8 @@ void Renderer::drawWireframeObject
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
-
+#include "../02_window/backbuffer/hud.hpp"
+#include "../00_types/level_00/font/ascii_font.hpp"
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 // Draws every indexed triangle in the mesh as a wireframe.
 void Renderer::drawFilledObject
@@ -474,6 +475,22 @@ void Renderer::drawFilledObject
         Vec4_f clip_pos0 = Math::multiply(transform, src_v0.m_position);
         Vec4_f clip_pos1 = Math::multiply(transform, src_v1.m_position);
         Vec4_f clip_pos2 = Math::multiply(transform, src_v2.m_position);
+
+        bool outside =
+        (
+            (clip_pos0.m_data[0] < -clip_pos0.m_data[3] && clip_pos1.m_data[0] < -clip_pos1.m_data[3] && clip_pos2.m_data[0] < -clip_pos2.m_data[3]) ||
+            (clip_pos0.m_data[0] >  clip_pos0.m_data[3] && clip_pos1.m_data[0] >  clip_pos1.m_data[3] && clip_pos2.m_data[0] >  clip_pos2.m_data[3]) ||
+
+            (clip_pos0.m_data[1] < -clip_pos0.m_data[3] && clip_pos1.m_data[1] < -clip_pos1.m_data[3] && clip_pos2.m_data[1] < -clip_pos2.m_data[3]) ||
+            (clip_pos0.m_data[1] >  clip_pos0.m_data[3] && clip_pos1.m_data[1] >  clip_pos1.m_data[3] && clip_pos2.m_data[1] >  clip_pos2.m_data[3]) ||
+
+            (clip_pos0.m_data[2] < -clip_pos0.m_data[3] && clip_pos1.m_data[2] < -clip_pos1.m_data[3] && clip_pos2.m_data[2] < -clip_pos2.m_data[3]) ||
+            (clip_pos0.m_data[2] >  clip_pos0.m_data[3] && clip_pos1.m_data[2] >  clip_pos1.m_data[3] && clip_pos2.m_data[2] >  clip_pos2.m_data[3])
+        );
+        if(outside)
+        {
+            continue;
+        }
 
         //---------------------------------------------------------------------//
         // Skip vertices behind the camera or invalid for perspective divide.

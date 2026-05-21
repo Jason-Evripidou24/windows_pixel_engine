@@ -154,35 +154,40 @@ Mat4_f Math::perspectiveMat4_f(const float fov_radians, const float aspect_ratio
 /*
 -   front, right and up must be normalised.
 */
-Mat4_f Math::lookAtMat4_f(const Vec3_f& position, const Vec3_f& front, const Vec3_f& right, const Vec3_f& up)
+Mat4_f Math::lookAtMat4_f(const Vec3_f& position, const Vec3_f& target, const Vec3_f& world_up)
 {
-    Mat4_f new_mat;
+    Vec3_f front = Math::normalise(Math::add(target, Math::scalarMultiply(position, -1.0f)));
 
-    float front_dot_pos = Math::dotProduct(front, position);
-    float right_dot_pos = Math::dotProduct(right, position);
-    float up_dot_pos = Math::dotProduct(up, position);
+    Vec3_f right = Math::normalise(Math::cross(world_up, front));
+    Vec3_f up    = Math::cross(front, right);
 
-    new_mat.m_data[0]   = right.m_data[0];
-    new_mat.m_data[1]   = right.m_data[1];
-    new_mat.m_data[2]   = right.m_data[2];
-    new_mat.m_data[3]   = -right_dot_pos;
+    Mat4_f result;
 
-    new_mat.m_data[4]   = up.m_data[0];
-    new_mat.m_data[5]   = up.m_data[1];
-    new_mat.m_data[6]   = up.m_data[2];
-    new_mat.m_data[7]   = -up_dot_pos;
+    // Row 0 (right axis)
+    result.m_data[0] = right.m_data[0];
+    result.m_data[1] = right.m_data[1];
+    result.m_data[2] = right.m_data[2];
+    result.m_data[3] = -Math::dotProduct(right, position);
 
-    new_mat.m_data[8]   = -front.m_data[0];
-    new_mat.m_data[9]   = -front.m_data[1];
-    new_mat.m_data[10]  = -front.m_data[2];
-    new_mat.m_data[11]  = front_dot_pos;
+    // Row 1 (up axis)
+    result.m_data[4] = up.m_data[0];
+    result.m_data[5] = up.m_data[1];
+    result.m_data[6] = up.m_data[2];
+    result.m_data[7] = -Math::dotProduct(up, position);
 
-    new_mat.m_data[12]  = 0.0f;
-    new_mat.m_data[13]  = 0.0f;
-    new_mat.m_data[14]  = 0.0f;
-    new_mat.m_data[15]  = 1.0f;
+    // Row 2 (-front axis)
+    result.m_data[8]  = -front.m_data[0];
+    result.m_data[9]  = -front.m_data[1];
+    result.m_data[10] = -front.m_data[2];
+    result.m_data[11] =  Math::dotProduct(front, position);
 
-    return new_mat;
+    // Row 3 (homogeneous)
+    result.m_data[12] = 0.0f;
+    result.m_data[13] = 0.0f;
+    result.m_data[14] = 0.0f;
+    result.m_data[15] = 1.0f;
+
+    return result;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

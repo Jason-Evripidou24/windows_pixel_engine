@@ -55,13 +55,13 @@ Camera::Camera
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Camera::updateVectors()
 {
-    m_front = Vec3_f(cosf(m_pitch_rads) * cosf(m_yaw_rads), sinf(m_pitch_rads), cosf(m_pitch_rads) * sinf(m_yaw_rads));
+    m_front = Vec3_f(cosf(m_pitch_rads) * sinf(m_yaw_rads), sinf(m_pitch_rads), cosf(m_pitch_rads) * cosf(m_yaw_rads));
     m_front = Math::normalise(m_front);
 
-    m_right = Math::cross(m_front, m_world_up);
+    m_right = Math::cross(m_world_up, m_front);
     m_right = Math::normalise(m_right);
 
-    m_up = Math::cross(m_right, m_front);
+    m_up = Math::cross(m_front, m_right);
     m_up = Math::normalise(m_up);
 
     if(m_roll_rads != 0.0f)
@@ -154,7 +154,7 @@ Mat4_f Camera::calcModelMatrix() const
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Mat4_f Camera::calcViewMatrix() const
 {
-    return Math::lookAtMat4_f(m_position, m_front, m_right, m_up);
+    return Math::lookAtMat4_f(m_position, Math::add(m_position, m_front), m_world_up);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

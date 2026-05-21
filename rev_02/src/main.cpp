@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Camera camera
     (
-        Vec3_f(0.0f, 0.0f, 10.0f),   // position
+        Vec3_f(0.0f, 0.0f, -10.0f),   // position
         0.0f,                        // pitch
         0.0f,                        // yaw
         0.0f,                        // roll
@@ -96,8 +96,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(window.m_input.isKeyDown('S')) { camera.moveForward(-move_speed); }
         if(window.m_input.isKeyDown('A')) { camera.moveRight(-move_speed); }
         if(window.m_input.isKeyDown('D')) { camera.moveRight(move_speed); }
-        if(window.m_input.isKeyDown('Q')) { camera.moveUp(-move_speed); }
-        if(window.m_input.isKeyDown('E')) { camera.moveUp(move_speed); }
+        if(window.m_input.isKeyDown('Q')) { camera.moveUp(move_speed); }
+        if(window.m_input.isKeyDown('E')) { camera.moveUp(-move_speed); }
 
         totalTime += timer.deltaTime;
 
@@ -115,16 +115,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Mat4_f cam_view = camera.calcViewMatrix();
         Mat4_f perspective = camera.calcProjectionMatrix(window.m_backbuffer.m_width / window.m_backbuffer.m_height);
 
-        Mat4_f view = Math::translationMat4_f(0.0f, 0.0f, -10.0f);
-        //Mat4_f perspective = Math::perspectiveMat4_f(0.7f, window.m_backbuffer.m_width / window.m_backbuffer.m_height, 0.1f, 100.0f);
-
         renderer.clear(&(window.m_backbuffer), Pixel(0, 0, 0, 0));
-
-        hud.drawMat4_f(window.m_backbuffer, 10, 10, view, Pixel(0, 255, 0, 255), ascii_font);
-        hud.drawMat4_f(window.m_backbuffer, 400, 10, cam_view, Pixel(0, 255, 0, 255), ascii_font);
-
-        renderer.drawFilledObject(&(window.m_backbuffer), animated_cube_object, Math::multiply(perspective, view));
-        renderer.drawFilledObject(&(window.m_backbuffer), cube_object, Math::multiply(perspective, view));
+    
+        renderer.drawFilledObject(&(window.m_backbuffer), animated_cube_object, Math::multiply(perspective, cam_view));
+        renderer.drawFilledObject(&(window.m_backbuffer), cube_object, Math::multiply(perspective, cam_view));
 
         window.present();
     }
