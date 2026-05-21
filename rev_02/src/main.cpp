@@ -12,6 +12,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "00_types/level_00/font/ascii_font.hpp"
 #include "00_types/level_00/pixel/pixel.hpp"
 #include "00_types/level_00/mat4/mat4_f.hpp"
 #include "00_types/level_00/vec2/vec2_f.hpp"
@@ -29,11 +30,14 @@
 
 #include "02_window/window.hpp"
 #include "02_window/backbuffer/backbuffer.hpp"
+#include "02_window/backbuffer/hud.hpp"
 #include "02_window/input/input.hpp"
 
 #include "03_rendering/renderer.hpp"
 
 #include "04_object/object.hpp"
+
+#include "05_camera/camera.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -62,6 +66,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     animated_cube_object.m_rotation_theta_radians = 0.0f;
     animated_cube_object.m_scale = Vec3_f(1.0f, 1.0f, 1.0f);
 
+    Camera camera
+    (
+        Vec3_f(0.0f, 0.0f, 10.0f),   // position
+        0.0f,                        // pitch
+        0.0f,                        // yaw
+        0.0f,                        // roll
+        0.7f,                        // field of view (radians)
+        0.1f,                        // near plane
+        100.0f,                      // far plane
+        Vec3_f(0.0f, 1.0f, 0.0f)     // world up
+    );
+
+    AsciiFont ascii_font;
+    Hud hud;
+
     Renderer renderer;
 
     Timer timer;
@@ -71,6 +90,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     while(window.processMessages())
     {
         timer.tick();
+
+        float move_speed = 5.0f * timer.deltaTime;
+        if(window.m_input.isKeyDown('W')) { camera.moveForward(move_speed); }
+        if(window.m_input.isKeyDown('S')) { camera.moveForward(-move_speed); }
+        if(window.m_input.isKeyDown('A')) { camera.moveRight(-move_speed); }
+        if(window.m_input.isKeyDown('D')) { camera.moveRight(move_speed); }
+        if(window.m_input.isKeyDown('Q')) { camera.moveUp(-move_speed); }
+        if(window.m_input.isKeyDown('E')) { camera.moveUp(move_speed); }
 
         totalTime += timer.deltaTime;
 
@@ -85,11 +112,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         float rz = totalTime;
         animated_cube_object.m_rotation_theta_radians = rz;
 
+        Mat4_f cam_view = camera.calcViewMatrix();
+        Mat4_f perspective = camera.calcProjectionMatrix(window.m_backbuffer.m_width / window.m_backbuffer.m_height);
 
         Mat4_f view = Math::translationMat4_f(0.0f, 0.0f, -10.0f);
-        Mat4_f perspective = Math::perspectiveMat4_f(0.7f, window.m_backbuffer.m_width / window.m_backbuffer.m_height, 0.1f, 100.0f);
+        //Mat4_f perspective = Math::perspectiveMat4_f(0.7f, window.m_backbuffer.m_width / window.m_backbuffer.m_height, 0.1f, 100.0f);
 
         renderer.clear(&(window.m_backbuffer), Pixel(0, 0, 0, 0));
+
+        hud.drawMat4_f(window.m_backbuffer, 10, 10, view, Pixel(0, 255, 0, 255), ascii_font);
+        hud.drawMat4_f(window.m_backbuffer, 400, 10, cam_view, Pixel(0, 255, 0, 255), ascii_font);
 
         renderer.drawFilledObject(&(window.m_backbuffer), animated_cube_object, Math::multiply(perspective, view));
         renderer.drawFilledObject(&(window.m_backbuffer), cube_object, Math::multiply(perspective, view));

@@ -151,6 +151,9 @@ Mat4_f Math::perspectiveMat4_f(const float fov_radians, const float aspect_ratio
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   front, right and up must be normalised.
+*/
 Mat4_f Math::lookAtMat4_f(const Vec3_f& position, const Vec3_f& front, const Vec3_f& right, const Vec3_f& up)
 {
     Mat4_f new_mat;
