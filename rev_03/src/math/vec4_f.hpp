@@ -23,6 +23,16 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   Note when using Vec4_f in pixel engine:
+    -   Vec4_f consists of {x, y, z, w}. The w is the "homogeneous coordinate", and it exists to make 3D transformations
+        work correctly."
+    -   w controls how the vector behaves under transformations.
+    -   When w = 1.0f i.e. {x, y, z, 1.0f}, the vector represents a real point in space. Translation, Scale and Rotation
+        matricies all affect it.
+    -   When w = 0.0f i.e. {x, y, z, 0.0f}, the vector represents direction. Translation does NOT affect it, only Scale and
+        Rotation matricies affect it.
+*/
 namespace Math
 {
     struct Vec4_f

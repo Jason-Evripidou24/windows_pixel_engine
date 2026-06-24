@@ -44,8 +44,8 @@ namespace Math
     Mat4_f translationMat4_f(const float x, const float y, const float z);
     Mat4_f rotationMat4_f(const float axis_x, const float axis_y, const float axis_z, const float theta_rad);
     Mat4_f scaleMat4_f(const float x, const float y, const float z);
-    Mat4_f perspectiveMat4_f(const float fov_radians, const float aspect_ratio, const float near, const float far);
-    Mat4_f lookAtMat4_f(const Vec3_f& position, const Vec3_f& target, const Vec3_f& world_up);
+    //Mat4_f perspectiveMat4_f(const float fov_radians, const float aspect_ratio, const float near, const float far);
+    //Mat4_f lookAtMat4_f(const Vec3_f& position, const Vec3_f& target, const Vec3_f& world_up);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -98,12 +98,6 @@ namespace Math
     //---------------------------------------------------------------------------------------------------------------------//
     Vec3_f subtract(const Vec3_f& vec_l, const Vec3_f& vec_r);
     //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Misc.
-    //---------------------------------------------------------------------------------------------------------------------//
-    Vec3_f clipCoordsToNormalisedDeviceCoords(const Vec4_f& clip_coords);
-    //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -111,7 +105,7 @@ namespace Math
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 // Testing functions.
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-bool identityMat4_f_TEST01();
+bool TEST_FUNC_identityMat4_f_01();
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
