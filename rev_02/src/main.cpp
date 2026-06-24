@@ -73,7 +73,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         0.0f,                        // yaw
         0.0f,                        // roll
         0.7f,                        // field of view (radians)
-        0.1f,                        // near plane
+        1.0f,                        // near plane
         100.0f,                      // far plane
         Vec3_f(0.0f, 1.0f, 0.0f)     // world up
     );
