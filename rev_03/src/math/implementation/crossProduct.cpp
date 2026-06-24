@@ -2,7 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <iostream>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,29 +18,14 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-// Test 01.
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-bool identityMat4_f_TEST01()
+Math::Vec3_f Math::crossProduct(const Vec3_f& vec_l, const Vec3_f& vec_r)
 {
-    std::cout << "##### ##### ##### ##### TEST ##### ##### ##### #####" << std::endl;
-    std::cout << "identityMat4_f_TEST01: ";
+    Vec3_f new_vec;
 
-    Math::Mat4_f expected;
-    expected.m_data[0]  = 1.0f; expected.m_data[1]  = 0.0f; expected.m_data[2]  = 0.0f; expected.m_data[3]  = 0.0f;
-    expected.m_data[4]  = 0.0f; expected.m_data[5]  = 1.0f; expected.m_data[6]  = 0.0f; expected.m_data[7]  = 0.0f;
-    expected.m_data[8]  = 0.0f; expected.m_data[9]  = 0.0f; expected.m_data[10] = 1.0f; expected.m_data[11] = 0.0f;
-    expected.m_data[12] = 0.0f; expected.m_data[13] = 0.0f; expected.m_data[14] = 0.0f; expected.m_data[15] = 1.0f;
+    new_vec.m_data[0] = (vec_l.m_data[1] * vec_r.m_data[2]) - (vec_l.m_data[2] * vec_r.m_data[1]);
+    new_vec.m_data[1] = (vec_l.m_data[2] * vec_r.m_data[0]) - (vec_l.m_data[0] * vec_r.m_data[2]);
+    new_vec.m_data[2] = (vec_l.m_data[0] * vec_r.m_data[1]) - (vec_l.m_data[1] * vec_r.m_data[0]);
 
-    Math::Mat4_f generated = Math::identityMat4_f();
-
-    if(generated == expected)
-    {
-        std::cout << "PASSED :)" << std::endl;
-        std::cout << "##### ##### ##### ##### #### ##### ##### ##### #####" << std::endl;
-        return true;
-    }
-    std::cout << "FAILED!!! :(" << std::endl;
-    std::cout << "##### ##### ##### ##### #### ##### ##### ##### #####" << std::endl;
-    return false;
+    return new_vec;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
