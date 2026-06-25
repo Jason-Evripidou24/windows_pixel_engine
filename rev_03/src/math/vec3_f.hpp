@@ -18,6 +18,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "../utils/utils.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -37,22 +38,25 @@ namespace Math
         //-----------------------------------------------------------------------------------------------------------------//
 
         //-----------------------------------------------------------------------------------------------------------------//
+        // Operator overloads.
+        //-----------------------------------------------------------------------------------------------------------------//
         bool operator==(const Vec3_f& other) const
         {
-            const float eps = 0.0001f;
-
             for(int i = 0; i < 3; i++)
             {
-                float this_val = m_data[i];
-                float other_val = other.m_data[i];
+                if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-                float smaller_val = this_val;
-                if(other_val < smaller_val) { smaller_val = other_val; }
-
-                float larger_val = this_val;
-                if(other_val > larger_val) { larger_val = other_val; }
-
-                if( (larger_val - smaller_val) > eps)
+        bool operator!=(const Vec3_f& other) const
+        {
+            for(int i = 0; i < 3; i++)
+            {
+                if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == true)
                 {
                     return false;
                 }

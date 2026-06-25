@@ -23,7 +23,9 @@ int main(int argc, char** argv)
 {
     std::cout << "TESTING MATHS:" << std::endl;
 
-    identityMat4_f_TEST01();
+    TEST_GENERAL_transformation_01();
+    TEST_GENERAL_transformation_02();
+    TEST_GENERAL_transformation_03();
 
     return 0;
 }

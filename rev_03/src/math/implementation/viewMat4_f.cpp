@@ -2,7 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <iostream>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,6 +18,42 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-// Test 01.
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Math::Mat4_f Math::viewMat4_f(const Vec3_f& position, const float pitch, const float yaw)
+{
+    Vec3_f forward;
+    forward.m_data[0] = cos(pitch) * sin(yaw);
+    forward.m_data[1] = sin(pitch);
+    forward.m_data[2] = cos(pitch) * cos(yaw);
+
+    forward = normalise(forward);
+
+    static const Vec3_f worldUp(0.0f, 1.0f, 0.0f);
+
+    Vec3_f right = normalise(crossProduct(forward, worldUp));
+    Vec3_f up    = crossProduct(right, forward);
+
+    Mat4_f view;
+
+    view.m_data[0] = right.m_data[0];
+    view.m_data[1] = right.m_data[1];
+    view.m_data[2] = right.m_data[2];
+    view.m_data[3] = -dotProduct(right, position);
+
+    view.m_data[4] = up.m_data[0];
+    view.m_data[5] = up.m_data[1];
+    view.m_data[6] = up.m_data[2];
+    view.m_data[7] = -dotProduct(up, position);
+
+    view.m_data[8]  = -forward.m_data[0];
+    view.m_data[9]  = -forward.m_data[1];
+    view.m_data[10] = -forward.m_data[2];
+    view.m_data[11] = dotProduct(forward, position);
+
+    view.m_data[12] = 0.0f;
+    view.m_data[13] = 0.0f;
+    view.m_data[14] = 0.0f;
+    view.m_data[15] = 1.0f;
+
+    return view;
+}
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
