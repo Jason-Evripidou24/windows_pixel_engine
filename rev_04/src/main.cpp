@@ -14,6 +14,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "backbuffer/backbuffer.hpp"
+#include "renderer/renderer.hpp"
 #include "window/window.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -23,14 +25,36 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     Window window;
-    if(!window.create(L"Pixel Engine", 800, 600, hInstance))
+    if(!window.create(L"Pixel Engine", 400, 300, hInstance))
     {
         return -1;
     }
 
+    Backbuffer backbuffer;
+    backbuffer.resize(window.m_width, window.m_height);
+
+    Renderer renderer;
+
+    float x = -1.0f;
+    float y = 1.0f;
+    float x_increment = 0.001f;
+    float y_increment = 0.01f;
+
     while(window.processMessages())
     {
+        backbuffer.clear(0xFFFFFF);
+        renderer.drawPixel(&backbuffer, x, y, 0.0f, 0x000000);
 
+        backbuffer.present(window.m_dc, window.m_width, window.m_height);
+
+        x = (x + x_increment);
+        if(x > 1.0f)
+        {
+            x = -1.0f;
+
+            y = (y - y_increment);
+            if(y < -1.0f) { y = 1.0f; }
+        }
     }
 
     window.destroy();
