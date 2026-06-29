@@ -35,26 +35,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Renderer renderer;
 
-    float x = -1.0f;
-    float y = 1.0f;
-    float x_increment = 0.001f;
-    float y_increment = 0.01f;
-
     while(window.processMessages())
     {
-        backbuffer.clear(0xFFFFFF);
-        renderer.drawPixel(&backbuffer, x, y, 0.0f, 0x000000);
+        backbuffer.clear(0x00000000);
+
+        renderer.drawLine
+        (
+            &backbuffer,
+            -0.5f,
+            0.5f,
+            0.0f,
+            0x99FF0000,
+            0.5f,
+            -0.5f,
+            0.9f,
+            0x990000FF
+        );
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
-
-        x = (x + x_increment);
-        if(x > 1.0f)
-        {
-            x = -1.0f;
-
-            y = (y - y_increment);
-            if(y < -1.0f) { y = 1.0f; }
-        }
     }
 
     window.destroy();

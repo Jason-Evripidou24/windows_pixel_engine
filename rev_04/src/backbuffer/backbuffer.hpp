@@ -37,7 +37,7 @@ struct Backbuffer
 
     BITMAPINFO m_bitmapinfo;
 
-    uint32_t* m_color_buffer; // Stored as B-G-R-A.
+    uint32_t* m_color_buffer; // Stored as A-R-G-B.
     float* m_depth_buffer;
     //---------------------------------------------------------------------------------------------------------------------//
 
