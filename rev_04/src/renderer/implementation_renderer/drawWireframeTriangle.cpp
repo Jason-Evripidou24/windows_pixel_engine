@@ -1,10 +1,4 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,67 +13,50 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../backbuffer/backbuffer.hpp"
+#include "../renderer.hpp"
 
-#include "../math/line3d.hpp"
+#include "../../backbuffer/backbuffer.hpp"
+#include "../../math/line3d.hpp"
+#include "../../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Renderer uses coordinates in clip space where -1 <= x,y,depth <= 1. 
-*/
-struct Renderer
+void Renderer::drawWireframeTriangle
+(
+    Backbuffer*    backbuffer,
+    Math::Vec3_f   pos_0,
+    const uint32_t color_0,
+    Math::Vec3_f   pos_1,
+    const uint32_t color_1,
+    Math::Vec3_f   pos_2,
+    const uint32_t color_2
+)
 {
+
     //---------------------------------------------------------------------------------------------------------------------//
-    // Functions.
+    Math::Line3d line_0;
+    line_0.m_start = pos_0;
+    line_0.m_end = pos_1;
+    uint32_t line_0_color_start = color_0;
+    uint32_t line_0_color_end = color_1;
+
+    Math::Line3d line_1;
+    line_1.m_start = pos_0;
+    line_1.m_end = pos_2;
+    uint32_t line_1_color_start = color_0;
+    uint32_t line_1_color_end = color_2;
+
+    Math::Line3d line_2;
+    line_2.m_start = pos_1;
+    line_2.m_end = pos_2;
+    uint32_t line_2_color_start = color_1;
+    uint32_t line_2_color_end = color_2;
+
+    this->drawLine(backbuffer, line_0, line_0_color_start, line_0_color_end);
+    this->drawLine(backbuffer, line_1, line_1_color_start, line_1_color_end);
+    this->drawLine(backbuffer, line_2, line_2_color_start, line_2_color_end);
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawPixel
-    (
-        Backbuffer*    backbuffer,
-        const float    x,
-        const float    y,
-        const float    depth,
-        const uint32_t color
-    );
-
-    void drawLine
-    (
-        Backbuffer*    backbuffer,
-        const float    x_0,
-        const float    y_0,
-        const float    depth_0,
-        const uint32_t color_0,
-        const float    x_1,
-        const float    y_1,
-        const float    depth_1,
-        const uint32_t color_1
-    );
-
-    void drawLine
-    (
-        Backbuffer*    backbuffer,
-        Math::Line3d   line,
-        const uint32_t color_start,
-        const uint32_t color_end
-    );
-
-    void drawWireframeTriangle
-    (
-        Backbuffer*    backbuffer,
-        Math::Vec3_f   pos_0,
-        const uint32_t color_0,
-        Math::Vec3_f   pos_1,
-        const uint32_t color_1,
-        Math::Vec3_f   pos_2,
-        const uint32_t color_2
-    );
-    //---------------------------------------------------------------------------------------------------------------------//
-};
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#endif
+}
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
