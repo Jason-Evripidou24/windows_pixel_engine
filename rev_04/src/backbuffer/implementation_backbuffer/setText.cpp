@@ -2,66 +2,53 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <string>
+#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <windows.h>
-#include <windowsx.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "backbuffer/backbuffer.hpp"
-#include "math/vec3_f.hpp"
-#include "renderer/renderer.hpp"
-#include "window/window.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
+void Backbuffer::setText(int x, int y, const char* text, int text_size, uint32_t color)
 {
-    Window window;
-    if(!window.create(L"Pixel Engine", 800, 800, hInstance))
+    //---------------------------------------------------------------------------------------------------------------------//
+    if
+    (
+        (m_color_buffer == nullptr) ||
+        (m_depth_buffer == nullptr)
+    )
     {
-        return -1;
+        return;
     }
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    Backbuffer backbuffer;
-    backbuffer.resize(window.m_width, window.m_height);
+    int curr_x = x;
+    int curr_y = y;
 
-    Renderer renderer;
-
-    while(window.processMessages())
+    for(int i = 0; i < text_size; i++)
     {
-        backbuffer.clear(0x00000000);
+        char c = text[i];
 
-        renderer.drawLine
-        (
-            &backbuffer,
-            -0.5f,
-            0.5f,
-            0.0f,
-            0x99FF0000,
-            0.5f,
-            -0.5f,
-            0.9f,
-            0x990000FF
-        );
-
-        Math::Vec3_f test_vec3_f(1.03424f, 123.1342f, -4.387456435);
-        std::string test_string = test_vec3_f.toString(10, 5);
-        backbuffer.setText(0, 150, test_string.c_str(), test_string.size(), 0x99FFFFFFFF);
-
-        backbuffer.present(window.m_dc, window.m_width, window.m_height);
+        if(c == '\n')
+        {
+            curr_x = x;
+            curr_y = curr_y + g_asciiFont.m_glyph_height + g_asciiFont.m_new_line_spacing;
+        }
+        else
+        {
+            this->setCharacter(curr_x, curr_y, c, color);
+            curr_x += g_asciiFont.m_glyph_width + g_asciiFont.m_spacing;
+        }
     }
-
-    window.destroy();
-    return EXIT_SUCCESS;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

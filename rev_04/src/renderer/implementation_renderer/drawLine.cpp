@@ -21,29 +21,33 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   z_0 and z_1 are the backbuffer depths such that they will only appear on the backbuffer when they are within the range
+    [-1.0f, 1.0f].
+*/
 void Renderer::drawLine
 (
     Backbuffer*    backbuffer,
     const float    x_0,
     const float    y_0,
-    const float    depth_0,
+    const float    z_0,
     const uint32_t color_0,
     const float    x_1,
     const float    y_1,
-    const float    depth_1,
+    const float    z_1,
     const uint32_t color_1
 )
 {
     //---------------------------------------------------------------------------------------------------------------------//
     if
     (
-        (backbuffer == nullptr)               ||
-        (x_0 < -1.0f) || (x_0 > 1.0f)         ||
-        (y_0 < -1.0f) || (y_0 > 1.0f)         ||
-        (depth_0 < -1.0f) || (depth_0 > 1.0f) ||
-        (x_1 < -1.0f) || (x_1 > 1.0f)         ||
-        (y_1 < -1.0f) || (y_1 > 1.0f)         ||
-        (depth_1 < -1.0f) || (depth_1 > 1.0f)
+        (backbuffer == nullptr)       ||
+        (x_0 < -1.0f) || (x_0 > 1.0f) ||
+        (y_0 < -1.0f) || (y_0 > 1.0f) ||
+        (z_0 < -1.0f) || (z_0 > 1.0f) ||
+        (x_1 < -1.0f) || (x_1 > 1.0f) ||
+        (y_1 < -1.0f) || (y_1 > 1.0f) ||
+        (z_1 < -1.0f) || (z_1 > 1.0f)
     )
     {
         return;
@@ -54,18 +58,19 @@ void Renderer::drawLine
     int backbuffer_x0 = (x_0 + 1.0f) * (backbuffer->m_width - 1) * 0.5f;
     int backbuffer_y0 = (1.0f - y_0) * (backbuffer->m_height - 1) * 0.5f;
 
+    float colA_0 = (float)((color_0 >> 0)  & 0xFF);
+    float colR_0 = (float)((color_0 >> 8)  & 0xFF);
+    float colG_0 = (float)((color_0 >> 16) & 0xFF);
+    float colB_0 = (float)((color_0 >> 24) & 0xFF);
+
+    
     int backbuffer_x1 = (x_1 + 1.0f) * (backbuffer->m_width - 1) * 0.5f;
     int backbuffer_y1 = (1.0f - y_1) * (backbuffer->m_height - 1) * 0.5f;
 
-    float colA_0 = (float)((color_0 >> 0)  & 0xFF);
-    float colR_0 = (float)((color_0 >> 8)  & 0xFF);
-    float colG_0 = (float)((color_0 >> 16)  & 0xFF);
-    float colB_0 = (float)((color_0 >> 24)  & 0xFF);
-
     float colA_1 = (float)((color_1 >> 0)  & 0xFF);
     float colR_1 = (float)((color_1 >> 8)  & 0xFF);
-    float colG_1 = (float)((color_1 >> 16)  & 0xFF);
-    float colB_1 = (float)((color_1 >> 24)  & 0xFF);
+    float colG_1 = (float)((color_1 >> 16) & 0xFF);
+    float colB_1 = (float)((color_1 >> 24) & 0xFF);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -81,7 +86,7 @@ void Renderer::drawLine
 
     if(steps == 0)
     {
-        backbuffer->setPixel(backbuffer_x0, backbuffer_y0, (depth_0 + depth_1) * 0.5f, color_0);
+        backbuffer->setPixel(backbuffer_x0, backbuffer_y0, (z_0 + z_1) * 0.5f, color_0);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -92,20 +97,20 @@ void Renderer::drawLine
 
         int curr_backbuffer_x = int(backbuffer_x0 + dx * t);
         int curr_backbuffer_y = int(backbuffer_y0 + dy * t);
-        float curr_backbuffer_depth = (depth_0 * (1.0f - t)) + (depth_1 * t);
+        float curr_backbuffer_depth = (z_0 * (1.0f - t)) + (z_1 * t);
 
         uint8_t curr_col_a = (uint8_t)((colA_0 * (1.0f - t)) + (colA_1 * t));
         uint8_t curr_col_r = (uint8_t)((colR_0 * (1.0f - t)) + (colR_1 * t));
         uint8_t curr_col_g = (uint8_t)((colG_0 * (1.0f - t)) + (colG_1 * t));
         uint8_t curr_col_b = (uint8_t)((colB_0 * (1.0f - t)) + (colB_1 * t));
 
-        uint32_t curr_col_bgra =
+        uint32_t curr_col_argb =
             (uint32_t(curr_col_a) << 0)  |
             (uint32_t(curr_col_r) << 8)  |
             (uint32_t(curr_col_g) << 16) |
             (uint32_t(curr_col_b) << 24);
 
-        backbuffer->setPixel(curr_backbuffer_x, curr_backbuffer_y, curr_backbuffer_depth, curr_col_bgra);
+        backbuffer->setPixel(curr_backbuffer_x, curr_backbuffer_y, curr_backbuffer_depth, curr_col_argb);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }

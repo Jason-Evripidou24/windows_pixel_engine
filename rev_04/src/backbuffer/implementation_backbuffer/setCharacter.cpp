@@ -2,66 +2,59 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <string>
+#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <windows.h>
-#include <windowsx.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "backbuffer/backbuffer.hpp"
-#include "math/vec3_f.hpp"
-#include "renderer/renderer.hpp"
-#include "window/window.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
+void Backbuffer::setCharacter(int x, int y, char character, uint32_t color)
 {
-    Window window;
-    if(!window.create(L"Pixel Engine", 800, 800, hInstance))
+    //---------------------------------------------------------------------------------------------------------------------//
+    if
+    (
+        (m_color_buffer == nullptr) ||
+        (m_depth_buffer == nullptr) ||
+        (x < 0)                     ||
+        (x >= m_width)              ||
+        (y < 0)                     ||
+        (y >= m_height)
+    )
     {
-        return -1;
+        return;
     }
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    Backbuffer backbuffer;
-    backbuffer.resize(window.m_width, window.m_height);
+    uint8_t c = static_cast<uint8_t>(character);
 
-    Renderer renderer;
+    const uint8_t* glyph = g_asciiFont.m_ascii_font_basic_bitmap[c];
 
-    while(window.processMessages())
+    for(int row = 0; row < g_asciiFont.m_glyph_height; row++)
     {
-        backbuffer.clear(0x00000000);
+        uint8_t bits = glyph[row];
 
-        renderer.drawLine
-        (
-            &backbuffer,
-            -0.5f,
-            0.5f,
-            0.0f,
-            0x99FF0000,
-            0.5f,
-            -0.5f,
-            0.9f,
-            0x990000FF
-        );
+        for(int col = 0; col < g_asciiFont.m_glyph_width; col++)
+        {
+            // MSB → LSB (left to right)
+            //bool pixel_on = bits & (0x80 >> col);
+            bool pixel_on = bits & (1 << col);
 
-        Math::Vec3_f test_vec3_f(1.03424f, 123.1342f, -4.387456435);
-        std::string test_string = test_vec3_f.toString(10, 5);
-        backbuffer.setText(0, 150, test_string.c_str(), test_string.size(), 0x99FFFFFFFF);
-
-        backbuffer.present(window.m_dc, window.m_width, window.m_height);
+            if(pixel_on)
+            {
+                this->setPixel(x + col, y + row, 1.0f, color);
+            }
+        }
     }
-
-    window.destroy();
-    return EXIT_SUCCESS;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

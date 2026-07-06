@@ -2,66 +2,33 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <string>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <windows.h>
-#include <windowsx.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "backbuffer/backbuffer.hpp"
-#include "math/vec3_f.hpp"
-#include "renderer/renderer.hpp"
-#include "window/window.hpp"
+#include "../utils.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
+bool Utils::checkFloatEquals(const float a, const float b)
 {
-    Window window;
-    if(!window.create(L"Pixel Engine", 800, 800, hInstance))
-    {
-        return -1;
-    }
+    const float eps = 0.0001f;
 
-    Backbuffer backbuffer;
-    backbuffer.resize(window.m_width, window.m_height);
+    float smaller_val = a;
+    if(b < smaller_val) { smaller_val = b; }
 
-    Renderer renderer;
+    float larger_val = a;
+    if(b > larger_val) { larger_val = b; }
 
-    while(window.processMessages())
-    {
-        backbuffer.clear(0x00000000);
-
-        renderer.drawLine
-        (
-            &backbuffer,
-            -0.5f,
-            0.5f,
-            0.0f,
-            0x99FF0000,
-            0.5f,
-            -0.5f,
-            0.9f,
-            0x990000FF
-        );
-
-        Math::Vec3_f test_vec3_f(1.03424f, 123.1342f, -4.387456435);
-        std::string test_string = test_vec3_f.toString(10, 5);
-        backbuffer.setText(0, 150, test_string.c_str(), test_string.size(), 0x99FFFFFFFF);
-
-        backbuffer.present(window.m_dc, window.m_width, window.m_height);
-    }
-
-    window.destroy();
-    return EXIT_SUCCESS;
+    if( (larger_val - smaller_val) > eps) { return false; }
+    return true;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
