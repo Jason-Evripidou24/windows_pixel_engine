@@ -3,6 +3,7 @@
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include <string>
+#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -41,7 +42,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Draw lines at x = {-1.0, -0.8, -0.6, ..., 0.0, 0.2, 0.4, ..., 1.0}
         //-----------------------------------------------------------------------------------------------------------------//
-        float x = 0.5f;
+        float x = 0.0f;
         renderer.drawLine(&backbuffer, Math::Vec3_f(x, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(x, -1.0f, 0.0f), 0xFFFFFF0000);
         /*
         renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(-1.0f, -1.0f, 0.0f), 0xFFFFFF0000);
@@ -61,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Draw lines at y = {-1.0, -0.8, -0.6, ..., 0.0, 0.2, 0.4, ..., 1.0}
         //-----------------------------------------------------------------------------------------------------------------//
-        float y = -0.5f;
+        float y = 0.0f;
         renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, y, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, y, 0.0f), 0xFFFF00FF00);
         /*
         renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, -1.0f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, -1.0f, 0.0f), 0xFFFF00FF00);
@@ -77,56 +78,72 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 1.0f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, 1.0f, 0.0f), 0xFFFF00FF00);
         */
         //-----------------------------------------------------------------------------------------------------------------//
-        
-        Math::Vec4_f rectangle_p0 = Math::Vec4_f(-0.5f, 0.5f, 0.0f, 1.0f);
-        Math::Vec4_f rectangle_p1 = Math::Vec4_f(-0.5f, -0.5f, 0.0f, 1.0f);
-        Math::Vec4_f rectangle_p2 = Math::Vec4_f(0.5f, -0.5f, 0.0f, 1.0f);
-        Math::Vec4_f rectangle_p3 = Math::Vec4_f(0.5f, 0.5f, 0.0f, 1.0f);
 
-        Math::Mat4_f translate = Math::translationMat4_f(0.5f, -0.5f, 0.0f);
+        static std::vector<Math::Vec4_f> cube_verts(8);
+        cube_verts[0] = Math::Vec4_f(-0.5f, 0.5f, 0.5f, 1.0f);
+        cube_verts[1] = Math::Vec4_f(-0.5f, -0.5f, 0.5f, 1.0f);
+        cube_verts[2] = Math::Vec4_f(0.5f, -0.5f, 0.5f, 1.0f);
+        cube_verts[3] = Math::Vec4_f(0.5f, 0.5f, 0.5f, 1.0f);
+        cube_verts[4] = Math::Vec4_f(-0.5f, 0.5f, -0.5f, 1.0f);
+        cube_verts[5] = Math::Vec4_f(-0.5f, -0.5f, -0.5f, 1.0f);
+        cube_verts[6] = Math::Vec4_f(0.5f, -0.5f, -0.5f, 1.0f);
+        cube_verts[7] = Math::Vec4_f(0.5f, 0.5f, -0.5f, 1.0f);
+
+        static std::vector<Math::Vec3_i> cube_triangles(12);
+        // Front Face.
+        cube_triangles[0] = Math::Vec3_i(0, 1, 2);
+        cube_triangles[1] = Math::Vec3_i(0, 2, 3);
+        // Rear Face.
+        cube_triangles[2] = Math::Vec3_i(7, 6, 5);
+        cube_triangles[3] = Math::Vec3_i(7, 5, 4);
+        // Top Face.
+        cube_triangles[4] = Math::Vec3_i(4, 0, 3);
+        cube_triangles[5] = Math::Vec3_i(4, 3, 7);
+        // Bottom Face.
+        cube_triangles[6] = Math::Vec3_i(1, 5, 6);
+        cube_triangles[7] = Math::Vec3_i(1, 6, 2);
+        // Left Face.
+        cube_triangles[8] = Math::Vec3_i(4, 5, 1);
+        cube_triangles[9] = Math::Vec3_i(4, 1, 0);
+        // Right Face.
+        cube_triangles[10] = Math::Vec3_i(3, 2, 6);
+        cube_triangles[11] = Math::Vec3_i(3, 6, 7);
+
+
+        Math::Mat4_f translate = Math::translationMat4_f(0.0f, 0.0f, 0.0f);
         static float scale_factor = 1.0f;
         static float increasing = -1.0f;
         if(scale_factor < 0.8f) { increasing = 1.0f; }
         if(scale_factor > 1.0f) { increasing = -1.0f; }
         scale_factor += (0.0001f * increasing);
-        Math::Mat4_f scale = Math::scaleMat4_f(scale_factor, scale_factor, scale_factor);
+        Math::Mat4_f scale = Math::scaleMat4_f(0.2f, 0.2f, 0.2f);
         static float angle = 0.0f;
-        angle += 0.005f;   // radians per frame
-        Math::Mat4_f rotate = Math::rotationMat4_f(1.0f, 1.0f, 1.0f, angle);
+        angle += 0.002f;   // radians per frame
+        Math::Mat4_f rotate = Math::rotationMat4_f(0.0f, 1.0f, 1.0f, angle);
         Math::Mat4_f model = translate * rotate * scale;
 
-        rectangle_p0 = model * rectangle_p0;
-        rectangle_p1 = model * rectangle_p1;
-        rectangle_p2 = model * rectangle_p2;
-        rectangle_p3 = model * rectangle_p3;
+        static std::vector<Math::Vec4_f> transformed_cube_verts(8);
+        for(int i = 0; i < 8; i++)
+        {
+            transformed_cube_verts[i] = model * cube_verts[i];
+        }
 
-        Math::Vec3_f p0_clip = Math::Vec3_f(rectangle_p0.m_data[0], rectangle_p0.m_data[1], rectangle_p0.m_data[2]);
-        Math::Vec3_f p1_clip = Math::Vec3_f(rectangle_p1.m_data[0], rectangle_p1.m_data[1], rectangle_p1.m_data[2]);
-        Math::Vec3_f p2_clip = Math::Vec3_f(rectangle_p2.m_data[0], rectangle_p2.m_data[1], rectangle_p2.m_data[2]);
-        Math::Vec3_f p3_clip = Math::Vec3_f(rectangle_p3.m_data[0], rectangle_p3.m_data[1], rectangle_p3.m_data[2]);
+        for(int i = 0; i < 12; i++)
+        {
+            int index_0 = cube_triangles[i].m_data[0];
+            Math::Vec4_f& transformed_vertex_0 = transformed_cube_verts[index_0];
+            Math::Vec3_f p0_clip = Math::Vec3_f(transformed_vertex_0.m_data[0], transformed_vertex_0.m_data[1], transformed_vertex_0.m_data[2]);
 
-        renderer.drawWireframeTriangle(&backbuffer, p0_clip, 0xFFFFFF00, p1_clip, 0xFFFFFF00, p2_clip, 0xFFFFFF00);
-        renderer.drawWireframeTriangle(&backbuffer, p0_clip, 0xFFFFFF00, p2_clip, 0xFFFFFF00, p3_clip, 0xFFFFFF00);
+            int index_1 = cube_triangles[i].m_data[1];
+            Math::Vec4_f& transformed_vertex_1 = transformed_cube_verts[index_1];
+            Math::Vec3_f p1_clip = Math::Vec3_f(transformed_vertex_1.m_data[0], transformed_vertex_1.m_data[1], transformed_vertex_1.m_data[2]);
 
-        std::string info_string = std::string("Point 0: ");
-        backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
-        info_string = rectangle_p0.toStringRow(10, 4);
-        backbuffer.setText(100, 10, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
+            int index_2 = cube_triangles[i].m_data[2];
+            Math::Vec4_f& transformed_vertex_2 = transformed_cube_verts[index_2];
+            Math::Vec3_f p2_clip = Math::Vec3_f(transformed_vertex_2.m_data[0], transformed_vertex_2.m_data[1], transformed_vertex_2.m_data[2]);
 
-        info_string = std::string("Point 1: ");
-        backbuffer.setText(10, 20, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
-        info_string = rectangle_p1.toStringRow(10, 4);
-        backbuffer.setText(100, 20, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
-
-        info_string = std::string("Point 2: ");
-        backbuffer.setText(10, 30, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
-        info_string = rectangle_p2.toStringRow(10, 4);
-        backbuffer.setText(100, 30, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
-
-        info_string = std::string("Point 3: ");
-        backbuffer.setText(10, 40, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
-        info_string = rectangle_p3.toStringRow(10, 4);
-        backbuffer.setText(100, 40, info_string.c_str(), info_string.size(), 0x99FFFFFFFF);
+            renderer.drawWireframeTriangle(&backbuffer, p0_clip, 0xFFFFFF00, p1_clip, 0xFFFFFF00, p2_clip, 0xFFFFFF00);
+        }
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
