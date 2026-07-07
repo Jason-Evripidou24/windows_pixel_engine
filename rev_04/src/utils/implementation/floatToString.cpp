@@ -2,6 +2,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <iomanip>
+#include <sstream>
 #include <string>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -21,75 +23,20 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 std::string Utils::floatToString(float value, int min_string_width, int num_decimals)
 {
-    //-------------------------------------------------------------------------------------------------------------//
-    if(num_decimals < 0) { num_decimals = 0; }
-    //-------------------------------------------------------------------------------------------------------------//
-
-    //-------------------------------------------------------------------------------------------------------------//
-    bool value_negative = false;
-    if(value < 0.0f)
+    if(num_decimals < 0)
     {
-        value_negative = true;
+        num_decimals = 0;
     }
 
-    long long int_part = (long long)value;
-    if(value_negative == true)
+    std::ostringstream oss;
+
+    if(min_string_width > 0)
     {
-        int_part *= -1LL;
+        oss << std::left << std::setw(min_string_width);
     }
 
-    float frac;
-    if(value_negative == true)
-    {
-        frac = value + (float)int_part;
-    }
-    else
-    {
-        frac = value - (float)int_part;
-    }
+    oss << std::fixed << std::setprecision(num_decimals) << value;
 
-    float scale = 1.0f;
-    for(int i = 0; i < num_decimals; i++)
-    {
-        scale *= 10.0f;
-    }
-
-    long long frac_part = (long long)(frac * scale);
-    if(frac_part < 0)
-    {
-        frac_part *= -1LL;
-    }
-    //-------------------------------------------------------------------------------------------------------------//
-
-    //-------------------------------------------------------------------------------------------------------------//
-    std::string result = std::string("");
-
-    if(value_negative == true)
-    {
-        result += std::string("-");
-    }
-
-    result += std::to_string(int_part);
-
-    if(num_decimals > 0)
-    {
-        result += std::string(".");
-
-        std::string frac_str = std::to_string(frac_part);
-        while(frac_str.size() < num_decimals)
-        {
-            frac_str = std::string("0") + frac_str;
-        }
-
-        result += frac_str;
-    }
-
-    if(result.size() < min_string_width)
-    {
-        result = std::string(min_string_width - result.size(), ' ') + result;
-    }
-
-    return result;
-    //-------------------------------------------------------------------------------------------------------------//
+    return oss.str();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

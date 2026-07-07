@@ -21,7 +21,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../backbuffer/backbuffer.hpp"
 
-#include "../math/line3d.hpp"
+#include "../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -47,22 +47,10 @@ struct Renderer
     void drawLine
     (
         Backbuffer*    backbuffer,
-        const float    x_0,
-        const float    y_0,
-        const float    depth_0,
+        Math::Vec3_f   pos_0,
         const uint32_t color_0,
-        const float    x_1,
-        const float    y_1,
-        const float    depth_1,
+        Math::Vec3_f   pos_1,
         const uint32_t color_1
-    );
-
-    void drawLine
-    (
-        Backbuffer*    backbuffer,
-        Math::Line3d   line,
-        const uint32_t color_start,
-        const uint32_t color_end
     );
 
     void drawWireframeTriangle

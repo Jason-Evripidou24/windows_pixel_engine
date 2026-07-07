@@ -16,7 +16,6 @@
 #include "../renderer.hpp"
 
 #include "../../backbuffer/backbuffer.hpp"
-#include "../../math/line3d.hpp"
 #include "../../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -36,27 +35,9 @@ void Renderer::drawWireframeTriangle
 {
 
     //---------------------------------------------------------------------------------------------------------------------//
-    Math::Line3d line_0;
-    line_0.m_start = pos_0;
-    line_0.m_end = pos_1;
-    uint32_t line_0_color_start = color_0;
-    uint32_t line_0_color_end = color_1;
-
-    Math::Line3d line_1;
-    line_1.m_start = pos_0;
-    line_1.m_end = pos_2;
-    uint32_t line_1_color_start = color_0;
-    uint32_t line_1_color_end = color_2;
-
-    Math::Line3d line_2;
-    line_2.m_start = pos_1;
-    line_2.m_end = pos_2;
-    uint32_t line_2_color_start = color_1;
-    uint32_t line_2_color_end = color_2;
-
-    this->drawLine(backbuffer, line_0, line_0_color_start, line_0_color_end);
-    this->drawLine(backbuffer, line_1, line_1_color_start, line_1_color_end);
-    this->drawLine(backbuffer, line_2, line_2_color_start, line_2_color_end);
+    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
+    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
+    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
     //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
