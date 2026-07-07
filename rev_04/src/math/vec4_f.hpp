@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef VEC3_F_HPP
-#define VEC3_F_HPP
+#ifndef VEC4_F_HPP
+#define VEC4_F_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -27,23 +27,23 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 namespace Math
 {
-    struct Vec3_f
+    struct Vec4_f
     {
         //-----------------------------------------------------------------------------------------------------------------//
-        float m_data[3];
+        float m_data[4];
         //-----------------------------------------------------------------------------------------------------------------//
         
         //-----------------------------------------------------------------------------------------------------------------//
-        Vec3_f() { m_data[0] = 0.0f; m_data[1] = 0.0f; m_data[2] = 0.0f; }
-        Vec3_f(float x, float y, float z) { m_data[0] = x; m_data[1] = y; m_data[2] = z; }
+        Vec4_f() { m_data[0] = 0.0f; m_data[1] = 0.0f; m_data[2] = 0.0f; m_data[3] = 0.0f; }
+        Vec4_f(float x, float y, float z, float w) { m_data[0] = x; m_data[1] = y; m_data[2] = z; m_data[3] = w; }
         //-----------------------------------------------------------------------------------------------------------------//
 
         //-----------------------------------------------------------------------------------------------------------------//
         // Comparison operator overloads.
         //-----------------------------------------------------------------------------------------------------------------//
-        bool operator==(const Vec3_f& other) const
+        bool operator==(const Vec4_f& other) const
         {
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < 4; i++)
             {
                 if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == false)
                 {
@@ -53,9 +53,9 @@ namespace Math
             return true;
         }
 
-        bool operator!=(const Vec3_f& other) const
+        bool operator!=(const Vec4_f& other) const
         {
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < 4; i++)
             {
                 if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == true)
                 {
@@ -69,43 +69,47 @@ namespace Math
         //-----------------------------------------------------------------------------------------------------------------//
         // Arithmetic operator overloads.
         //-----------------------------------------------------------------------------------------------------------------//
-        Vec3_f operator+(const Vec3_f& rhs) const
+        Vec4_f operator+(const Vec4_f& rhs) const
         {
-            return Vec3_f
+            return Vec4_f
             (
                 m_data[0] + rhs.m_data[0],
                 m_data[1] + rhs.m_data[1],
-                m_data[2] + rhs.m_data[2]
+                m_data[2] + rhs.m_data[2],
+                m_data[3] + rhs.m_data[3]
             );
         }
 
-        Vec3_f operator-(const Vec3_f& rhs) const
+        Vec4_f operator-(const Vec4_f& rhs) const
         {
-            return Vec3_f
+            return Vec4_f
             (
                 m_data[0] - rhs.m_data[0],
                 m_data[1] - rhs.m_data[1],
-                m_data[2] - rhs.m_data[2]
+                m_data[2] - rhs.m_data[2],
+                m_data[3] - rhs.m_data[3]
             );
         }
 
-        Vec3_f operator*(const float scalar) const
+        Vec4_f operator*(const float scalar) const
         {
-            return Vec3_f
+            return Vec4_f
             (
                 m_data[0] * scalar,
                 m_data[1] * scalar,
-                m_data[2] * scalar
+                m_data[2] * scalar,
+                m_data[3] * scalar
             );
         }
 
-        Vec3_f operator/(const float scalar) const
+        Vec4_f operator/(const float scalar) const
         {
-            return Vec3_f
+            return Vec4_f
             (
                 m_data[0] / scalar,
                 m_data[1] / scalar,
-                m_data[2] / scalar
+                m_data[2] / scalar,
+                m_data[3] / scalar
             );
         }
         //-----------------------------------------------------------------------------------------------------------------//
@@ -120,8 +124,31 @@ namespace Math
                 std::string("[") +
                 Utils::floatToString(m_data[0], min_num_width, num_decimals) + std::string(", ") +
                 Utils::floatToString(m_data[1], min_num_width, num_decimals) + std::string(", ") +
-                Utils::floatToString(m_data[2], min_num_width, num_decimals) +
+                Utils::floatToString(m_data[2], min_num_width, num_decimals) + std::string(", ") +
+                Utils::floatToString(m_data[3], min_num_width, num_decimals) +
                 std::string("]")
+            );
+        }
+
+        std::string toStringCol(int min_num_width, int num_decimals) const
+        {
+            return
+            (
+                std::string("|") +
+                Utils::floatToString(m_data[0], min_num_width, num_decimals) +
+                std::string("|") +
+                std::string("\n") +
+                std::string("|") +
+                Utils::floatToString(m_data[1], min_num_width, num_decimals) +
+                std::string("|") +
+                std::string("\n") +
+                std::string("|") +
+                Utils::floatToString(m_data[2], min_num_width, num_decimals) +
+                std::string("|") +
+                std::string("\n") +
+                std::string("|") +
+                Utils::floatToString(m_data[3], min_num_width, num_decimals) +
+                std::string("|")
             );
         }
         //-----------------------------------------------------------------------------------------------------------------//
