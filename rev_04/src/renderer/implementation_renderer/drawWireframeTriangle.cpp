@@ -24,7 +24,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawWireframeTriangle
 (
-    Backbuffer*    backbuffer,
+    Backbuffer&    backbuffer,
     Math::Vec3_f   pos_0,
     const uint32_t color_0,
     Math::Vec3_f   pos_1,

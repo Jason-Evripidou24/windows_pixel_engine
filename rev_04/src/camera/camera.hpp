@@ -1,14 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef MATH_HPP
-#define MATH_HPP
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   NOTE: Maths in this program is done ROW MAJOR!!
-    -   Since we are not using opengl and rendering by our own methods this is easier for us to visualiase mathematically.
-*/
+#ifndef CAMERA_HPP
+#define CAMERA_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -16,6 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <string>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -26,65 +19,90 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "mat4_f.hpp"
-#include "vec3_f.hpp"
-#include "vec3_i.hpp"
-#include "vec4_f.hpp"
+#include "../math/math.hpp"
+
+#include "../math/mat4_f.hpp"
+#include "../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-namespace Math
+struct Camera
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    static const float  PI_f                 = 3.14159265358979323846f;
-    static const double PI_d                 = 3.14159265358979323846;
+    const float m_CAMERA_MIN_PITCH_DEGREES_f = -89.0f;
+    const float m_CAMERA_MIN_PITCH_RADIANS_f = m_CAMERA_MIN_PITCH_DEGREES_f * Math::RADIANS_PER_DEGREE_f;
 
-    static const float  TWO_PI_f             = 2.0f * 3.14159265358979323846f;
-    static const double TWO_PI_d             = 2.0 * 3.14159265358979323846;
-
-    static const float  DEGREES_PER_RADIAN_f = 180.0f / PI_f;
-    static const double DEGREES_PER_RADIAN_d = 180.0  / PI_d;
-    static const float  RADIANS_PER_DEGREE_f = PI_f   / 180.0f;
-    static const double RADIANS_PER_DEGREE_d = PI_d   / 180.0;
+    const float m_CAMERA_MAX_PITCH_DEGREES_f = 89.0f;
+    const float m_CAMERA_MAX_PITCH_RADIANS_f = m_CAMERA_MAX_PITCH_DEGREES_f * Math::RADIANS_PER_DEGREE_f;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Mat4_f.
+    // Transform.
     //---------------------------------------------------------------------------------------------------------------------//
-    Mat4_f identityMat4_f();
-    Mat4_f translationMat4_f(const float x, const float y, const float z);
-    Mat4_f rotationMat4_f(const float axis_x, const float axis_y, const float axis_z, const float theta_rad);
-    Mat4_f scaleMat4_f(const float x, const float y, const float z);
-    Mat4_f perspectiveMat4_f(const float fov_radians, const float aspect_ratio, const float near, const float far);
-    Mat4_f lookAtMat4_f(const Vec3_f& cam_pos, const Vec3_f& cam_direction, const Vec3_f& cam_right, const Vec3_f& cam_up);
+    Math::Vec3_f m_position;    // Camera position.
+
+    // Euler angles (radians).
+    float m_pitch_rads;         // Rotation around local X axis.
+    float m_yaw_rads;           // Rotation around local Y axis.
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Dot product.
+    // Projection parameters.
     //---------------------------------------------------------------------------------------------------------------------//
-    float dotProduct(const Vec3_f& vec_l, const Vec3_f& vec_r);
-    float dotProduct(const Vec4_f& vec_l, const Vec4_f& vec_r);
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Cross product.
-    //---------------------------------------------------------------------------------------------------------------------//
-    Vec3_f crossProduct(const Vec3_f& vec_l, const Vec3_f& vec_r);
+    float m_fov_rads;
+    float m_near_plane;
+    float m_far_plane;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Normalise.
+    // Orientation vectors.
     //---------------------------------------------------------------------------------------------------------------------//
-    Vec3_f normalise(const Vec3_f& vec);
-    Vec4_f normalise(const Vec4_f& vec);
+    Math::Vec3_f m_world_up;    // World up direction.
+
+    Math::Vec3_f m_front;       // Forward direction.
+    Math::Vec3_f m_right;       // Right direction.
+    Math::Vec3_f m_up;          // Camera up direction.
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Misc.
+    Camera
+    (
+        const Math::Vec3_f& position,
+        const float pitch_rads,
+        const float yaw_rads,
+        const float fov_rads,
+        const float near_plane,
+        const float far_plane,
+        const Math::Vec3_f& world_up
+    );
+
+    void updateVectors();
+
+    void moveForward(const float offset);
+    void moveRight(const float offset);
+    void moveUp(const float offset);
+
+    void lookRight(const float offset);
+    void lookUp(const float offset);
+
+    Math::Mat4_f calcViewMatrix() const;
+    Math::Mat4_f calcProjectionMatrix(const float aspect_ratio) const;
     //---------------------------------------------------------------------------------------------------------------------//
-    float degreesToRadians(const float degrees);
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    std::string toString(int min_num_width, int num_decimals)
+    {
+        std::string result =
+            std::string("CAM POSITION: ") + m_position.toStringRow(min_num_width, num_decimals) + std::string("\n") +
+            std::string("CAM WORLD UP: ") + m_world_up.toStringRow(min_num_width, num_decimals) + std::string("\n") +
+            std::string("CAM FRONT:    ") + m_front.toStringRow(min_num_width, num_decimals)    + std::string("\n") +
+            std::string("CAM RIGHT:    ") + m_right.toStringRow(min_num_width, num_decimals)    + std::string("\n") +
+            std::string("CAM UP:       ") + m_up.toStringRow(6, 2);
+
+        return result;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

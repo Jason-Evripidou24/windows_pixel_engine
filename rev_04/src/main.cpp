@@ -17,9 +17,13 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "backbuffer/backbuffer.hpp"
+#include "camera/camera.hpp"
 #include "math/math.hpp"
 #include "renderer/renderer.hpp"
 #include "window/window.hpp"
+#include "model/mesh.hpp"
+#include "model/model.hpp"
+#include "model/vertex.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -27,6 +31,67 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
+    //---------------------------------------------------------------------------------------------------------------------//
+    static std::vector<Mesh> cube_meshes(3);
+    // Center cube.
+    cube_meshes[0] = Mesh::createCubeMesh(0xFFFFFF00);
+    // Positive color.
+    cube_meshes[1] = Mesh::createCubeMesh(0xFF000000);
+    // Negative color.
+    cube_meshes[2] = Mesh::createCubeMesh(0xFFFFFFFF);
+
+    static std::vector<Model> cube_models(7);
+    // Center cube.
+    cube_models[0] = Model();
+    cube_models[0].m_mesh = &(cube_meshes[0]);
+    cube_models[0].m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
+    cube_models[0].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[0].m_rotate_rad = 0.0f;
+    cube_models[0].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    // Positive x axis.
+    cube_models[1] = Model();
+    cube_models[1].m_mesh = &(cube_meshes[1]);
+    cube_models[1].m_position = Math::Vec3_f(5.0f, 0.0f, 0.0f);
+    cube_models[1].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[1].m_rotate_rad = 0.0f;
+    cube_models[1].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    // Negative x axis.
+    cube_models[2] = Model();
+    cube_models[2].m_mesh = &(cube_meshes[2]);
+    cube_models[2].m_position = Math::Vec3_f(-5.0f, 0.0f, 0.0f);
+    cube_models[2].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[2].m_rotate_rad = 0.0f;
+    cube_models[2].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    // Positive y axis.
+    cube_models[3] = Model();
+    cube_models[3].m_mesh = &(cube_meshes[1]);
+    cube_models[3].m_position = Math::Vec3_f(0.0f, 5.0f, 0.0f);
+    cube_models[3].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[3].m_rotate_rad = 0.0f;
+    cube_models[3].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    // Negative y axis.
+    cube_models[4] = Model();
+    cube_models[4].m_mesh = &(cube_meshes[2]);
+    cube_models[4].m_position = Math::Vec3_f(0.0f, -5.0f, 0.0f);
+    cube_models[4].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[4].m_rotate_rad = 0.0f;
+    cube_models[4].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    // Positive z axis.
+    cube_models[5] = Model();
+    cube_models[5].m_mesh = &(cube_meshes[1]);
+    cube_models[5].m_position = Math::Vec3_f(0.0f, 0.0f, 5.0f);
+    cube_models[5].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[5].m_rotate_rad = 0.0f;
+    cube_models[5].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    // Negative z axis.
+    cube_models[6] = Model();
+    cube_models[6].m_mesh = &(cube_meshes[2]);
+    cube_models[6].m_position = Math::Vec3_f(0.0f, 0.0f, -5.0f);
+    cube_models[6].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_models[6].m_rotate_rad = 0.0f;
+    cube_models[6].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    //---------------------------------------------------------------------------------------------------------------------//
+
     Window window;
     if(!window.create(L"Pixel Engine", 1600, 900, hInstance)) { return -1; }
 
@@ -37,113 +102,63 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     while(window.processMessages())
     {
-        backbuffer.clear(0x00000000);
+        backbuffer.clear(0xFF87CEFA);
 
-        //-----------------------------------------------------------------------------------------------------------------//
-        // Draw lines at x = {-1.0, -0.8, -0.6, ..., 0.0, 0.2, 0.4, ..., 1.0}
-        //-----------------------------------------------------------------------------------------------------------------//
-        float x = 0.0f;
-        renderer.drawLine(&backbuffer, Math::Vec3_f(x, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(x, -1.0f, 0.0f), 0xFFFFFF0000);
-        /*
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(-1.0f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-0.8f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(-0.8f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-0.6f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(-0.6f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-0.4f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(-0.4f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-0.2f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(-0.2f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(0.0f, 1.0f, 0.0f), 0xFFFFFFFFFF, Math::Vec3_f(0.0f, -1.0f, 0.0f), 0xFFFFFFFFFF);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(0.2f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(0.2f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(0.4f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(0.4f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(0.6f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(0.6f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(0.8f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(0.8f, -1.0f, 0.0f), 0xFFFFFF0000);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(1.0f, 1.0f, 0.0f), 0xFFFFFF0000, Math::Vec3_f(1.0f, -1.0f, 0.0f), 0xFFFFFF0000);
-        */
-        //-----------------------------------------------------------------------------------------------------------------//
+        // Pretend we have a camera looking straight ahead at position (0, 0, 5).
+        static float camera_x = 0.0f;
+        static float camera_y = 0.0f;
+        static float camera_z = 15.0f;
+        static float camera_speed = 0.005f;
+        // Move camera along x
+        if(window.m_input.isKeyDown('A') == true) { camera_x -= camera_speed; }
+        if(window.m_input.isKeyDown('D') == true) { camera_x += camera_speed; }
+        // Move camera along y
+        if(window.m_input.isKeyDown('Q') == true) { camera_y += camera_speed; }
+        if(window.m_input.isKeyDown('E') == true) { camera_y -= camera_speed; }
+        // Move camera along z
+        if(window.m_input.isKeyDown('W') == true) { camera_z -= camera_speed; }
+        if(window.m_input.isKeyDown('S') == true) { camera_z += camera_speed; }
 
-        //-----------------------------------------------------------------------------------------------------------------//
-        // Draw lines at y = {-1.0, -0.8, -0.6, ..., 0.0, 0.2, 0.4, ..., 1.0}
-        //-----------------------------------------------------------------------------------------------------------------//
-        float y = 0.0f;
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, y, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, y, 0.0f), 0xFFFF00FF00);
-        /*
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, -1.0f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, -1.0f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, -0.8f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, -0.8f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, -0.6f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, -0.6f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, -0.4f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, -0.4f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, -0.2f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, -0.2f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 0.0f, 0.0f), 0xFFFFFFFFFF, Math::Vec3_f(1.0f, 0.0f, 0.0f), 0xFFFFFFFFFF);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 0.2f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, 0.2f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 0.4f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, 0.4f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 0.6f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, 0.6f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 0.8f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, 0.8f, 0.0f), 0xFFFF00FF00);
-        renderer.drawLine(&backbuffer, Math::Vec3_f(-1.0f, 1.0f, 0.0f), 0xFFFF00FF00, Math::Vec3_f(1.0f, 1.0f, 0.0f), 0xFFFF00FF00);
-        */
-        //-----------------------------------------------------------------------------------------------------------------//
+        Math::Vec3_f cam_pos(camera_x, camera_y, camera_z);
+        Math::Vec3_f world_up(0.0f, 1.0f, 0.0f);
+        Camera camera
+        (
+            cam_pos,
+            Math::degreesToRadians(0.0f),
+            Math::degreesToRadians(180.0f),
+            Math::degreesToRadians(45.0f),
+            1.0f,
+            100.0f,
+            world_up
+        );
 
-        static std::vector<Math::Vec4_f> cube_verts(8);
-        cube_verts[0] = Math::Vec4_f(-0.5f, 0.5f, 0.5f, 1.0f);
-        cube_verts[1] = Math::Vec4_f(-0.5f, -0.5f, 0.5f, 1.0f);
-        cube_verts[2] = Math::Vec4_f(0.5f, -0.5f, 0.5f, 1.0f);
-        cube_verts[3] = Math::Vec4_f(0.5f, 0.5f, 0.5f, 1.0f);
-        cube_verts[4] = Math::Vec4_f(-0.5f, 0.5f, -0.5f, 1.0f);
-        cube_verts[5] = Math::Vec4_f(-0.5f, -0.5f, -0.5f, 1.0f);
-        cube_verts[6] = Math::Vec4_f(0.5f, -0.5f, -0.5f, 1.0f);
-        cube_verts[7] = Math::Vec4_f(0.5f, 0.5f, -0.5f, 1.0f);
+        Math::Mat4_f cam_projection = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
+        Math::Mat4_f cam_view = camera.calcViewMatrix();
 
-        static std::vector<Math::Vec3_i> cube_triangles(12);
-        // Front Face.
-        cube_triangles[0] = Math::Vec3_i(0, 1, 2);
-        cube_triangles[1] = Math::Vec3_i(0, 2, 3);
-        // Rear Face.
-        cube_triangles[2] = Math::Vec3_i(7, 6, 5);
-        cube_triangles[3] = Math::Vec3_i(7, 5, 4);
-        // Top Face.
-        cube_triangles[4] = Math::Vec3_i(4, 0, 3);
-        cube_triangles[5] = Math::Vec3_i(4, 3, 7);
-        // Bottom Face.
-        cube_triangles[6] = Math::Vec3_i(1, 5, 6);
-        cube_triangles[7] = Math::Vec3_i(1, 6, 2);
-        // Left Face.
-        cube_triangles[8] = Math::Vec3_i(4, 5, 1);
-        cube_triangles[9] = Math::Vec3_i(4, 1, 0);
-        // Right Face.
-        cube_triangles[10] = Math::Vec3_i(3, 2, 6);
-        cube_triangles[11] = Math::Vec3_i(3, 6, 7);
+        Math::Vec3_f camera_position(camera_x, camera_y, camera_z);
+        Math::Mat4_f view = Math::translationMat4_f
+        (
+            -camera_position.m_data[0],
+            -camera_position.m_data[1],
+            -camera_position.m_data[2]
+        );
 
+        Math::Mat4_f projection = Math::perspectiveMat4_f(0.7f, (float)backbuffer.m_width / (float)backbuffer.m_height, 1.0f, 100.0f);
 
-        Math::Mat4_f translate = Math::translationMat4_f(0.0f, 0.0f, 0.0f);
-        static float scale_factor = 1.0f;
-        static float increasing = -1.0f;
-        if(scale_factor < 0.8f) { increasing = 1.0f; }
-        if(scale_factor > 1.0f) { increasing = -1.0f; }
-        scale_factor += (0.0001f * increasing);
-        Math::Mat4_f scale = Math::scaleMat4_f(0.2f, 0.2f, 0.2f);
+        
+        Math::Mat4_f proj_view = projection * view;
         static float angle = 0.0f;
         angle += 0.002f;   // radians per frame
-        Math::Mat4_f rotate = Math::rotationMat4_f(0.0f, 1.0f, 1.0f, angle);
-        Math::Mat4_f model = translate * rotate * scale;
-
-        static std::vector<Math::Vec4_f> transformed_cube_verts(8);
-        for(int i = 0; i < 8; i++)
+        for(int i = 0; i < 7; i++)
         {
-            transformed_cube_verts[i] = model * cube_verts[i];
+            cube_models[i].m_rotate_rad = angle;
+            Math::Mat4_f model = cube_models[i].calcModelMatrix();
+            renderer.drawModel(backbuffer, cube_models[i], proj_view);
         }
 
-        for(int i = 0; i < 12; i++)
-        {
-            int index_0 = cube_triangles[i].m_data[0];
-            Math::Vec4_f& transformed_vertex_0 = transformed_cube_verts[index_0];
-            Math::Vec3_f p0_clip = Math::Vec3_f(transformed_vertex_0.m_data[0], transformed_vertex_0.m_data[1], transformed_vertex_0.m_data[2]);
+        std::string info_string = camera.toString(6, 2);
+        backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFF000000);
 
-            int index_1 = cube_triangles[i].m_data[1];
-            Math::Vec4_f& transformed_vertex_1 = transformed_cube_verts[index_1];
-            Math::Vec3_f p1_clip = Math::Vec3_f(transformed_vertex_1.m_data[0], transformed_vertex_1.m_data[1], transformed_vertex_1.m_data[2]);
-
-            int index_2 = cube_triangles[i].m_data[2];
-            Math::Vec4_f& transformed_vertex_2 = transformed_cube_verts[index_2];
-            Math::Vec3_f p2_clip = Math::Vec3_f(transformed_vertex_2.m_data[0], transformed_vertex_2.m_data[1], transformed_vertex_2.m_data[2]);
-
-            renderer.drawWireframeTriangle(&backbuffer, p0_clip, 0xFFFFFF00, p1_clip, 0xFFFFFF00, p2_clip, 0xFFFFFF00);
-        }
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

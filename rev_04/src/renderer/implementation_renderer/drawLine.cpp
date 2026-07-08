@@ -25,7 +25,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawLine
 (
-    Backbuffer*    backbuffer,
+    Backbuffer&    backbuffer,
     Math::Vec3_f   pos_0,
     const uint32_t color_0,
     Math::Vec3_f   pos_1,
@@ -41,7 +41,6 @@ void Renderer::drawLine
     //---------------------------------------------------------------------------------------------------------------------//
     if
     (
-        (backbuffer == nullptr)       ||
         (line.checkAnyPartOfLineWithinBounds(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f) == false)
     )
     {
@@ -52,8 +51,8 @@ void Renderer::drawLine
 
     //---------------------------------------------------------------------------------------------------------------------//
     
-    int backbuffer_x0 = (line.m_start.m_data[0] + 1.0f) * (backbuffer->m_width - 1) * 0.5f;
-    int backbuffer_y0 = (1.0f - line.m_start.m_data[1]) * (backbuffer->m_height - 1) * 0.5f;
+    int backbuffer_x0 = (line.m_start.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y0 = (1.0f - line.m_start.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
 
     float colA_0 = (float)((line_color_start >> 0)  & 0xFF);
     float colR_0 = (float)((line_color_start >> 8)  & 0xFF);
@@ -61,8 +60,8 @@ void Renderer::drawLine
     float colB_0 = (float)((line_color_start >> 24) & 0xFF);
 
     
-    int backbuffer_x1 = (line.m_end.m_data[0] + 1.0f) * (backbuffer->m_width - 1) * 0.5f;
-    int backbuffer_y1 = (1.0f - line.m_end.m_data[1]) * (backbuffer->m_height - 1) * 0.5f;
+    int backbuffer_x1 = (line.m_end.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y1 = (1.0f - line.m_end.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
 
     float colA_1 = (float)((line_color_end >> 0)  & 0xFF);
     float colR_1 = (float)((line_color_end >> 8)  & 0xFF);
@@ -83,7 +82,7 @@ void Renderer::drawLine
 
     if(steps == 0)
     {
-        backbuffer->setPixel(backbuffer_x0, backbuffer_y0, (line.m_start.m_data[2] + line.m_end.m_data[2]) * 0.5f, line_color_start);
+        backbuffer.setPixel(backbuffer_x0, backbuffer_y0, (line.m_start.m_data[2] + line.m_end.m_data[2]) * 0.5f, line_color_start);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -107,7 +106,7 @@ void Renderer::drawLine
             (uint32_t(curr_col_g) << 16) |
             (uint32_t(curr_col_b) << 24);
 
-        backbuffer->setPixel(curr_backbuffer_x, curr_backbuffer_y, curr_backbuffer_depth, curr_col_argb);
+        backbuffer.setPixel(curr_backbuffer_x, curr_backbuffer_y, curr_backbuffer_depth, curr_col_argb);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }

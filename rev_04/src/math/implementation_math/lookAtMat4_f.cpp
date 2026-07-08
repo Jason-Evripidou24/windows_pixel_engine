@@ -2,7 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,40 +13,46 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../math.hpp"
 
-#include "../../backbuffer/backbuffer.hpp"
+#include "../vec3_f.hpp"
+#include "../vec4_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawPixel
-(
-    Backbuffer&    backbuffer,
-    const float    x,
-    const float    y,
-    const float    depth,
-    const uint32_t color
-)
+// TODO: FIX THIS METHOD
+Math::Mat4_f Math::lookAtMat4_f(const Vec3_f& cam_pos, const Vec3_f& cam_direction, const Vec3_f& cam_right, const Vec3_f& cam_up)
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    if
-    (
-        (x < -1.0f) || (x > 1.0f)         ||
-        (y < -1.0f) || (y > 1.0f)         ||
-        (depth < -1.0f) || (depth > 1.0f)
-    )
-    {
-        return;
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
+    Mat4_f new_mat;
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x = (x + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
-    int backbuffer_y = (1.0f - y) * (backbuffer.m_height - 1) * 0.5f;
+    /*
+    float pos_dot_dir = Math::dotProduct(cam_pos, cam_direction);
+    float pos_dot_right = Math::dotProduct(cam_pos, cam_right);
+    float pos_dot_up = Math::dotProduct(cam_pos, cam_up);
 
-    backbuffer.setPixel(backbuffer_x, backbuffer_y, depth, color);
-    //---------------------------------------------------------------------------------------------------------------------//
+    new_mat.m_data[0]  = cam_right.m_data[0];
+    new_mat.m_data[1]  = cam_right.m_data[1];
+    new_mat.m_data[2]  = cam_right.m_data[2];
+    new_mat.m_data[3]  = -pos_dot_right;
+
+    new_mat.m_data[4]  = cam_up.m_data[0];
+    new_mat.m_data[5]  = cam_up.m_data[1];
+    new_mat.m_data[6]  = cam_up.m_data[2];
+    new_mat.m_data[7]  = -pos_dot_up;
+
+    new_mat.m_data[8]  = -cam_direction.m_data[0];
+    new_mat.m_data[9]  = -cam_direction.m_data[1];
+    new_mat.m_data[10] = -cam_direction.m_data[2];
+    new_mat.m_data[11] = pos_dot_dir;
+
+    new_mat.m_data[12] = 0.0f;
+    new_mat.m_data[13] = 0.0f;
+    new_mat.m_data[14] = 0.0f;
+    new_mat.m_data[15] = 1.0f;
+    */
+
+    return new_mat;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
