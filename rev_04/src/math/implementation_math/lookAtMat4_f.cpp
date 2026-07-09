@@ -27,10 +27,9 @@ Math::Mat4_f Math::lookAtMat4_f(const Vec3_f& cam_pos, const Vec3_f& cam_directi
 {
     Mat4_f new_mat;
 
-    /*
-    float pos_dot_dir = Math::dotProduct(cam_pos, cam_direction);
     float pos_dot_right = Math::dotProduct(cam_pos, cam_right);
     float pos_dot_up = Math::dotProduct(cam_pos, cam_up);
+    float pos_dot_dir = Math::dotProduct(cam_pos, cam_direction);
 
     new_mat.m_data[0]  = cam_right.m_data[0];
     new_mat.m_data[1]  = cam_right.m_data[1];
@@ -51,7 +50,6 @@ Math::Mat4_f Math::lookAtMat4_f(const Vec3_f& cam_pos, const Vec3_f& cam_directi
     new_mat.m_data[13] = 0.0f;
     new_mat.m_data[14] = 0.0f;
     new_mat.m_data[15] = 1.0f;
-    */
 
     return new_mat;
 }

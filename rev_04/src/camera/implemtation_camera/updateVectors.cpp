@@ -38,8 +38,8 @@ void Camera::updateVectors()
     (
         Math::crossProduct
         (
-            m_world_up,
-            m_front
+            m_front,
+            m_world_up
         )
     );
 
@@ -47,8 +47,8 @@ void Camera::updateVectors()
     (
         Math::crossProduct
         (
-            m_front,
-            m_right
+            m_right,
+            m_front
         )
     );
 }

@@ -29,6 +29,34 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+static Camera camera
+(
+    Math::Vec3_f(0.0f, 0.0f, 15.0f),
+    Math::degreesToRadians(0.0f),
+    Math::degreesToRadians(180.0f),
+    Math::degreesToRadians(45.0f),
+    1.0f,
+    100.0f,
+    Math::Vec3_f(0.0f, 1.0f, 0.0f)
+);
+
+static float camera_move_speed = 0.005f;
+void processInput(Window& window)
+{
+    // Move camera along x
+    if(window.m_input.isKeyDown('A') == true) { camera.moveRight(-camera_move_speed); }
+    if(window.m_input.isKeyDown('D') == true) { camera.moveRight(camera_move_speed); }
+    // Move camera along y
+    if(window.m_input.isKeyDown('Q') == true) { camera.moveUp(camera_move_speed); }
+    if(window.m_input.isKeyDown('E') == true) { camera.moveUp(-camera_move_speed); }
+    // Move camera along z
+    if(window.m_input.isKeyDown('W') == true) { camera.moveForward(camera_move_speed); }
+    if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-camera_move_speed); }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -104,56 +132,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     {
         backbuffer.clear(0xFF87CEFA);
 
-        // Pretend we have a camera looking straight ahead at position (0, 0, 5).
-        static float camera_x = 0.0f;
-        static float camera_y = 0.0f;
-        static float camera_z = 15.0f;
-        static float camera_speed = 0.005f;
-        // Move camera along x
-        if(window.m_input.isKeyDown('A') == true) { camera_x -= camera_speed; }
-        if(window.m_input.isKeyDown('D') == true) { camera_x += camera_speed; }
-        // Move camera along y
-        if(window.m_input.isKeyDown('Q') == true) { camera_y += camera_speed; }
-        if(window.m_input.isKeyDown('E') == true) { camera_y -= camera_speed; }
-        // Move camera along z
-        if(window.m_input.isKeyDown('W') == true) { camera_z -= camera_speed; }
-        if(window.m_input.isKeyDown('S') == true) { camera_z += camera_speed; }
-
-        Math::Vec3_f cam_pos(camera_x, camera_y, camera_z);
-        Math::Vec3_f world_up(0.0f, 1.0f, 0.0f);
-        Camera camera
-        (
-            cam_pos,
-            Math::degreesToRadians(0.0f),
-            Math::degreesToRadians(180.0f),
-            Math::degreesToRadians(45.0f),
-            1.0f,
-            100.0f,
-            world_up
-        );
-
+        processInput(window);
+        
         Math::Mat4_f cam_projection = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
         Math::Mat4_f cam_view = camera.calcViewMatrix();
+        Math::Mat4_f cam_proj_cam_view = cam_projection * cam_view;
 
-        Math::Vec3_f camera_position(camera_x, camera_y, camera_z);
-        Math::Mat4_f view = Math::translationMat4_f
-        (
-            -camera_position.m_data[0],
-            -camera_position.m_data[1],
-            -camera_position.m_data[2]
-        );
-
-        Math::Mat4_f projection = Math::perspectiveMat4_f(0.7f, (float)backbuffer.m_width / (float)backbuffer.m_height, 1.0f, 100.0f);
-
-        
-        Math::Mat4_f proj_view = projection * view;
         static float angle = 0.0f;
         angle += 0.002f;   // radians per frame
         for(int i = 0; i < 7; i++)
         {
             cube_models[i].m_rotate_rad = angle;
             Math::Mat4_f model = cube_models[i].calcModelMatrix();
-            renderer.drawModel(backbuffer, cube_models[i], proj_view);
+            renderer.drawModel(backbuffer, cube_models[i], cam_proj_cam_view);
         }
 
         std::string info_string = camera.toString(6, 2);
