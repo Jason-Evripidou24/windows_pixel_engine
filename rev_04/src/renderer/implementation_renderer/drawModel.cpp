@@ -41,6 +41,16 @@ void Renderer::drawModel
         Math::Vec4_f transformed_position_1 = proj_view_mode_mat * model.m_mesh->m_vertices[triangle_vertex_1_index].m_position;
         Math::Vec4_f transformed_position_2 = proj_view_mode_mat * model.m_mesh->m_vertices[triangle_vertex_2_index].m_position;
 
+        if
+        (
+            transformed_position_0.m_data[3] <= 0.0f ||
+            transformed_position_1.m_data[3] <= 0.0f ||
+            transformed_position_2.m_data[3] <= 0.0f
+        )
+        {
+            continue;
+        }
+
         uint32_t color_0 = model.m_mesh->m_vertices[triangle_vertex_0_index].m_color;
         uint32_t color_1 = model.m_mesh->m_vertices[triangle_vertex_1_index].m_color;
         uint32_t color_2 = model.m_mesh->m_vertices[triangle_vertex_2_index].m_color;

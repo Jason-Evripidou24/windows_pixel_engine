@@ -35,9 +35,9 @@ Mesh Mesh::roadMesh(uint32_t color)
     float leb_x  = -4.0f;   float leb_y  = 0.15f;           float reb_x  = 4.0f;   float reb_y  = 0.15f;
     float linv_x = -4.3f;   float linv_y = 0.0f;            float rinv_x = 4.3f;   float rinv_y = 0.0f;
     float ltk_x  = -4.4f;   float ltk_y  = 0.45f;           float rtk_x  = 4.4f;   float rtk_y  = 0.45f;
-    float lbk_x  = -4.5f;   float lbk_y  = 0.45f;           float rbk_x  = 4.5f;   float rbk_y  = 0.45f;
-    float lfp_x  = -5.0f;   float lfp_y  = 0.5f;            float rfp_x  = 5.0f;   float rfp_y  = 0.5f;
-    float lbp_x  = -6.0f;   float lbp_y  = 0.5f;            float rbp_x  = 6.0f;   float rbp_y  = 0.5f;
+    float lbk_x  = -4.7f;   float lbk_y  = 0.45f;           float rbk_x  = 4.7f;   float rbk_y  = 0.45f;
+    float lfp_x  = -6.0f;   float lfp_y  = 0.7f;            float rfp_x  = 6.0f;   float rfp_y  = 0.7f;
+    float lbp_x  = -7.0f;   float lbp_y  = 0.7f;            float rbp_x  = 7.0f;   float rbp_y  = 0.7f;
 
     road_mesh.m_vertices = std::vector<Vertex>(cross_section_vertex_count * num_cross_sections);
 
@@ -78,7 +78,7 @@ Mesh Mesh::roadMesh(uint32_t color)
     for(int i = 0; i < cross_section_vertex_count - 1; i++)
     {
         road_mesh.m_triangles[(i * 2) + 0] = Math::Vec3_i(i, i + cross_section_vertex_count, i + cross_section_vertex_count + 1);
-        road_mesh.m_triangles[(i * 2) + 1] = Math::Vec3_i(i, i + cross_section_vertex_count, i + 1);
+        road_mesh.m_triangles[(i * 2) + 1] = Math::Vec3_i(i, i + cross_section_vertex_count + 1, i + 1);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 

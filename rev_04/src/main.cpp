@@ -44,8 +44,8 @@ static bool tracking_mouse = false;
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 0.5f;
-static float camera_look_speed = 0.01f;
+static float camera_move_speed = 0.05f;
+static float camera_look_speed = 0.002f;
 void processInput(Window& window)
 {
     // Move camera along x
