@@ -33,14 +33,14 @@ static Camera camera
     Math::degreesToRadians(180.0f),
     Math::degreesToRadians(45.0f),
     0.1f,
-    5.0f,
+    10.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 0.005f;
+static float camera_move_speed = 0.002f;
 static float camera_look_speed = 0.002f;
 void processInput(Window& window)
 {
@@ -161,7 +161,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             std::string info_string = triangle_transform.toString(6, 2);
             backbuffer.setText(10, 10 + (i * 100), info_string.c_str(), info_string.size(), 0xFFFFFFFF);
 
-            renderer.drawWireframeTriangle(backbuffer, triangle_transform);
+            //renderer.drawWireframeTriangle(backbuffer, triangle_transform);
+
+            std::vector<Math::Triangle> triangles_transformed = renderer.clipTriangleBetweenY(triangle_transform, -1.0f, 1.0f);
+            for(int j = 0; j < triangles_transformed.size(); j++)
+            {
+                renderer.drawWireframeTriangle(backbuffer, triangles_transformed[j]);
+            }
         }
 
         /*

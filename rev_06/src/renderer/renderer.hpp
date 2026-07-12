@@ -51,8 +51,26 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     Math::Triangle transformTriangle(const Math::Triangle& triangle, const Math::Mat4_f& matrix);
 
-    //Math::Vertex clipIntersectionZ(const Math::Vertex& v_0, const Math::Vertex& v_1, const float plane_z);
-    //std::vector<Math::Triangle> clipTriangleMaxZ(const Math::Triangle& triangle, const float max_z_plane);
+    Math::Vertex intersectionWithPlaneX(const Math::Vertex& v_0, const Math::Vertex& v_1, const float plane_x);
+    Math::Vertex intersectionWithPlaneY(const Math::Vertex& v_0, const Math::Vertex& v_1, const float plane_y);
+    Math::Vertex intersectionWithPlaneZ(const Math::Vertex& v_0, const Math::Vertex& v_1, const float plane_z);
+
+    std::vector<Math::Triangle> clipTriangleMinY(const Math::Triangle& triangle, const float min_y_plane);
+    std::vector<Math::Triangle> clipTriangleMaxY(const Math::Triangle& triangle, const float max_y_plane);
+    std::vector<Math::Triangle> clipTriangleBetweenY(const Math::Triangle& triangle, const float min_y_plane, const float max_y_plane);
+
+    std::vector<Math::Triangle> clipTriangleMinZ(const Math::Triangle& triangle, const float min_z_plane);
+    std::vector<Math::Triangle> clipTriangleMaxZ(const Math::Triangle& triangle, const float max_z_plane);
+    std::vector<Math::Triangle> clipTriangleBetweenZ(const Math::Triangle& triangle, const float min_z_plane, const float max_z_plane);
+
+    std::vector<Math::Triangle> clipTriangleBetweenXYZ
+    (
+        const Math::Triangle& triangle,
+        const float min_y_plane,
+        const float max_y_plane,
+        const float min_z_plane,
+        const float max_z_plane
+    );
     
     void perspectiveDivideTriangle(Math::Triangle& triangle);
 
