@@ -2,7 +2,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <algorithm>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,30 +14,37 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../camera.hpp"
 
-#include "../../backbuffer/backbuffer.hpp"
+#include "../../math/math.hpp"
 #include "../../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
+Camera::Camera
 (
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
+    const Math::Vec3_f& position,
+    const float pitch_rads,
+    const float yaw_rads,
+    const float fov_rads,
+    const float near_plane,
+    const float far_plane,
+    const Math::Vec3_f& world_up
 )
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
-    //---------------------------------------------------------------------------------------------------------------------//
+    m_position = position;
+
+    m_pitch_rads = std::clamp<float>(pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
+    m_yaw_rads   = std::fmod(yaw_rads, Math::TWO_PI_f);
+
+    m_fov_rads   = fov_rads;
+    m_near_plane = near_plane;
+    m_far_plane  = far_plane;
+
+    m_world_up = Math::normalise(world_up);
+
+    this->updateVectors();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

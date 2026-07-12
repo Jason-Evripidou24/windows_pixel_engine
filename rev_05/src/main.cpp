@@ -23,7 +23,6 @@
 #include "window/window.hpp"
 #include "model/mesh.hpp"
 #include "model/model.hpp"
-#include "model/vertex.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -31,20 +30,20 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 static Camera camera
 (
-    Math::Vec3_f(0.0f, 0.0f, 15.0f),
+    Math::Vec3_f(0.0f, 0.0f, 2.0f),
     Math::degreesToRadians(0.0f),
     Math::degreesToRadians(180.0f),
     Math::degreesToRadians(45.0f),
-    0.1f,
-    100.0f,
+    0.2f,
+    5.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 0.02f;
-static float camera_look_speed = 0.005f;
+static float camera_move_speed = 0.005f;
+static float camera_look_speed = 0.002f;
 void processInput(Window& window)
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -64,8 +63,8 @@ void processInput(Window& window)
     //---------------------------------------------------------------------------------------------------------------------//
     // Mouse.
     //---------------------------------------------------------------------------------------------------------------------//
-    float curr_mouse_pos_x = window.m_input.m_mouse_x;
-    float curr_mouse_pos_y = window.m_input.m_mouse_y;
+    float curr_mouse_pos_x = (float)window.m_input.m_mouse_x;
+    float curr_mouse_pos_y = (float)window.m_input.m_mouse_y;
 
     if(window.m_input.isMouseDown(0) == true)
     {
@@ -86,72 +85,22 @@ void processInput(Window& window)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Mesh road_mesh = Mesh::roadMesh(0xFF000000);
-    Model road_model = Model();
-    road_model.m_mesh = &road_mesh;
-    road_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
-    road_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    road_model.m_rotate_rad = 0.0f;
-    road_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+    Math::Vec4_f triangle_0_pos = Math::Vec4_f(0.0f, 0.5f, -2.0f, 1.0f);
+    uint32_t triangle_0_col = 0xFF000000;
 
-    static std::vector<Mesh> cube_meshes(3);
-    // Center cube.
-    cube_meshes[0] = Mesh::cubeMesh(0xFFFFFF00);
-    // Positive color.
-    cube_meshes[1] = Mesh::cubeMesh(0xFF000000);
-    // Negative color.
-    cube_meshes[2] = Mesh::cubeMesh(0xFFFFFFFF);
+    Math::Vec4_f triangle_1_pos = Math::Vec4_f(-0.5f, -0.5f, -2.0f, 1.0f);
+    uint32_t triangle_1_col = 0xFF000000;
 
-    static std::vector<Model> cube_models(7);
-    // Center cube.
-    cube_models[0] = Model();
-    cube_models[0].m_mesh = &(cube_meshes[0]);
-    cube_models[0].m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
-    cube_models[0].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[0].m_rotate_rad = 0.0f;
-    cube_models[0].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    // Positive x axis.
-    cube_models[1] = Model();
-    cube_models[1].m_mesh = &(cube_meshes[1]);
-    cube_models[1].m_position = Math::Vec3_f(5.0f, 0.0f, 0.0f);
-    cube_models[1].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[1].m_rotate_rad = 0.0f;
-    cube_models[1].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    // Negative x axis.
-    cube_models[2] = Model();
-    cube_models[2].m_mesh = &(cube_meshes[2]);
-    cube_models[2].m_position = Math::Vec3_f(-5.0f, 0.0f, 0.0f);
-    cube_models[2].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[2].m_rotate_rad = 0.0f;
-    cube_models[2].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    // Positive y axis.
-    cube_models[3] = Model();
-    cube_models[3].m_mesh = &(cube_meshes[1]);
-    cube_models[3].m_position = Math::Vec3_f(0.0f, 5.0f, 0.0f);
-    cube_models[3].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[3].m_rotate_rad = 0.0f;
-    cube_models[3].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    // Negative y axis.
-    cube_models[4] = Model();
-    cube_models[4].m_mesh = &(cube_meshes[2]);
-    cube_models[4].m_position = Math::Vec3_f(0.0f, -5.0f, 0.0f);
-    cube_models[4].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[4].m_rotate_rad = 0.0f;
-    cube_models[4].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    // Positive z axis.
-    cube_models[5] = Model();
-    cube_models[5].m_mesh = &(cube_meshes[1]);
-    cube_models[5].m_position = Math::Vec3_f(0.0f, 0.0f, 5.0f);
-    cube_models[5].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[5].m_rotate_rad = 0.0f;
-    cube_models[5].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    // Negative z axis.
-    cube_models[6] = Model();
-    cube_models[6].m_mesh = &(cube_meshes[2]);
-    cube_models[6].m_position = Math::Vec3_f(0.0f, 0.0f, -5.0f);
-    cube_models[6].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_models[6].m_rotate_rad = 0.0f;
-    cube_models[6].m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    Math::Vec4_f triangle_2_pos = Math::Vec4_f(0.5f, -0.5f, -2.0f, 1.0f);
+    uint32_t triangle_2_col = 0xFF000000;
+
+    Math::Triangle triangle;
+    triangle.m_vertices[0].m_position = triangle_0_pos;
+    triangle.m_vertices[0].m_color = triangle_0_col;
+    triangle.m_vertices[1].m_position = triangle_1_pos;
+    triangle.m_vertices[1].m_color = triangle_1_col;
+    triangle.m_vertices[2].m_position = triangle_2_pos;
+    triangle.m_vertices[2].m_color = triangle_2_col;
     //---------------------------------------------------------------------------------------------------------------------//
 
     Window window;
@@ -172,21 +121,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Math::Mat4_f cam_view = camera.calcViewMatrix();
         Math::Mat4_f cam_proj_cam_view = cam_projection * cam_view;
 
-        static float angle = 0.0f;
-        angle += 0.002f;   // radians per frame
-        for(int i = 0; i < 7; i++)
+        Math::Triangle triangle_transform = renderer.transformTriangle(triangle, cam_proj_cam_view);
+        renderer.perspectiveDivideTriangle(triangle_transform);
+        std::vector<Math::Triangle> triangles = renderer.clipTriangleMaxZ(triangle_transform, 0.5f);
+
+        std::string info_string ="NUM TRIANGLES: " + std::to_string(triangles.size());
+        backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFF000000);
+
+        info_string = triangle_transform.m_vertices[0].m_position.toStringRow(6, 2);
+        backbuffer.setText(10, 30, info_string.c_str(), info_string.size(), 0xFF000000);
+        info_string = triangle_transform.m_vertices[1].m_position.toStringRow(6, 2);
+        backbuffer.setText(10, 40, info_string.c_str(), info_string.size(), 0xFF000000);
+        info_string = triangle_transform.m_vertices[2].m_position.toStringRow(6, 2);
+        backbuffer.setText(10, 50, info_string.c_str(), info_string.size(), 0xFF000000);
+
+        for(int i = 0; i < triangles.size(); i++)
         {
-            cube_models[i].m_rotate_rad = angle;
-            Math::Mat4_f model = cube_models[i].calcModelMatrix();
-            renderer.drawModel(backbuffer, cube_models[i], cam_proj_cam_view);
+            info_string = triangles[i].m_vertices[0].m_position.toStringRow(6, 2);
+            backbuffer.setText(500, 10 + (i * 50), info_string.c_str(), info_string.size(), 0xFF000000);
+            info_string = triangles[i].m_vertices[1].m_position.toStringRow(6, 2);
+            backbuffer.setText(500, 20 + (i * 50), info_string.c_str(), info_string.size(), 0xFF000000);
+            info_string = triangles[i].m_vertices[2].m_position.toStringRow(6, 2);
+            backbuffer.setText(500, 30 + (i * 50), info_string.c_str(), info_string.size(), 0xFF000000);
 
-            for(int i = 0; i < 100; i++)
-            {
-                road_model.m_position.m_data[2] = (float)i;
-                renderer.drawModel(backbuffer, road_model, cam_proj_cam_view);
-            }
+            renderer.drawWireframeTriangle(backbuffer, triangles[i]);
         }
-
+        
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
 

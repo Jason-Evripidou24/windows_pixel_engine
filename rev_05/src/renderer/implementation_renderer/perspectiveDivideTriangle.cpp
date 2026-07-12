@@ -16,27 +16,23 @@
 #include "../renderer.hpp"
 
 #include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+void Renderer::perspectiveDivideTriangle(Math::Triangle& triangle)
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
-    //---------------------------------------------------------------------------------------------------------------------//
+    for(int i = 0; i < 3; i++)
+    {
+        Math::Vec4_f& position = triangle.m_vertices[i].m_position;
+
+        float w = position.m_data[3];
+
+        position.m_data[0] /= w;
+        position.m_data[1] /= w;
+        position.m_data[2] /= w;
+        position.m_data[3] = 1.0f;
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

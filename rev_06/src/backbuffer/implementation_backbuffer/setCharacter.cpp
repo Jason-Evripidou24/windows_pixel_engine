@@ -13,30 +13,48 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+void Backbuffer::setCharacter(int x, int y, char character, uint32_t color)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
+    if
+    (
+        (m_color_buffer == nullptr) ||
+        (m_depth_buffer == nullptr) ||
+        (x < 0)                     ||
+        (x >= m_width)              ||
+        (y < 0)                     ||
+        (y >= m_height)
+    )
+    {
+        return;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
+
+    uint8_t c = static_cast<uint8_t>(character);
+
+    const uint8_t* glyph = g_asciiFont.m_ascii_font_basic_bitmap[c];
+
+    for(int row = 0; row < g_asciiFont.m_glyph_height; row++)
+    {
+        uint8_t bits = glyph[row];
+
+        for(int col = 0; col < g_asciiFont.m_glyph_width; col++)
+        {
+            // MSB → LSB (left to right)
+            //bool pixel_on = bits & (0x80 >> col);
+            bool pixel_on = bits & (1 << col);
+
+            if(pixel_on)
+            {
+                this->setPixel(x + col, y + row, 1.0f, color);
+            }
+        }
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

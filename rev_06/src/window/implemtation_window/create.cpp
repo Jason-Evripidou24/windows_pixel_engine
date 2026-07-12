@@ -2,41 +2,64 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <windows.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
+#include "../window.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+bool Window::create(const wchar_t* title, int width, int height, HINSTANCE h_instance)
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
-    //---------------------------------------------------------------------------------------------------------------------//
+    m_width = width;
+    m_height = height;
+
+    WNDCLASS wc = {};
+    wc.lpfnWndProc   = WindowProc;
+    wc.hInstance     = h_instance;
+    wc.lpszClassName = L"PixelEngineWindow";
+
+    RegisterClass(&wc);
+
+    RECT rect = {0, 0, width, height};
+    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+
+    m_hwnd = CreateWindowEx
+    (
+        0,
+        wc.lpszClassName,
+        title,
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        rect.right - rect.left,
+        rect.bottom - rect.top,
+        nullptr,
+        nullptr,
+        h_instance,
+        nullptr
+    );
+
+    if(m_hwnd == nullptr) { return false; }
+
+    SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
+
+    ShowWindow(m_hwnd, SW_SHOW);
+
+    m_dc = GetDC(m_hwnd);
+
+    m_running = true;
+
+    return true;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

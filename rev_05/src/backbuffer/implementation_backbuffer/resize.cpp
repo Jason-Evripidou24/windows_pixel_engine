@@ -8,35 +8,80 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <windows.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+void Backbuffer::resize(int width, int height)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
+    if
+    (
+        (width <= 0)  ||
+        (height <= 0) ||
+        (
+            (width == m_width)   &&
+            (height == m_height)
+        )
+    )
+    {
+        return;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    this->freeBuffers();
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    m_width  = width;
+    m_height = height;
+    m_pitch  = m_width * sizeof(uint32_t);
+
+    m_bitmapinfo = {};
+    m_bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    m_bitmapinfo.bmiHeader.biWidth = m_width;
+    m_bitmapinfo.bmiHeader.biHeight = -m_height; // top-down
+    m_bitmapinfo.bmiHeader.biPlanes = 1;
+    m_bitmapinfo.bmiHeader.biBitCount = 32;
+    m_bitmapinfo.bmiHeader.biCompression = BI_RGB;
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    size_t pixel_count = static_cast<size_t>(m_width) * static_cast<size_t>(m_height);
+
+    size_t color_buffer_size = pixel_count * sizeof(uint32_t);
+    m_color_buffer = (uint32_t*)VirtualAlloc
+    (
+        0,
+        color_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
+
+    size_t depth_buffer_size = pixel_count * sizeof(float);
+    m_depth_buffer = (float*)VirtualAlloc
+    (
+        0,
+        depth_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
+
+    if( (m_color_buffer == nullptr) || (m_depth_buffer == nullptr) )
+    {
+        this->freeBuffers();
+        m_width = 0;
+        m_height = 0;
+        m_pitch = 0;
+        m_bitmapinfo = {};
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

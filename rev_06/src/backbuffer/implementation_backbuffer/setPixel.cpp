@@ -13,30 +13,37 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+void Backbuffer::setPixel(int x, int y, float z, uint32_t color)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
+    if
+    (
+        (m_color_buffer == nullptr) ||
+        (m_depth_buffer == nullptr) ||
+        (x < 0)                     ||
+        (x >= m_width)              ||
+        (y < 0)                     ||
+        (y >= m_height)             ||
+        (z < -1.0f)                 ||
+        (z > 1.0f)
+    )
+    {
+        return;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
+
+    int buffers_index = (y * m_width) + x;
+    
+    if(z > m_depth_buffer[buffers_index])
+    {
+        m_color_buffer[buffers_index] = color;
+        m_depth_buffer[buffers_index] = z;
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

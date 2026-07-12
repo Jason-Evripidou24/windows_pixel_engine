@@ -16,27 +16,49 @@
 #include "../renderer.hpp"
 
 #include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
+#include "../../math/vertex.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+/*
+-   Vertexes are (should be) within clip space.
+*/
+void Renderer::drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const Math::Vertex& v_1)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
+    // Calculate the backbuffer pixel width and height that will be required.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int backbuffer_x0 = (v_0.m_position.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y0 = (1.0f - v_0.m_position.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
+    
+    int backbuffer_x1 = (v_1.m_position.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y1 = (1.0f - v_1.m_position.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
+
+
+    int dx = backbuffer_x1 - backbuffer_x0;
+    int dy = backbuffer_y1 - backbuffer_y0;
+
+    int abs_dx = dx; if(abs_dx < 0) { abs_dx *= -1; }
+    int abs_dy = dy; if(abs_dy < 0) { abs_dy *= -1; }
+
+    int steps = abs_dx; if(abs_dy > steps) { steps = abs_dy; }
+
+    if(steps == 0)
+    {
+        this->drawPixel(backbuffer, v_0);
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    for(int i = 0; i <= steps; i++)
+    {
+        float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
+
+        Math::Vertex curr_vert = Math::interpolateVertex(v_0, v_1, t);
+        this->drawPixel(backbuffer, curr_vert);
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

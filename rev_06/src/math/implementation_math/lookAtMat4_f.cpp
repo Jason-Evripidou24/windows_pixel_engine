@@ -2,7 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,30 +13,44 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../math.hpp"
 
-#include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
+#include "../vec3_f.hpp"
+#include "../vec4_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
-(
-    Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
-)
+// TODO: FIX THIS METHOD
+Math::Mat4_f Math::lookAtMat4_f(const Vec3_f& cam_pos, const Vec3_f& cam_direction, const Vec3_f& cam_right, const Vec3_f& cam_up)
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
-    //---------------------------------------------------------------------------------------------------------------------//
+    Mat4_f new_mat;
+
+    float pos_dot_right = Math::dotProduct(cam_pos, cam_right);
+    float pos_dot_up = Math::dotProduct(cam_pos, cam_up);
+    float pos_dot_dir = Math::dotProduct(cam_pos, cam_direction);
+
+    new_mat.m_data[0]  = cam_right.m_data[0];
+    new_mat.m_data[1]  = cam_right.m_data[1];
+    new_mat.m_data[2]  = cam_right.m_data[2];
+    new_mat.m_data[3]  = -pos_dot_right;
+
+    new_mat.m_data[4]  = cam_up.m_data[0];
+    new_mat.m_data[5]  = cam_up.m_data[1];
+    new_mat.m_data[6]  = cam_up.m_data[2];
+    new_mat.m_data[7]  = -pos_dot_up;
+
+    new_mat.m_data[8]  = -cam_direction.m_data[0];
+    new_mat.m_data[9]  = -cam_direction.m_data[1];
+    new_mat.m_data[10] = -cam_direction.m_data[2];
+    new_mat.m_data[11] = pos_dot_dir;
+
+    new_mat.m_data[12] = 0.0f;
+    new_mat.m_data[13] = 0.0f;
+    new_mat.m_data[14] = 0.0f;
+    new_mat.m_data[15] = 1.0f;
+
+    return new_mat;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

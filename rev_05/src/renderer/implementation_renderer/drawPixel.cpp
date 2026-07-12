@@ -16,27 +16,50 @@
 #include "../renderer.hpp"
 
 #include "../../backbuffer/backbuffer.hpp"
-#include "../../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawWireframeTriangle
+void Renderer::drawPixel
 (
     Backbuffer&    backbuffer,
-    Math::Vec3_f   pos_0,
-    const uint32_t color_0,
-    Math::Vec3_f   pos_1,
-    const uint32_t color_1,
-    Math::Vec3_f   pos_2,
-    const uint32_t color_2
+    const float    x,
+    const float    y,
+    const float    depth,
+    const uint32_t color
 )
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    this->drawLine(backbuffer, pos_0, color_0, pos_1, color_1);
-    this->drawLine(backbuffer, pos_0, color_0, pos_2, color_2);
-    this->drawLine(backbuffer, pos_1, color_1, pos_2, color_2);
+    if
+    (
+        (x < -1.0f) || (x > 1.0f)         ||
+        (y < -1.0f) || (y > 1.0f)         ||
+        (depth < -1.0f) || (depth > 1.0f)
+    )
+    {
+        return;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    int backbuffer_x = (x + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y = (1.0f - y) * (backbuffer.m_height - 1) * 0.5f;
+
+    backbuffer.setPixel(backbuffer_x, backbuffer_y, depth, color);
+    //---------------------------------------------------------------------------------------------------------------------//
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Renderer::drawPixel(Backbuffer& backbuffer, const Math::Vertex& vertex)
+{
+    //---------------------------------------------------------------------------------------------------------------------//
+    int backbuffer_x = (vertex.m_position.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y = (1.0f - vertex.m_position.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
+
+    backbuffer.setPixel(backbuffer_x, backbuffer_y, vertex.m_position.m_data[2], vertex.m_color);
     //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
