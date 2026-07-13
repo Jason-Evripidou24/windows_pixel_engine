@@ -13,23 +13,41 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../renderer.hpp"
+
+#include "../../utils/utils.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::perspectiveDivideTriangle(Math::Triangle& triangle)
+Math::Triangle Renderer::perspectiveDivideTriangle(const Math::Triangle& triangle)
 {
+    Math::Triangle output = triangle;
+
     for(int i = 0; i < 3; i++)
     {
-        Math::Vec4_f& position = triangle.m_vertices[i].m_position;
+        Math::Vec4_f& output_position = output.m_vertices[i].m_position;
 
-        float w = position.m_data[3];
+        float w = output_position.m_data[3];
 
-        position.m_data[0] = position.m_data[0] / w;
-        position.m_data[1] = position.m_data[1] / w;
-        position.m_data[2] = position.m_data[2] / w;
-        position.m_data[3] = 1.0f;
+        if(w <= 0.0f)
+        {
+            output_position.m_data[0] = 0.0f;
+            output_position.m_data[1] = 0.0f;
+            output_position.m_data[2] = 0.0f;
+            output_position.m_data[3] = 0.0f;
+
+            return output;
+        }
+        else
+        {
+            output_position.m_data[0] = output_position.m_data[0] / w;
+            output_position.m_data[1] = output_position.m_data[1] / w;
+            output_position.m_data[2] = output_position.m_data[2] / w;
+            output_position.m_data[3] = 1.0f;
+        }
     }
+
+    return output;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -57,6 +57,9 @@ struct Backbuffer
     void setText(int x, int y, const char* text, int text_size, uint32_t color);
 
     void present(HDC dc, int window_width, int window_height);
+
+    int toBackbufferCoordX(const float x);
+    int toBackbufferCoordY(const float y);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

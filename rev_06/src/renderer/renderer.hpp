@@ -55,6 +55,10 @@ struct Renderer
     Math::Vertex intersectionWithPlaneY(const Math::Vertex& v_0, const Math::Vertex& v_1, const float plane_y);
     Math::Vertex intersectionWithPlaneZ(const Math::Vertex& v_0, const Math::Vertex& v_1, const float plane_z);
 
+    std::vector<Math::Triangle> clipTriangleMinX(const Math::Triangle& triangle, const float min_x_plane);
+    std::vector<Math::Triangle> clipTriangleMaxX(const Math::Triangle& triangle, const float max_x_plane);
+    std::vector<Math::Triangle> clipTriangleBetweenX(const Math::Triangle& triangle, const float min_x_plane, const float max_x_plane);
+
     std::vector<Math::Triangle> clipTriangleMinY(const Math::Triangle& triangle, const float min_y_plane);
     std::vector<Math::Triangle> clipTriangleMaxY(const Math::Triangle& triangle, const float max_y_plane);
     std::vector<Math::Triangle> clipTriangleBetweenY(const Math::Triangle& triangle, const float min_y_plane, const float max_y_plane);
@@ -66,15 +70,19 @@ struct Renderer
     std::vector<Math::Triangle> clipTriangleBetweenXYZ
     (
         const Math::Triangle& triangle,
+        const float min_x_plane,
+        const float max_x_plane,
         const float min_y_plane,
         const float max_y_plane,
         const float min_z_plane,
         const float max_z_plane
     );
     
-    void perspectiveDivideTriangle(Math::Triangle& triangle);
+    Math::Triangle perspectiveDivideTriangle(const Math::Triangle& triangle);
+    
+    void drawTriangle(Backbuffer& backbuffer, const Math::Triangle& triangle, const bool draw_filled);
+    void fillTriangle(Backbuffer& backbuffer, const Math::Triangle& triangle);
 
-    void drawWireframeTriangle(Backbuffer& backbuffer, const Math::Triangle& triangle);
     void drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const Math::Vertex& v_1);
     void drawPixel(Backbuffer& backbuffer, const Math::Vertex& vertex);
     //---------------------------------------------------------------------------------------------------------------------//

@@ -21,6 +21,7 @@
 #include "math/math.hpp"
 #include "renderer/renderer.hpp"
 #include "window/window.hpp"
+#include "utils/utils.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -32,7 +33,7 @@ static Camera camera
     Math::degreesToRadians(0.0f),
     Math::degreesToRadians(180.0f),
     Math::degreesToRadians(45.0f),
-    0.1f,
+    0.01f,
     10.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
@@ -42,6 +43,8 @@ static float mouse_pos_y = 0.0f;
 
 static float camera_move_speed = 0.002f;
 static float camera_look_speed = 0.002f;
+
+static bool draw_filled = true;
 void processInput(Window& window)
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -56,6 +59,8 @@ void processInput(Window& window)
     // Move camera along z
     if(window.m_input.isKeyDown('W') == true) { camera.moveForward(camera_move_speed); }
     if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-camera_move_speed); }
+
+    if(window.m_input.isKeyPressed('0') == true) { draw_filled = !draw_filled; }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -153,49 +158,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         for(int i = 0; i < pyramid_triangles.size(); i++)
         {
-            Math::Triangle& triangle = pyramid_triangles[i];
+            const Math::Triangle& triangle = pyramid_triangles[i];
 
-            Math::Triangle triangle_transform = renderer.transformTriangle(triangle, cam_proj_cam_view);
-            renderer.perspectiveDivideTriangle(triangle_transform);
+            const Math::Triangle triangle_transform = renderer.transformTriangle(triangle, cam_proj_cam_view);
 
             std::string info_string = triangle_transform.toString(6, 2);
             backbuffer.setText(10, 10 + (i * 100), info_string.c_str(), info_string.size(), 0xFFFFFFFF);
 
-            //renderer.drawWireframeTriangle(backbuffer, triangle_transform);
-
-            std::vector<Math::Triangle> triangles_transformed = renderer.clipTriangleBetweenY(triangle_transform, -1.0f, 1.0f);
-            for(int j = 0; j < triangles_transformed.size(); j++)
-            {
-                renderer.drawWireframeTriangle(backbuffer, triangles_transformed[j]);
-            }
+            renderer.drawTriangle(backbuffer, triangle_transform, draw_filled);
         }
 
-        /*
-        std::vector<Math::Triangle> triangles = renderer.clipTriangleMaxZ(triangle_transform, 0.5f);
-
-        std::string info_string ="NUM TRIANGLES: " + std::to_string(triangles.size());
-        backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFF000000);
-
-        info_string = triangle_transform.m_vertices[0].m_position.toStringRow(6, 2);
-        backbuffer.setText(10, 30, info_string.c_str(), info_string.size(), 0xFF000000);
-        info_string = triangle_transform.m_vertices[1].m_position.toStringRow(6, 2);
-        backbuffer.setText(10, 40, info_string.c_str(), info_string.size(), 0xFF000000);
-        info_string = triangle_transform.m_vertices[2].m_position.toStringRow(6, 2);
-        backbuffer.setText(10, 50, info_string.c_str(), info_string.size(), 0xFF000000);
-
-        for(int i = 0; i < triangles.size(); i++)
-        {
-            info_string = triangles[i].m_vertices[0].m_position.toStringRow(6, 2);
-            backbuffer.setText(500, 10 + (i * 50), info_string.c_str(), info_string.size(), 0xFF000000);
-            info_string = triangles[i].m_vertices[1].m_position.toStringRow(6, 2);
-            backbuffer.setText(500, 20 + (i * 50), info_string.c_str(), info_string.size(), 0xFF000000);
-            info_string = triangles[i].m_vertices[2].m_position.toStringRow(6, 2);
-            backbuffer.setText(500, 30 + (i * 50), info_string.c_str(), info_string.size(), 0xFF000000);
-
-            renderer.drawWireframeTriangle(backbuffer, triangles[i]);
-        }
-        */
-        
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
 

@@ -30,12 +30,11 @@ void Renderer::drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const M
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate the backbuffer pixel width and height that will be required.
     //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x0 = (v_0.m_position.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
-    int backbuffer_y0 = (1.0f - v_0.m_position.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
-    
-    int backbuffer_x1 = (v_1.m_position.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
-    int backbuffer_y1 = (1.0f - v_1.m_position.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
+    int backbuffer_x0 = backbuffer.toBackbufferCoordX(v_0.m_position.m_data[0]);
+    int backbuffer_y0 = backbuffer.toBackbufferCoordY(v_0.m_position.m_data[1]);
 
+    int backbuffer_x1 = backbuffer.toBackbufferCoordX(v_1.m_position.m_data[0]);
+    int backbuffer_y1 = backbuffer.toBackbufferCoordY(v_1.m_position.m_data[1]);
 
     int dx = backbuffer_x1 - backbuffer_x0;
     int dy = backbuffer_y1 - backbuffer_y0;
