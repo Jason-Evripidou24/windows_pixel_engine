@@ -23,6 +23,7 @@
 #include "../backbuffer/backbuffer.hpp"
 
 #include "../math/math.hpp"
+#include "../model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -76,6 +77,14 @@ struct Renderer
         const float max_y_plane,
         const float min_z_plane,
         const float max_z_plane
+    );
+
+    void drawModel
+    (
+        Backbuffer& backbuffer,
+        const Model& model,
+        const Math::Mat4_f& projection_view_matrix,
+        const bool draw_filled
     );
     
     Math::Triangle perspectiveDivideTriangle(const Math::Triangle& triangle);

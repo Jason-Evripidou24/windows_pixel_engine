@@ -19,10 +19,11 @@
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 /*
--   Triangle has been transformed to clip space but not yet undergone perspective divide or clipping against x,y,z planes.
+-   Triangle has been transformed to clip space and undergone perspective divide but no clipping against x,y,z planes.
 */
 void Renderer::drawTriangle(Backbuffer& backbuffer, const Math::Triangle& triangle, const bool draw_filled)
 {
+    /*
     if
     (
         (triangle.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
@@ -43,10 +44,11 @@ void Renderer::drawTriangle(Backbuffer& backbuffer, const Math::Triangle& triang
     {
         return;
     }
+    */
 
     const std::vector<Math::Triangle> triangles_clipped = this->clipTriangleBetweenXYZ
     (
-        perspective_divide_triangle,
+        triangle,
         -1.0f,
         1.0f,
         -1.0f,

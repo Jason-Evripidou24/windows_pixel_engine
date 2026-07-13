@@ -22,6 +22,8 @@
 #include "renderer/renderer.hpp"
 #include "window/window.hpp"
 #include "utils/utils.hpp"
+#include "model/mesh.hpp"
+#include "model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -88,85 +90,48 @@ void processInput(Window& window)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Apex
-    Math::Vertex pyramid_0_vertex;
-    pyramid_0_vertex.m_position = Math::Vec4_f(0.0f, 0.5f, 3.0f, 1.0f);
-    pyramid_0_vertex.m_color = 0xFFFF00FF; // Magenta
-    // Base - Front Left
-    Math::Vertex pyramid_1_vertex;
-    pyramid_1_vertex.m_position = Math::Vec4_f(-0.5f, -0.5f, 3.5f, 1.0f);
-    pyramid_1_vertex.m_color = 0xFFFFA500; // Orange
-    // Base - Front Right
-    Math::Vertex pyramid_2_vertex;
-    pyramid_2_vertex.m_position = Math::Vec4_f(0.5f, -0.5f, 3.5f, 1.0f);
-    pyramid_2_vertex.m_color = 0xFF87CEEB; // Sky Blue
-    // Base - Back Right
-    Math::Vertex pyramid_3_vertex;
-    pyramid_3_vertex.m_position = Math::Vec4_f(0.5f, -0.5f, 2.5f, 1.0f);
-    pyramid_3_vertex.m_color = 0xFF00FF00; // Green
-    // Base - Back Left
-    Math::Vertex pyramid_4_vertex;
-    pyramid_4_vertex.m_position = Math::Vec4_f(-0.5f, -0.5f, 2.5f, 1.0f);
-    pyramid_4_vertex.m_color = 0xFFFFFF00; // Yellow
+    Mesh pyramid_mesh = Mesh::pyramidMesh();
+    Mesh cube_mesh = Mesh::cubeMesh();
 
-    std::vector<Math::Triangle> pyramid_triangles(6);
-    // Side faces
-    pyramid_triangles[0].m_vertices[0] = pyramid_0_vertex;
-    pyramid_triangles[0].m_vertices[1] = pyramid_1_vertex;
-    pyramid_triangles[0].m_vertices[2] = pyramid_2_vertex;
+    Model pyramid_model;
+    pyramid_model.m_mesh = &pyramid_mesh;
+    pyramid_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
+    pyramid_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    pyramid_model.m_rotate_rad = Math::degreesToRadians(0.0f);
+    pyramid_model.m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
 
-    pyramid_triangles[1].m_vertices[0] = pyramid_0_vertex;
-    pyramid_triangles[1].m_vertices[1] = pyramid_2_vertex;
-    pyramid_triangles[1].m_vertices[2] = pyramid_3_vertex;
-
-    pyramid_triangles[2].m_vertices[0] = pyramid_0_vertex;
-    pyramid_triangles[2].m_vertices[1] = pyramid_3_vertex;
-    pyramid_triangles[2].m_vertices[2] = pyramid_4_vertex;
-
-    pyramid_triangles[3].m_vertices[0] = pyramid_0_vertex;
-    pyramid_triangles[3].m_vertices[1] = pyramid_4_vertex;
-    pyramid_triangles[3].m_vertices[2] = pyramid_1_vertex;
-
-    // Base
-    pyramid_triangles[4].m_vertices[0] = pyramid_1_vertex;
-    pyramid_triangles[4].m_vertices[1] = pyramid_4_vertex;
-    pyramid_triangles[4].m_vertices[2] = pyramid_3_vertex;
-
-    pyramid_triangles[5].m_vertices[0] = pyramid_1_vertex;
-    pyramid_triangles[5].m_vertices[1] = pyramid_3_vertex;
-    pyramid_triangles[5].m_vertices[2] = pyramid_2_vertex;
+    Model cube_model;
+    cube_model.m_mesh = &cube_mesh;
+    cube_model.m_position = Math::Vec3_f(0.0f, 0.0f, -5.0f);
+    cube_model.m_scale = Math::Vec3_f(0.9f, 0.9f, 0.9f);
+    cube_model.m_rotate_rad = Math::degreesToRadians(0.0f);
+    cube_model.m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
     //---------------------------------------------------------------------------------------------------------------------//
 
     Window window;
     if(!window.create(L"Pixel Engine", 1600, 900, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    backbuffer.resize(window.m_width, window.m_height);
+    backbuffer.resize(window.m_width / 2, window.m_height / 2);
 
     Renderer renderer;
+
+    Math::Mat4_f projection_matrix = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
+    Math::Mat4_f view_matrix;
+    Math::Mat4_f proj_view_matrix;
 
     while(window.processMessages())
     {
         //backbuffer.clear(0xEBCE87FF); // Sky blue
-        backbuffer.clear(0xFF000000); // Black
+        //backbuffer.clear(0xFF000000); // Black
+        backbuffer.clear(0xFFFFFFFF); // White
 
         processInput(window);
+    
+        view_matrix = camera.calcViewMatrix();
+        proj_view_matrix = projection_matrix * view_matrix;
 
-        Math::Mat4_f cam_projection = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
-        Math::Mat4_f cam_view = camera.calcViewMatrix();
-        Math::Mat4_f cam_proj_cam_view = cam_projection * cam_view;
-
-        for(int i = 0; i < pyramid_triangles.size(); i++)
-        {
-            const Math::Triangle& triangle = pyramid_triangles[i];
-
-            const Math::Triangle triangle_transform = renderer.transformTriangle(triangle, cam_proj_cam_view);
-
-            std::string info_string = triangle_transform.toString(6, 2);
-            backbuffer.setText(10, 10 + (i * 100), info_string.c_str(), info_string.size(), 0xFFFFFFFF);
-
-            renderer.drawTriangle(backbuffer, triangle_transform, draw_filled);
-        }
+        renderer.drawModel(backbuffer, cube_model, proj_view_matrix, draw_filled);
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

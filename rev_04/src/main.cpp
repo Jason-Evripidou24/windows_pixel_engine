@@ -177,7 +177,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         for(int i = 0; i < 7; i++)
         {
             cube_models[i].m_rotate_rad = angle;
-            Math::Mat4_f model = cube_models[i].calcModelMatrix();
             renderer.drawModel(backbuffer, cube_models[i], cam_proj_cam_view);
 
             for(int i = 0; i < 100; i++)
