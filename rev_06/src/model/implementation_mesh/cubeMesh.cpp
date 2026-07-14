@@ -73,31 +73,31 @@ Mesh Mesh::cubeMesh()
     //-----------------------------------------------------------------------------------------------------------------//
     // Indicies: Each triplet represents a triangle face.
     //-----------------------------------------------------------------------------------------------------------------//
-    cube_mesh.m_triangle_indices = std::vector<Math::Vec3_i>(triangles_count);
+    cube_mesh.m_triangles_indices = std::vector<Math::Vec3_i>(triangles_count);
 
     // Front Face (+Z)
-    cube_mesh.m_triangle_indices[0] = Math::Vec3_i(0, 1, 2);
-    cube_mesh.m_triangle_indices[1] = Math::Vec3_i(1, 3, 2);
+    cube_mesh.m_triangles_indices[0] = Math::Vec3_i(0, 1, 2);
+    cube_mesh.m_triangles_indices[1] = Math::Vec3_i(1, 3, 2);
 
     // Rear Face (-Z)
-    cube_mesh.m_triangle_indices[2] = Math::Vec3_i(4, 5, 6);
-    cube_mesh.m_triangle_indices[3] = Math::Vec3_i(5, 7, 6);
+    cube_mesh.m_triangles_indices[2] = Math::Vec3_i(4, 5, 6);
+    cube_mesh.m_triangles_indices[3] = Math::Vec3_i(5, 7, 6);
 
     // Top Face (+Y)
-    cube_mesh.m_triangle_indices[4] = Math::Vec3_i(5, 4, 0);
-    cube_mesh.m_triangle_indices[5] = Math::Vec3_i(4, 1, 0);
+    cube_mesh.m_triangles_indices[4] = Math::Vec3_i(5, 4, 0);
+    cube_mesh.m_triangles_indices[5] = Math::Vec3_i(4, 1, 0);
 
     // Bottom Face (-Y)
-    cube_mesh.m_triangle_indices[6] = Math::Vec3_i(2, 3, 7);
-    cube_mesh.m_triangle_indices[7] = Math::Vec3_i(3, 6, 7);
+    cube_mesh.m_triangles_indices[6] = Math::Vec3_i(2, 3, 7);
+    cube_mesh.m_triangles_indices[7] = Math::Vec3_i(3, 6, 7);
 
     // Left Face (-X)
-    cube_mesh.m_triangle_indices[8] = Math::Vec3_i(5, 0, 7);
-    cube_mesh.m_triangle_indices[9] = Math::Vec3_i(0, 2, 7);
+    cube_mesh.m_triangles_indices[8] = Math::Vec3_i(5, 0, 7);
+    cube_mesh.m_triangles_indices[9] = Math::Vec3_i(0, 2, 7);
 
     // Right Face (+X)
-    cube_mesh.m_triangle_indices[10] = Math::Vec3_i(1, 4, 3);
-    cube_mesh.m_triangle_indices[11] = Math::Vec3_i(4, 6, 3);
+    cube_mesh.m_triangles_indices[10] = Math::Vec3_i(1, 4, 3);
+    cube_mesh.m_triangles_indices[11] = Math::Vec3_i(4, 6, 3);
     //-----------------------------------------------------------------------------------------------------------------//
 
     return cube_mesh;

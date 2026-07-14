@@ -78,6 +78,48 @@ float Math::interpolateFloat(const float start, const float end, float t)
 /*
 -   t must be within 0.0f <= t <= 1.0f
 */
+Math::Vec2_f Math::interpolateVec2f(const Vec2_f& start, const Vec2_f& end, float t)
+{
+    //---------------------------------------------------------------------------------------------------------------------//
+    if(t <= 0.0f) { t = 0.0f; }
+    if(t >= 1.0f) { t = 1.0f; }
+    //---------------------------------------------------------------------------------------------------------------------//
+    
+    Math::Vec2_f result;
+    for(int i = 0; i < 2; i++)
+    {
+        result.m_data[i] = Math::interpolateFloat(start.m_data[i], end.m_data[i], t);
+    }
+    return result;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   t must be within 0.0f <= t <= 1.0f
+*/
+Math::Vec3_f Math::interpolateVec3f(const Vec3_f& start, const Vec3_f& end, float t)
+{
+    //---------------------------------------------------------------------------------------------------------------------//
+    if(t <= 0.0f) { t = 0.0f; }
+    if(t >= 1.0f) { t = 1.0f; }
+    //---------------------------------------------------------------------------------------------------------------------//
+    
+    Math::Vec3_f result;
+    for(int i = 0; i < 3; i++)
+    {
+        result.m_data[i] = Math::interpolateFloat(start.m_data[i], end.m_data[i], t);
+    }
+    return result;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   t must be within 0.0f <= t <= 1.0f
+*/
 Math::Vec4_f Math::interpolateVec4f(const Vec4_f& start, const Vec4_f& end, float t)
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -107,7 +149,10 @@ Math::Vertex Math::interpolateVertex(const Vertex& start, const Vertex& end, flo
     //---------------------------------------------------------------------------------------------------------------------//
     
     Math::Vertex result;
+
     result.m_position = Math::interpolateVec4f(start.m_position, end.m_position, t);
+    result.m_normal = Math::normalise(Math::interpolateVec3f(start.m_normal, end.m_normal, t));
+    result.m_tex_coords = Math::interpolateVec2f(start.m_tex_coords, end.m_tex_coords, t);
     result.m_color = Math::interpolateUint32(start.m_color, end.m_color, t);
 
     return result;

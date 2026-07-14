@@ -1,13 +1,11 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TRIANGLE_HPP
-#define TRIANGLE_HPP
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -18,55 +16,110 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "vertex.hpp"
+#include "../mesh.hpp"
+#include "../../math/vec4_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-namespace Math
+/*
+-   OBJ file
+    -   v      (vertex position)
+    -   vt     (vertex texture coordinates)
+    -   vn     (vertex normal)
+    -   f      (face consisting of three vertices)
+    -   usemtl
+    -   mtllib
+
+-   MTL file
+    -   newmtl
+    -   Kd (diffuse colour)
+    -   Ka (ambient colour)
+    -   Ks (specular colour)
+    -   Ns (shininess)
+    -   map_Kd (diffuse texture)
+    -   d / Tr (opacity)
+*/
+int parseOBJIndex(const std::string& token)
 {
-    struct Triangle
+    size_t slash = token.find('/');
+
+    if(slash != std::string::npos)
     {
-        //-----------------------------------------------------------------------------------------------------------------//
-        Vertex m_vertices[3];
-        //-----------------------------------------------------------------------------------------------------------------//
+        return std::stoi(token.substr(0, slash));
+    }
+
+    return std::stoi(token);
+}
+
+Mesh Mesh::loadFileObj(const std::string& filename)
+{
+    Mesh mesh;
+
+    std::ifstream file(filename);
+    if(!file.is_open()) { return mesh; }
+
+    std::vector<Math::Vertex> vertices;
+    std::vector<Math::Vec4_f> vertices_positions;
+    std::vector<Math::Vec3_i> triangles_indices;
+
+    std::string line;
+
+    while(std::getline(file, line))
+    {
+        std::stringstream ss(line);
+
+        std::string prefix;
+        ss >> prefix;
 
         //-----------------------------------------------------------------------------------------------------------------//
-        Triangle()
+        // Vertex position.
+        //-----------------------------------------------------------------------------------------------------------------//
+        if(prefix == "v")
         {
-            m_vertices[0] = Vertex();
-            m_vertices[1] = Vertex();
-            m_vertices[2] = Vertex();
-        }
+            float x;
+            float y;
+            float z;
 
-        Triangle(const Vertex& v_0, const Vertex& v_1, const Vertex& v_2)
+            ss >> x >> y >> z;
+
+            vertices_positions.push_back(Math::Vec4_f(x, y, z, 1.0f));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Triangle face.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "f")
         {
-            m_vertices[0] = v_0;
-            m_vertices[1] = v_1;
-            m_vertices[2] = v_2;
+            std::string a;
+            std::string b;
+            std::string c;
+            ss >> a >> b >> c;
+
+            // OBJ indices start at 1
+            int i0 = parseOBJIndex(a)-1;
+            int i1 = parseOBJIndex(b)-1;
+            int i2 = parseOBJIndex(c)-1;
+
+            Math::Vec3_i triangle_indices(i0, i1, i2);
+            triangles_indices.push_back(triangle_indices);
         }
         //-----------------------------------------------------------------------------------------------------------------//
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        // Visulisation.
-        //-----------------------------------------------------------------------------------------------------------------//
-        std::string toString(int min_num_width, int num_decimals) const
-        {
-            return
-            (
-                std::string("TRIANGLE INFO:") + std::string("\n") +
-                m_vertices[0].toString(min_num_width, num_decimals) + std::string("\n") +
-                m_vertices[1].toString(min_num_width, num_decimals) + std::string("\n") +
-                m_vertices[2].toString(min_num_width, num_decimals)
-            );
-        }
-        //-----------------------------------------------------------------------------------------------------------------//
-    };
-};
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+    }
 
 
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#endif
+    for(int i = 0; i < vertices_positions.size(); i++)
+    {
+        Math::Vertex new_vert;
+        new_vert.m_position = vertices_positions[i];
+        new_vert.m_color = 0xFF000000; // Black default.
+        vertices.push_back(new_vert);
+    }
+
+    mesh.m_vertices = vertices;
+    mesh.m_triangles_indices = triangles_indices;
+    return mesh;
+}
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

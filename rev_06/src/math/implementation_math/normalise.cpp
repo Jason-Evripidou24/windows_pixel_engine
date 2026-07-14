@@ -22,6 +22,37 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Math::Vec2_f Math::normalise(const Vec2_f& vec)
+{
+    Vec2_f new_vec;
+
+    float length = 0.0f;
+    for(int i = 0; i < 2; i++)
+    {
+        length += (vec.m_data[i] * vec.m_data[i]);
+    }
+    length = sqrtf(length);
+
+    if(length == 0.0f)
+    {
+        for(int i = 0; i < 2; i++)
+        {
+            new_vec.m_data[i] = 0.0f;
+        }
+        return new_vec;
+    }
+
+    for(int i = 0; i < 2; i++)
+    {
+        new_vec.m_data[i] = vec.m_data[i] / length;
+    }
+    
+    return new_vec;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Math::Vec3_f Math::normalise(const Vec3_f& vec)
 {
     Vec3_f new_vec;

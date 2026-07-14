@@ -93,6 +93,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Mesh pyramid_mesh = Mesh::pyramidMesh();
     Mesh cube_mesh = Mesh::cubeMesh();
 
+    Mesh loaded_cube_mesh = Mesh::loadFileObj("../assets/cube.obj");
+
     Model pyramid_model;
     pyramid_model.m_mesh = &pyramid_mesh;
     pyramid_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
@@ -101,7 +103,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     pyramid_model.m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
 
     Model cube_model;
-    cube_model.m_mesh = &cube_mesh;
+    cube_model.m_mesh = &loaded_cube_mesh;
     cube_model.m_position = Math::Vec3_f(0.0f, 0.0f, -5.0f);
     cube_model.m_scale = Math::Vec3_f(0.9f, 0.9f, 0.9f);
     cube_model.m_rotate_rad = Math::degreesToRadians(0.0f);

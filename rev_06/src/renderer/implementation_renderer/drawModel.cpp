@@ -33,7 +33,7 @@ void Renderer::drawModel
 {
     const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
 
-    for(const Math::Vec3_i& triangle_indices : model.m_mesh->m_triangle_indices)
+    for(const Math::Vec3_i& triangle_indices : model.m_mesh->m_triangles_indices)
     {
         int index_0 = triangle_indices.m_data[0];
         int index_1 = triangle_indices.m_data[1];

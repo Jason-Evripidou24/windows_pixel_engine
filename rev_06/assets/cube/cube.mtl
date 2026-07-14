@@ -1,0 +1,35 @@
+newmtl Magenta
+Ka 0.0 0.0 0.0
+Kd 1.0 0.0 1.0
+Ks 0.0 0.0 0.0
+Ns 0
+
+newmtl Cyan
+Ka 0.0 0.0 0.0
+Kd 0.0 1.0 1.0
+Ks 0.0 0.0 0.0
+Ns 0
+
+newmtl Yellow
+Ka 0.0 0.0 0.0
+Kd 1.0 1.0 0.0
+Ks 0.0 0.0 0.0
+Ns 0
+
+newmtl Green
+Ka 0.0 0.0 0.0
+Kd 0.0 1.0 0.0
+Ks 0.0 0.0 0.0
+Ns 0
+
+newmtl Blue
+Ka 0.0 0.0 0.0
+Kd 0.0 0.0 1.0
+Ks 0.0 0.0 0.0
+Ns 0
+
+newmtl Red
+Ka 0.0 0.0 0.0
+Kd 1.0 0.0 0.0
+Ks 0.0 0.0 0.0
+Ns 0

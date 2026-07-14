@@ -64,15 +64,15 @@ Mesh Mesh::pyramidMesh()
     //-----------------------------------------------------------------------------------------------------------------//
     // Indicies: Each triplet represents a triangle face.
     //-----------------------------------------------------------------------------------------------------------------//
-    pyramid_mesh.m_triangle_indices = std::vector<Math::Vec3_i>(triangles_count);
+    pyramid_mesh.m_triangles_indices = std::vector<Math::Vec3_i>(triangles_count);
 
-    pyramid_mesh.m_triangle_indices[0] = Math::Vec3_i(0, 1, 2);
-    pyramid_mesh.m_triangle_indices[1] = Math::Vec3_i(0, 2, 3);
-    pyramid_mesh.m_triangle_indices[2] = Math::Vec3_i(0, 3, 4);
-    pyramid_mesh.m_triangle_indices[3] = Math::Vec3_i(0, 4, 1);
+    pyramid_mesh.m_triangles_indices[0] = Math::Vec3_i(0, 1, 2);
+    pyramid_mesh.m_triangles_indices[1] = Math::Vec3_i(0, 2, 3);
+    pyramid_mesh.m_triangles_indices[2] = Math::Vec3_i(0, 3, 4);
+    pyramid_mesh.m_triangles_indices[3] = Math::Vec3_i(0, 4, 1);
 
-    pyramid_mesh.m_triangle_indices[4] = Math::Vec3_i(1, 4, 3);
-    pyramid_mesh.m_triangle_indices[5] = Math::Vec3_i(1, 3, 2);
+    pyramid_mesh.m_triangles_indices[4] = Math::Vec3_i(1, 4, 3);
+    pyramid_mesh.m_triangles_indices[5] = Math::Vec3_i(1, 3, 2);
     //-----------------------------------------------------------------------------------------------------------------//
 
     return pyramid_mesh;
