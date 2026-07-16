@@ -99,28 +99,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     //---------------------------------------------------------------------------------------------------------------------//
     Mesh loaded_cube_mesh = Mesh::loadObjFile("../assets/cube/", "cube.obj");
 
-    Model cube_model;
-    cube_model.m_mesh = &loaded_cube_mesh;
-    cube_model.m_position = Math::Vec3_f(0.0f, 0.0f, -5.0f);
-    cube_model.m_scale = Math::Vec3_f(0.9f, 0.9f, 0.9f);
-    cube_model.m_rotate_rad = Math::convertDegreesToRadians(0.0f);
-    cube_model.m_rotate_axis = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    /*
-                          number          number
-                            3               2
-    multiplier      1       3               2
-                    20      60              40
-                    100     300             200
-                    300     900             600
-                    350     1050            700
-    */
+    std::vector<Model> cube_models(10);
+    for(int i = 0; i < 10; i++)
+    {
+        cube_models[i].m_mesh = &loaded_cube_mesh;
+        cube_models[i].m_scale = Math::Vec3_f(0.5f, 0.5f, 0.5f);
+        cube_models[i].m_rotate_rad = Math::convertDegreesToRadians(20.0f * (float)i);
+        cube_models[i].m_rotate_axis = Math::Vec3_f(1.0f, 0.3f, 0.5f);
+    }
+    cube_models[0].m_position = Math::Vec3_f( 0.0f,  0.0f,  0.0f);
+    cube_models[1].m_position = Math::Vec3_f( 2.0f,  5.0f, -15.0f);
+    cube_models[2].m_position = Math::Vec3_f(-1.5f, -2.2f, -2.5f);
+    cube_models[3].m_position = Math::Vec3_f(-3.8f, -2.0f, -12.3f);
+    cube_models[4].m_position = Math::Vec3_f( 2.4f, -0.4f, -3.5f);
+    cube_models[5].m_position = Math::Vec3_f(-1.7f,  3.0f, -7.5f);
+    cube_models[6].m_position = Math::Vec3_f( 1.3f, -2.0f, -2.5f);
+    cube_models[7].m_position = Math::Vec3_f( 1.5f,  2.0f, -2.5f);
+    cube_models[8].m_position = Math::Vec3_f( 1.5f,  0.2f, -1.5f);
+    cube_models[9].m_position = Math::Vec3_f(-1.3f,  1.0f, -1.5f);
     //---------------------------------------------------------------------------------------------------------------------//
 
     Window window;
-    if(!window.create(L"Pixel Engine", 1050, 700, hInstance)) { return -1; }
+    if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
     backbuffer.resize(window.m_width / 3, window.m_height / 3);
@@ -142,7 +142,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        renderer.drawModel(backbuffer, cube_model, proj_view_matrix, draw_filled);
+        for(const Model& model : cube_models)
+        {
+            renderer.drawModel(backbuffer, model, proj_view_matrix, draw_filled);
+        }
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
