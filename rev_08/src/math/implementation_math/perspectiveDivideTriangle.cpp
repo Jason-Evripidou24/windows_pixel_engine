@@ -2,7 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,55 +12,40 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../model/model.hpp"
+#include "../math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
-*/
-void Renderer::drawModel
-(
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
-)
+Math::Triangle Math::perspectiveDivideTriangle(const Math::Triangle& triangle)
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    Math::Triangle output = triangle;
 
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
+    for(int i = 0; i < 3; i++)
     {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
+        Math::Vec4_f& output_position = output.m_vertices[i].m_position;
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
-        if
-        (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
-        )
-        {
-            continue;
-        }
+        float w = output_position.m_data[3];
 
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
-        if
-        (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
-        )
+        if(w <= 0.0f)
         {
-            continue;
+            output_position.m_data[0] = 0.0f;
+            output_position.m_data[1] = 0.0f;
+            output_position.m_data[2] = 0.0f;
+            output_position.m_data[3] = 0.0f;
+
+            return output;
         }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
+        else
+        {
+            output_position.m_data[0] = output_position.m_data[0] / w;
+            output_position.m_data[1] = output_position.m_data[1] / w;
+            output_position.m_data[2] = output_position.m_data[2] / w;
+            output_position.m_data[3] = 1.0f;
+        }
     }
+
+    return output;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -8,6 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <windows.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,31 +20,68 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Backbuffer::setPixel(int x, int y, float z, uint32_t color)
+void Backbuffer::resize(int width, int height)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     if
     (
-        (m_color_buffer == nullptr) ||
-        (m_depth_buffer == nullptr) ||
-        (x < 0)                     ||
-        (x >= m_width)              ||
-        (y < 0)                     ||
-        (y >= m_height)             ||
-        (z < -1.0f)                 ||
-        (z > 1.0f)
+        (width <= 0)  ||
+        (height <= 0) ||
+        (
+            (width == m_width)   &&
+            (height == m_height)
+        )
     )
     {
         return;
     }
     //---------------------------------------------------------------------------------------------------------------------//
-
-    int buffers_index = (y * m_width) + x;
     
-    if(z > m_depth_buffer[buffers_index])
+    this->freeBuffers();
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    m_width  = width;
+    m_height = height;
+    m_pitch  = m_width * sizeof(uint32_t);
+
+    m_bitmapinfo = {};
+    m_bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    m_bitmapinfo.bmiHeader.biWidth = m_width;
+    m_bitmapinfo.bmiHeader.biHeight = -m_height; // top-down
+    m_bitmapinfo.bmiHeader.biPlanes = 1;
+    m_bitmapinfo.bmiHeader.biBitCount = 32;
+    m_bitmapinfo.bmiHeader.biCompression = BI_RGB;
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    size_t pixel_count = static_cast<size_t>(m_width) * static_cast<size_t>(m_height);
+
+    size_t color_buffer_size = pixel_count * sizeof(uint32_t);
+    m_color_buffer = (uint32_t*)VirtualAlloc
+    (
+        0,
+        color_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
+
+    size_t depth_buffer_size = pixel_count * sizeof(float);
+    m_depth_buffer = (float*)VirtualAlloc
+    (
+        0,
+        depth_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
+
+    if( (m_color_buffer == nullptr) || (m_depth_buffer == nullptr) )
     {
-        m_depth_buffer[buffers_index] = z;
-        m_color_buffer[buffers_index] = color;
+        this->freeBuffers();
+        m_width = 0;
+        m_height = 0;
+        m_pitch = 0;
+        m_bitmapinfo = {};
     }
+    //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

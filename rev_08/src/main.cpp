@@ -41,6 +41,10 @@ static Camera camera
 );
 
 static bool prev_zero_key = false;
+static bool draw_filled = true;
+
+static bool prev_one_key = false;
+static bool draw_with_tiles = false;
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
@@ -48,7 +52,6 @@ static float mouse_pos_y = 0.0f;
 static float camera_move_speed = 0.002f;
 static float camera_look_speed = 0.002f;
 
-static bool draw_filled = true;
 void processInput(Window& window)
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -70,6 +73,13 @@ void processInput(Window& window)
         draw_filled = !draw_filled;
     }
     prev_zero_key = curr_zero_key;
+
+    bool curr_one_key = window.m_input.isKeyDown('1');
+    if( (curr_one_key == true) && (prev_one_key == false) )
+    {
+        draw_with_tiles = !draw_with_tiles;
+    }
+    prev_one_key = curr_one_key;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -123,7 +133,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    backbuffer.resize(window.m_width / 2, window.m_height / 2);
+    backbuffer.resize(window.m_width / 3, window.m_height / 3);
 
     Renderer renderer;
 
@@ -134,17 +144,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     while(window.processMessages())
     {
         //backbuffer.clear(0xEBCE87FF); // Sky blue
-        backbuffer.clear(0xFF000000); // Black
-        //backbuffer.clear(0xFFFFFFFF); // White
+        //backbuffer.clear(0xFF000000); // Black
+        backbuffer.clear(0xFFFFFFFF); // White
 
         processInput(window);
     
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        for(const Model& model : cube_models)
+        for(const Model& cube_model : cube_models)
         {
-            renderer.drawModel(backbuffer, model, proj_view_matrix, draw_filled);
+            std::vector<RenderTriangle> model_render_triangles = cube_model.transformModelForRendering(proj_view_matrix);
+            renderer.drawRenderTriangles(backbuffer, model_render_triangles, draw_filled);
         }
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);

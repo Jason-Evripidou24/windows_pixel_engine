@@ -15,53 +15,33 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../renderer.hpp"
 
-#include "../../model/model.hpp"
+#include "../../backbuffer/backbuffer.hpp"
+#include "../../math/math.hpp"
+#include "../../math/vertex.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 /*
+-   Vertexe is (should be) within clip space.
 */
-void Renderer::drawModel
-(
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
-)
+void Renderer::drawPixel(Backbuffer& backbuffer, const Math::Vertex& vertex, const Material& material)
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Calculate color using vertex color and material color.
+    //---------------------------------------------------------------------------------------------------------------------//
+    uint32_t material_diffuse_color = Math::convertVec3fToColor(material.m_diffuse);
+    uint32_t pixel_color = Math::interpolateUint32(vertex.m_color, material_diffuse_color, 0.5f);
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
-    {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Calculate the backbuffer pixel width and height that will be required.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int backbuffer_x = (vertex.m_position.m_data[0] + 1.0f) * (backbuffer.m_width - 1) * 0.5f;
+    int backbuffer_y = (1.0f - vertex.m_position.m_data[1]) * (backbuffer.m_height - 1) * 0.5f;
+    //---------------------------------------------------------------------------------------------------------------------//
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
-        if
-        (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
-        )
-        {
-            continue;
-        }
-
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
-        if
-        (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
-        )
-        {
-            continue;
-        }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
-    }
+    backbuffer.setPixel(backbuffer_x, backbuffer_y, vertex.m_position.m_data[2], pixel_color);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

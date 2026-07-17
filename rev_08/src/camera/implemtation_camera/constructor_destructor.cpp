@@ -2,7 +2,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <algorithm>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,55 +14,37 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../camera.hpp"
 
-#include "../../model/model.hpp"
+#include "../../math/math.hpp"
+#include "../../math/vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
-*/
-void Renderer::drawModel
+Camera::Camera
 (
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
+    const Math::Vec3_f& position,
+    const float pitch_rads,
+    const float yaw_rads,
+    const float fov_rads,
+    const float near_plane,
+    const float far_plane,
+    const Math::Vec3_f& world_up
 )
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    m_position = position;
 
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
-    {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
+    m_pitch_rads = std::clamp<float>(pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
+    m_yaw_rads   = std::fmod(yaw_rads, Math::TWO_PI_f);
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
-        if
-        (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
-        )
-        {
-            continue;
-        }
+    m_fov_rads   = fov_rads;
+    m_near_plane = near_plane;
+    m_far_plane  = far_plane;
 
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
-        if
-        (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
-        )
-        {
-            continue;
-        }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
-    }
+    m_world_up = Math::normalise(world_up);
+
+    this->updateVectors();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

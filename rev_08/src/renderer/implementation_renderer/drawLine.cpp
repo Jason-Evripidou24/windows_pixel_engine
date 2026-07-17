@@ -13,37 +13,51 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../backbuffer.hpp"
+#include "../renderer.hpp"
+
+#include "../../backbuffer/backbuffer.hpp"
+#include "../../math/vertex.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Backbuffer::setPixel(int x, int y, float z, uint32_t color)
+/*
+-   Vertexes are (should be) within clip space.
+*/
+void Renderer::drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    if
-    (
-        (m_color_buffer == nullptr) ||
-        (m_depth_buffer == nullptr) ||
-        (x < 0)                     ||
-        (x >= m_width)              ||
-        (y < 0)                     ||
-        (y >= m_height)             ||
-        (z < -1.0f)                 ||
-        (z > 1.0f)
-    )
+    // Calculate the backbuffer pixel width and height that will be required.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int backbuffer_x0 = backbuffer.toBackbufferCoordX(v_0.m_position.m_data[0]);
+    int backbuffer_y0 = backbuffer.toBackbufferCoordY(v_0.m_position.m_data[1]);
+
+    int backbuffer_x1 = backbuffer.toBackbufferCoordX(v_1.m_position.m_data[0]);
+    int backbuffer_y1 = backbuffer.toBackbufferCoordY(v_1.m_position.m_data[1]);
+
+    int dx = backbuffer_x1 - backbuffer_x0;
+    int dy = backbuffer_y1 - backbuffer_y0;
+
+    int abs_dx = dx; if(abs_dx < 0) { abs_dx *= -1; }
+    int abs_dy = dy; if(abs_dy < 0) { abs_dy *= -1; }
+
+    int steps = abs_dx; if(abs_dy > steps) { steps = abs_dy; }
+
+    if(steps == 0)
     {
-        return;
+        this->drawPixel(backbuffer, v_0, material);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
-    int buffers_index = (y * m_width) + x;
-    
-    if(z > m_depth_buffer[buffers_index])
+    //---------------------------------------------------------------------------------------------------------------------//
+    for(int i = 0; i <= steps; i++)
     {
-        m_depth_buffer[buffers_index] = z;
-        m_color_buffer[buffers_index] = color;
+        float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
+
+        Math::Vertex curr_vert = Math::interpolateVertex(v_0, v_1, t);
+        this->drawPixel(backbuffer, curr_vert, material);
     }
+    //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -2,7 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,37 +13,60 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../backbuffer.hpp"
+#include "../math.hpp"
+
+#include "../mat4_f.hpp"
+#include "../vec3_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Backbuffer::setPixel(int x, int y, float z, uint32_t color)
+Math::Mat4_f Math::rotationMat4_f(const float axis_x, const float axis_y, const float axis_z, const float theta_rad)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    if
-    (
-        (m_color_buffer == nullptr) ||
-        (m_depth_buffer == nullptr) ||
-        (x < 0)                     ||
-        (x >= m_width)              ||
-        (y < 0)                     ||
-        (y >= m_height)             ||
-        (z < -1.0f)                 ||
-        (z > 1.0f)
-    )
+    Vec3_f axis = Math::normalise(Vec3_f(axis_x, axis_y, axis_z));
+
+    float x = axis.m_data[0];
+    float y = axis.m_data[1];
+    float z = axis.m_data[2];
+
+    if( (x == 0.0f) && (y == 0.0f) && (z == 0.0f) )
     {
-        return;
+        return Math::identityMat4_f();
     }
+
+    float cos_theta = cosf(theta_rad);
+    float sin_theta = sinf(theta_rad);
+    float one_minus_cos_theta = 1.0f - cos_theta;
     //---------------------------------------------------------------------------------------------------------------------//
 
-    int buffers_index = (y * m_width) + x;
-    
-    if(z > m_depth_buffer[buffers_index])
-    {
-        m_depth_buffer[buffers_index] = z;
-        m_color_buffer[buffers_index] = color;
-    }
+    //---------------------------------------------------------------------------------------------------------------------//
+    Mat4_f new_mat;
+
+    // Row-major rotation matrix
+
+    new_mat.m_data[0]  = cos_theta + (x * x * one_minus_cos_theta);
+    new_mat.m_data[1]  = (x * y * one_minus_cos_theta) - (z * sin_theta);
+    new_mat.m_data[2]  = (x * z * one_minus_cos_theta) + (y * sin_theta);
+    new_mat.m_data[3]  = 0.0f;
+
+    new_mat.m_data[4]  = (y * x * one_minus_cos_theta) + (z * sin_theta);
+    new_mat.m_data[5]  = cos_theta + (y * y * one_minus_cos_theta);
+    new_mat.m_data[6]  = (y * z * one_minus_cos_theta) - (x * sin_theta);
+    new_mat.m_data[7]  = 0.0f;
+
+    new_mat.m_data[8]  = (z * x * one_minus_cos_theta) - (y * sin_theta);
+    new_mat.m_data[9]  = (z * y * one_minus_cos_theta) + (x * sin_theta);
+    new_mat.m_data[10] = cos_theta + (z * z * one_minus_cos_theta);
+    new_mat.m_data[11] = 0.0f;
+
+    new_mat.m_data[12] = 0.0f;
+    new_mat.m_data[13] = 0.0f;
+    new_mat.m_data[14] = 0.0f;
+    new_mat.m_data[15] = 1.0f;
+
+    return new_mat;
+    //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

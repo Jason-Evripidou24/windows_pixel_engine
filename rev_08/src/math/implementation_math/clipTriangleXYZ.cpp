@@ -2,7 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,55 +13,49 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../model/model.hpp"
+#include "../math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
-*/
-void Renderer::drawModel
+std::vector<Math::Triangle> Math::clipTriangleBetweenXYZ
 (
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
+    const Math::Triangle& triangle,
+    const float min_x_plane,
+    const float max_x_plane,
+    const float min_y_plane,
+    const float max_y_plane,
+    const float min_z_plane,
+    const float max_z_plane
 )
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    std::vector<Math::Triangle> triangles_clipped_between_x = std::vector<Math::Triangle>();
+    std::vector<Math::Triangle> triangles_clipped_between_x_y = std::vector<Math::Triangle>();
+    std::vector<Math::Triangle> triangles_clipped_between_x_y_z = std::vector<Math::Triangle>();
 
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
+    triangles_clipped_between_x = Math::clipTriangleBetweenX(triangle, min_x_plane, max_x_plane);
+
+    for(const Math::Triangle& triangle_clipped_between_x : triangles_clipped_between_x)
     {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
+        std::vector<Math::Triangle> temp_triangles = Math::clipTriangleBetweenY(triangle_clipped_between_x, min_y_plane, max_y_plane);
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
-        if
-        (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
-        )
+        for(const Math::Triangle& temp_triangle : temp_triangles)
         {
-            continue;
+            triangles_clipped_between_x_y.push_back(temp_triangle);
         }
-
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
-        if
-        (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
-        )
-        {
-            continue;
-        }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
     }
+
+    for(const Math::Triangle& triangle_clipped_between_x_y : triangles_clipped_between_x_y)
+    {
+        std::vector<Math::Triangle> temp_triangles = Math::clipTriangleBetweenZ(triangle_clipped_between_x_y, min_z_plane, max_z_plane);
+
+        for(const Math::Triangle& temp_triangle : temp_triangles)
+        {
+            triangles_clipped_between_x_y_z.push_back(temp_triangle);
+        }
+    }
+
+    return triangles_clipped_between_x_y_z;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

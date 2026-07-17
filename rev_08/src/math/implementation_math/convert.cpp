@@ -2,7 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,55 +13,55 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../model/model.hpp"
+#include "../math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
-*/
-void Renderer::drawModel
-(
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
-)
+float Math::convertDegreesToRadians(const float degrees)
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    return degrees * RADIANS_PER_DEGREE_f;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
-    {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
-        if
-        (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
-        )
-        {
-            continue;
-        }
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   input vec must be within [0, 1.0f].
+-   Vec3_f data is {r, g, b}
+*/
+uint32_t Math::convertVec3fToColor(const Vec3_f& color)
+{
+    uint32_t r = static_cast<uint32_t>(color.m_data[0] * 255.0f);
+    uint32_t g = static_cast<uint32_t>(color.m_data[1] * 255.0f);
+    uint32_t b = static_cast<uint32_t>(color.m_data[2] * 255.0f);
 
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
-        if
-        (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
-        )
-        {
-            continue;
-        }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
-    }
+    return
+        (0xFF << 24) | // Alpha
+        (r    << 16) | // Red
+        (g    << 8 ) | // Green
+        (b    << 0 );  // Blue
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   input vec must be within [0, 1.0f].
+-   Vec4_f data is {a, r, g, b}
+*/
+uint32_t Math::convertVec4fToColor(const Vec4_f& color)
+{
+    uint32_t a = static_cast<uint32_t>(color.m_data[0] * 255.0f);
+    uint32_t r = static_cast<uint32_t>(color.m_data[1] * 255.0f);
+    uint32_t g = static_cast<uint32_t>(color.m_data[2] * 255.0f);
+    uint32_t b = static_cast<uint32_t>(color.m_data[3] * 255.0f);
+
+    return
+        (a << 24) | // Alpha
+        (r << 16) | // Red
+        (g << 8 ) | // Green
+        (b << 0 );  // Blue
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

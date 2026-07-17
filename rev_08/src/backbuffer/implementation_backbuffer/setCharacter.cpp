@@ -13,55 +13,48 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../model/model.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
-*/
-void Renderer::drawModel
-(
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
-)
+void Backbuffer::setCharacter(int x, int y, char character, uint32_t color)
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
-
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
+    //---------------------------------------------------------------------------------------------------------------------//
+    if
+    (
+        (m_color_buffer == nullptr) ||
+        (m_depth_buffer == nullptr) ||
+        (x < 0)                     ||
+        (x >= m_width)              ||
+        (y < 0)                     ||
+        (y >= m_height)
+    )
     {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
+        return;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
-        if
-        (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
-        )
-        {
-            continue;
-        }
+    uint8_t c = static_cast<uint8_t>(character);
 
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
-        if
-        (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
-        )
+    const uint8_t* glyph = g_asciiFont.m_ascii_font_basic_bitmap[c];
+
+    for(int row = 0; row < g_asciiFont.m_glyph_height; row++)
+    {
+        uint8_t bits = glyph[row];
+
+        for(int col = 0; col < g_asciiFont.m_glyph_width; col++)
         {
-            continue;
+            // MSB → LSB (left to right)
+            //bool pixel_on = bits & (0x80 >> col);
+            bool pixel_on = bits & (1 << col);
+
+            if(pixel_on)
+            {
+                this->setPixel(x + col, y + row, 1.0f, color);
+            }
         }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

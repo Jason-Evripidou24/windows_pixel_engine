@@ -2,7 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,55 +12,54 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../model.hpp"
+#include "../render_triangle.hpp"
 
-#include "../../model/model.hpp"
+#include "../../math/mat4_f.hpp"
+#include "../../math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
-*/
-void Renderer::drawModel
-(
-    Backbuffer& backbuffer,
-    const Model& model,
-    const Math::Mat4_f& projection_view_matrix,
-    const bool draw_filled
-)
+std::vector<RenderTriangle> Model::transformModelForRendering(const Math::Mat4_f& projection_view_matrix) const
 {
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * this->calcModelMatrix();
 
-    for(int i = 0; i < model.m_mesh->m_triangles.size(); i++)
+    std::vector<RenderTriangle> output_render_triangles;
+    output_render_triangles.reserve(m_mesh->m_triangles.size());
+
+    for(int i = 0; i < m_mesh->m_triangles.size(); i++)
     {
-        const Math::Triangle& triangle = model.m_mesh->m_triangles[i];
-        const int material_index = model.m_mesh->m_triangles_material_index[i];
-        const Material& material = model.m_mesh->m_materials[material_index];
+        Math::Triangle triangle = m_mesh->m_triangles[i];
+        const int material_index = m_mesh->m_triangles_material_index[i];
+        const Material& material = m_mesh->m_materials[material_index];
 
-        const Math::Triangle triangle_transform = Math::transformTriangle(triangle, proj_view_model_matrix);
+        triangle = Math::transformTriangle(triangle, proj_view_model_matrix);
         if
         (
-            (triangle_transform.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
-            (triangle_transform.m_vertices[2].m_position.m_data[3] <= 0.0f)
+            (triangle.m_vertices[0].m_position.m_data[3] <= 0.0f) ||
+            (triangle.m_vertices[1].m_position.m_data[3] <= 0.0f) ||
+            (triangle.m_vertices[2].m_position.m_data[3] <= 0.0f)
         )
         {
             continue;
         }
 
-        const Math::Triangle perspective_divide_triangle = Math::perspectiveDivideTriangle(triangle_transform);
+        triangle = Math::perspectiveDivideTriangle(triangle);
         if
         (
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
-            (Utils::checkFloatEquals(perspective_divide_triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
+            (Utils::checkFloatEquals(triangle.m_vertices[0].m_position.m_data[3], 0.0f) == true) ||
+            (Utils::checkFloatEquals(triangle.m_vertices[1].m_position.m_data[3], 0.0f) == true) ||
+            (Utils::checkFloatEquals(triangle.m_vertices[2].m_position.m_data[3], 0.0f) == true)
         )
         {
             continue;
         }
-        
-        this->drawTriangle(backbuffer, perspective_divide_triangle, material, draw_filled);
+
+        output_render_triangles.push_back(RenderTriangle(triangle, &material));
     }
+
+    return output_render_triangles;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
