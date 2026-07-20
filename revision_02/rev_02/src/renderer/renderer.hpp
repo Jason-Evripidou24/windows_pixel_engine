@@ -137,17 +137,38 @@ struct Renderer
         multithreading by having each TileRenderer contain a thread. For now no multithreading.
     */
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRenderer m_tile_renderer_0;
-    bool         m_tile_renderer_0_job_complete;
-
-    TileRenderer m_tile_renderer_1;
-    bool         m_tile_renderer_1_job_complete;
-
-    TileRenderer m_tile_renderer_2;
-    bool         m_tile_renderer_2_job_complete;
-
-    TileRenderer m_tile_renderer_3;
-    bool         m_tile_renderer_3_job_complete;
+    TileRenderer m_tile_renderer_00;
+    bool         m_tile_renderer_00_job_complete;
+    TileRenderer m_tile_renderer_01;
+    bool         m_tile_renderer_01_job_complete;
+    TileRenderer m_tile_renderer_02;
+    bool         m_tile_renderer_02_job_complete;
+    TileRenderer m_tile_renderer_03;
+    bool         m_tile_renderer_03_job_complete;
+    TileRenderer m_tile_renderer_04;
+    bool         m_tile_renderer_04_job_complete;
+    TileRenderer m_tile_renderer_05;
+    bool         m_tile_renderer_05_job_complete;
+    TileRenderer m_tile_renderer_06;
+    bool         m_tile_renderer_06_job_complete;
+    TileRenderer m_tile_renderer_07;
+    bool         m_tile_renderer_07_job_complete;
+    TileRenderer m_tile_renderer_08;
+    bool         m_tile_renderer_08_job_complete;
+    TileRenderer m_tile_renderer_09;
+    bool         m_tile_renderer_09_job_complete;
+    TileRenderer m_tile_renderer_10;
+    bool         m_tile_renderer_10_job_complete;
+    TileRenderer m_tile_renderer_11;
+    bool         m_tile_renderer_11_job_complete;
+    TileRenderer m_tile_renderer_12;
+    bool         m_tile_renderer_12_job_complete;
+    TileRenderer m_tile_renderer_13;
+    bool         m_tile_renderer_13_job_complete;
+    TileRenderer m_tile_renderer_14;
+    bool         m_tile_renderer_14_job_complete;
+    TileRenderer m_tile_renderer_15;
+    bool         m_tile_renderer_15_job_complete;
 
     std::mutex              m_renderer_mutex;
     std::condition_variable m_renderer_condition_variable;

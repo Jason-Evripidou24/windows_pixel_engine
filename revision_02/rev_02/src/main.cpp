@@ -24,6 +24,7 @@
 #include "utils/utils.hpp"
 #include "model/mesh.hpp"
 #include "model/model.hpp"
+#include "timer/timer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -129,11 +130,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     cube_models[9].m_position = Math::Vec3_f(-1.3f,  1.0f, -1.5f);
     //---------------------------------------------------------------------------------------------------------------------//
 
+    Timer timer;
+    timer.init();
+
     Window window;
     if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    backbuffer.resize(window.m_width / 3, window.m_height / 3);
+    backbuffer.resize(window.m_width / 2, window.m_height / 2);
 
     Renderer renderer(&backbuffer);
 
@@ -143,6 +147,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     while(window.processMessages())
     {
+        timer.tick();
+
         //backbuffer.clear(0xEBCE87FF); // Sky blue
         backbuffer.clear(0xFF000000); // Black
         //backbuffer.clear(0xFFFFFFFF); // White
@@ -157,6 +163,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             std::queue<MaterialTriangle*> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
             renderer.drawMaterialTriangles(model_material_triangles, draw_filled);
         }
+
+        std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
+        backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
