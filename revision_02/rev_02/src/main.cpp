@@ -41,32 +41,41 @@ static Camera camera
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
+std::string controls_string =
+    std::string("CONTROLS") + std::string("\n") +
+    std::string("W/A                : ") + std::string("MOVE FORWARD/BACKWARD")        + std::string("\n") +
+    std::string("S/D                : ") + std::string("Move LEFT/RIGHT")              + std::string("\n") +
+    std::string("Q/E                : ") + std::string("Move UP/DOWN")                 + std::string("\n") +
+    std::string("LEFT MOUSE AND DRAG: ") + std::string("LOOK AROUND")                  + std::string("\n") +
+    std::string("0                  : ") + std::string("TOGGLE FILLED/WIREFRAME MODE") + std::string("\n") +
+    std::string("1                  : ") + std::string("INCREASE MOVE SPEED")          + std::string("\n") +
+    std::string("2                  : ") + std::string("DECREASE MOVE SPEED");
+
 static bool prev_zero_key = false;
 static bool draw_filled = true;
-
-static bool prev_one_key = false;
-static bool draw_with_tiles = false;
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 0.002f;
+static float camera_move_speed = 0.2f;
 static float camera_look_speed = 0.002f;
 
-void processInput(Window& window)
+void processInput(Window& window, float delta_time)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Keyboard.
     //---------------------------------------------------------------------------------------------------------------------//
+    float movement = camera_move_speed * delta_time;
+
     // Move camera along x
-    if(window.m_input.isKeyDown('A') == true) { camera.moveRight(-camera_move_speed); }
-    if(window.m_input.isKeyDown('D') == true) { camera.moveRight(camera_move_speed); }
+    if(window.m_input.isKeyDown('A') == true) { camera.moveRight(-movement); }
+    if(window.m_input.isKeyDown('D') == true) { camera.moveRight(movement); }
     // Move camera along y
-    if(window.m_input.isKeyDown('Q') == true) { camera.moveUp(camera_move_speed); }
-    if(window.m_input.isKeyDown('E') == true) { camera.moveUp(-camera_move_speed); }
+    if(window.m_input.isKeyDown('Q') == true) { camera.moveUp(movement); }
+    if(window.m_input.isKeyDown('E') == true) { camera.moveUp(-movement); }
     // Move camera along z
-    if(window.m_input.isKeyDown('W') == true) { camera.moveForward(camera_move_speed); }
-    if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-camera_move_speed); }
+    if(window.m_input.isKeyDown('W') == true) { camera.moveForward(movement); }
+    if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-movement); }
 
     bool curr_zero_key = window.m_input.isKeyDown('0');
     if( (curr_zero_key == true) && (prev_zero_key == false) )
@@ -75,12 +84,16 @@ void processInput(Window& window)
     }
     prev_zero_key = curr_zero_key;
 
-    bool curr_one_key = window.m_input.isKeyDown('1');
-    if( (curr_one_key == true) && (prev_one_key == false) )
+    // Increase and decrease move speed.
+    if(window.m_input.isKeyDown('1') == true)
     {
-        draw_with_tiles = !draw_with_tiles;
+        camera_move_speed += 0.1f;
     }
-    prev_one_key = curr_one_key;
+    if(window.m_input.isKeyDown('2') == true)
+    {
+        camera_move_speed -= 0.1f;
+        if(camera_move_speed <= 0.0f) { camera_move_speed = 0.0f; }
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -153,7 +166,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         backbuffer.clear(0xFF000000); // Black
         //backbuffer.clear(0xFFFFFFFF); // White
 
-        processInput(window);
+        processInput(window, timer.deltaTime);
     
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
@@ -166,6 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
+        backbuffer.setText(10, 280, controls_string.c_str(), controls_string.size(), 0xFFFFFFFF);
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

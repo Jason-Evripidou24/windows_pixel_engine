@@ -21,7 +21,7 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle*> material_triangles_queue, bool draw_filled)
+void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle*>& material_triangles_queue, bool draw_filled)
 {
     while(material_triangles_queue.empty() == false)
     {
