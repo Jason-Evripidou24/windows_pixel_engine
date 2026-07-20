@@ -57,7 +57,7 @@ struct Model
     //---------------------------------------------------------------------------------------------------------------------//
     Math::Mat4_f calcModelMatrix() const;
 
-    std::queue<MaterialTriangle*> transformModelForRendering(const Math::Mat4_f& projection_view_matrix) const;
+    std::queue<MaterialTriangle> transformModelForRendering(const Math::Mat4_f& projection_view_matrix) const;
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

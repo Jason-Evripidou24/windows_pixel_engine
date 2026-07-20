@@ -44,8 +44,8 @@ static Camera camera
 std::string controls_string =
     std::string("CONTROLS") + std::string("\n") +
     std::string("W/A                : ") + std::string("MOVE FORWARD/BACKWARD")        + std::string("\n") +
-    std::string("S/D                : ") + std::string("Move LEFT/RIGHT")              + std::string("\n") +
-    std::string("Q/E                : ") + std::string("Move UP/DOWN")                 + std::string("\n") +
+    std::string("S/D                : ") + std::string("MOVE LEFT/RIGHT")              + std::string("\n") +
+    std::string("Q/E                : ") + std::string("MOVE UP/DOWN")                 + std::string("\n") +
     std::string("LEFT MOUSE AND DRAG: ") + std::string("LOOK AROUND")                  + std::string("\n") +
     std::string("0                  : ") + std::string("TOGGLE FILLED/WIREFRAME MODE") + std::string("\n") +
     std::string("1                  : ") + std::string("INCREASE MOVE SPEED")          + std::string("\n") +
@@ -124,7 +124,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Mesh loaded_cube_mesh = Mesh::loadObjFile("../assets/cube/", "cube.obj");
 
     std::vector<Model> cube_models(10);
-    for(int i = 0; i < 10; i++)
+    for(size_t i = 0; i < 10; i++)
     {
         cube_models[i].m_mesh = &loaded_cube_mesh;
         cube_models[i].m_scale = Math::Vec3_f(0.5f, 0.5f, 0.5f);
@@ -173,13 +173,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         for(const Model& cube_model : cube_models)
         {
-            std::queue<MaterialTriangle*> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
+            std::queue<MaterialTriangle> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
             renderer.drawMaterialTriangles(model_material_triangles, draw_filled);
         }
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
-        backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
-        backbuffer.setText(10, 280, controls_string.c_str(), controls_string.size(), 0xFFFFFFFF);
+        backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+        backbuffer.setText(10, 280, controls_string.c_str(), static_cast<int>(controls_string.size()), 0xFFFFFFFF);
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

@@ -22,11 +22,11 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-std::queue<MaterialTriangle*> Model::transformModelForRendering(const Math::Mat4_f& projection_view_matrix) const
+std::queue<MaterialTriangle> Model::transformModelForRendering(const Math::Mat4_f& projection_view_matrix) const
 {
     const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * this->calcModelMatrix();
 
-    std::queue<MaterialTriangle*> output_material_triangles_queue;
+    std::queue<MaterialTriangle> output_material_triangles_queue;
 
     for(int i = 0; i < m_mesh->m_triangles.size(); i++)
     {
@@ -56,8 +56,7 @@ std::queue<MaterialTriangle*> Model::transformModelForRendering(const Math::Mat4
             continue;
         }
 
-        MaterialTriangle* new_material_triangle = new MaterialTriangle(triangle, material);
-        output_material_triangles_queue.push(new_material_triangle);
+        output_material_triangles_queue.push(MaterialTriangle(triangle, material));
     }
 
     return output_material_triangles_queue;
