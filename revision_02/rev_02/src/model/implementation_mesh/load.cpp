@@ -48,6 +48,50 @@
     -   d / Tr (opacity)
 */
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Math::Vec4_f parseVertexPosition(std::stringstream& stream)
+{
+    float x;
+    float y;
+    float z;
+
+    // Invalid position coordinate.
+    if(!(stream >> x >> y >> z)) { return Math::Vec4_f(0.0f, 0.0f, 0.0f, 1.0f); }
+
+    return Math::Vec4_f(x, y, z, 1.0f);
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Math::Vec2_f parseVertexTexCoord(std::stringstream& stream)
+{
+    float u = 0.0f;
+    float v = 0.0f;
+
+    // Invalid texture coordinate.
+    if(!(stream >> u >> v)) { return Math::Vec2_f(0.0f, 0.0f); }
+
+    return Math::Vec2_f(u, v);
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+Math::Vec3_f parseVertexNormal(std::stringstream& stream)
+{
+    float x;
+    float y;
+    float z;
+
+    // Invalid normal direction.
+    if(!(stream >> x >> y >> z)) { return Math::Vec3_f(0.0f, 1.0f, 0.0f); }
+
+    return Math::Vec3_f(x, y, z);
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct OBJIndex
 {
     int position;
@@ -93,6 +137,65 @@ OBJIndex parseOBJVertex(const std::string& token)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+std::vector<OBJIndex> parseFace(std::stringstream& stream)
+{
+    std::vector<OBJIndex> indices;
+
+    std::string token;
+
+    while(stream >> token)
+    {
+        indices.push_back(parseOBJVertex(token));
+    }
+
+    return indices;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+std::vector<Math::Triangle> createTriangles
+(
+    const std::vector<OBJIndex>& face_indices,
+    const std::vector<Math::Vec4_f>& vertex_positions,
+    const std::vector<Math::Vec2_f>& vertex_tex_coords,
+    const std::vector<Math::Vec3_f>& vertex_normals
+)
+{
+    std::vector<Math::Triangle> triangles;
+
+    for(size_t i = 1; i + 1 < face_indices.size(); i++)
+    {
+        const OBJIndex& i0 = face_indices[0];
+        const OBJIndex& i1 = face_indices[i];
+        const OBJIndex& i2 = face_indices[i + 1];
+
+        Math::Vertex vertex0;
+        vertex0.m_position = vertex_positions[i0.position];
+        vertex0.m_tex_coords = vertex_tex_coords[i0.texcoord];
+        vertex0.m_normal = vertex_normals[i0.normal];
+        vertex0.m_color = 0xFFFFFFFF; // White default.
+
+        Math::Vertex vertex1;
+        vertex1.m_position = vertex_positions[i1.position];
+        vertex1.m_tex_coords = vertex_tex_coords[i1.texcoord];
+        vertex1.m_normal = vertex_normals[i1.normal];
+        vertex1.m_color = 0xFFFFFFFF; // White default.
+
+        Math::Vertex vertex2;
+        vertex2.m_position = vertex_positions[i2.position];
+        vertex2.m_tex_coords = vertex_tex_coords[i2.texcoord];
+        vertex2.m_normal = vertex_normals[i2.normal];
+        vertex2.m_color = 0xFFFFFFFF; // White default.
+
+        triangles.push_back(Math::Triangle(vertex0, vertex1, vertex2));
+    }
+
+    return triangles;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filename)
 {
@@ -134,13 +237,7 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         //-----------------------------------------------------------------------------------------------------------------//
         if(prefix == "v")
         {
-            float x;
-            float y;
-            float z;
-
-            ss >> x >> y >> z;
-
-            vertex_positions.push_back(Math::Vec4_f(x, y, z, 1.0f));
+            vertex_positions.push_back(parseVertexPosition(ss));
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
@@ -149,12 +246,7 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         //-----------------------------------------------------------------------------------------------------------------//
         else if(prefix == "vt")
         {
-            float x;
-            float y;
-
-            ss >> x >> y;
-
-            vertex_tex_coords.push_back(Math::Vec2_f(x, y));
+            vertex_tex_coords.push_back(parseVertexTexCoord(ss));
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
@@ -163,13 +255,7 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         //-----------------------------------------------------------------------------------------------------------------//
         else if(prefix == "vn")
         {
-            float x;
-            float y;
-            float z;
-
-            ss >> x >> y >> z;
-
-            vertex_normals.push_back(Math::Vec3_f(x, y, z));
+            vertex_normals.push_back(parseVertexNormal(ss));
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
@@ -208,44 +294,28 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         //-----------------------------------------------------------------------------------------------------------------//
         else if(prefix == "f")
         {
-            std::string s0;
-            std::string s1;
-            std::string s2;
+            std::vector<OBJIndex> face_indices = parseFace(ss);
 
-            ss >> s0 >> s1 >> s2;
+            std::vector<Math::Triangle> new_triangles = createTriangles
+            (
+                face_indices,
+                vertex_positions,
+                vertex_tex_coords,
+                vertex_normals
+            );
 
-            OBJIndex i0 = parseOBJVertex(s0);
-            OBJIndex i1 = parseOBJVertex(s1);
-            OBJIndex i2 = parseOBJVertex(s2);
-
-            Math::Vertex vertex0;
-            vertex0.m_position = vertex_positions[i0.position];
-            vertex0.m_tex_coords = vertex_tex_coords[i0.texcoord];
-            vertex0.m_normal = vertex_normals[i0.normal];
-            vertex0.m_color = 0xFFFFFFFF; // White default.
-
-            Math::Vertex vertex1;
-            vertex1.m_position = vertex_positions[i1.position];
-            vertex1.m_tex_coords = vertex_tex_coords[i1.texcoord];
-            vertex1.m_normal = vertex_normals[i1.normal];
-            vertex1.m_color = 0xFFFFFFFF; // White default.
-
-            Math::Vertex vertex2;
-            vertex2.m_position = vertex_positions[i2.position];
-            vertex2.m_tex_coords = vertex_tex_coords[i2.texcoord];
-            vertex2.m_normal = vertex_normals[i2.normal];
-            vertex2.m_color = 0xFFFFFFFF; // White default.
-
-            Math::Triangle triangle(vertex0, vertex1, vertex2);
-            triangles.push_back(triangle);
-
-            if(material_names_to_indexes.find(current_material_name) != material_names_to_indexes.end())
+            for(const Math::Triangle& triangle : new_triangles)
             {
-                triangles_material_index.push_back(material_names_to_indexes[current_material_name]);
-            }
-            else
-            {
-                triangles_material_index.push_back(-1);
+                triangles.push_back(triangle);
+
+                if(material_names_to_indexes.find(current_material_name) != material_names_to_indexes.end())
+                {
+                    triangles_material_index.push_back(material_names_to_indexes[current_material_name]);
+                }
+                else
+                {
+                    triangles_material_index.push_back(0); // In loadMtlFile we set the default/invalid material at index 0.
+                }
             }
         }
         //-----------------------------------------------------------------------------------------------------------------//
@@ -257,67 +327,5 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
     mesh.m_triangles_material_index = triangles_material_index;
 
     return mesh;
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-std::vector<Material> Mesh::loadMtlFile(const std::string& file_folder, const std::string& filename)
-{
-    //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<Material> materials;
-
-    std::ifstream file(file_folder + filename);
-    if(!file.is_open()) { return materials; }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    Material curr_material = Material();
-
-    std::string line;
-    while(std::getline(file, line))
-    {
-        std::stringstream ss(line);
-
-        std::string prefix;
-        ss >> prefix;
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        // Comment.
-        //-----------------------------------------------------------------------------------------------------------------//
-        if(prefix == "#") { continue; }
-        //-----------------------------------------------------------------------------------------------------------------//
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        // New material.
-        //-----------------------------------------------------------------------------------------------------------------//
-        if(prefix == "newmtl")
-        {
-            if(curr_material.m_name.empty() == false) { materials.push_back(curr_material); }
-
-            curr_material = Material();
-            ss >> curr_material.m_name;
-        }
-        //-----------------------------------------------------------------------------------------------------------------//
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        // Diffuse colour.
-        //-----------------------------------------------------------------------------------------------------------------//
-        else if(prefix == "Kd")
-        {
-            float r;
-            float g;
-            float b;
-
-            ss >> r >> g >> b;
-
-            curr_material.m_diffuse = Math::Vec3_f(r, g, b);
-        }
-        //-----------------------------------------------------------------------------------------------------------------//
-    }
-
-    if(curr_material.m_name.empty() == false) { materials.push_back(curr_material); }
-
-    return materials;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
