@@ -18,36 +18,19 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Triangle has been transformed to clip space and undergone perspective divide but no clipping against x,y,z planes.
-*/
-void TileRenderer::drawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled)
+void TileRenderer::parentRequestDrawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, bool* parent_job_complete)
 {
-    if(material_triangle == nullptr) { return; }
+    std::unique_lock<std::mutex> lock(m_object_mutex);
+    
+    if( (m_running == false) || (material_triangle == nullptr) ) { return; }
 
-    const std::vector<Math::Triangle> triangles_clipped = Math::clipTriangleBetweenXYZ
-    (
-        material_triangle->m_triangle,
-        m_x_min,
-        m_x_max,
-        m_y_min,
-        m_y_max,
-        m_z_min,
-        m_z_max
-    );
+    m_tile_renderer_job.m_material_triangle = material_triangle;
+    m_tile_renderer_job.m_draw_filled = draw_filled;
+    m_tile_renderer_job.m_parent_job_complete = parent_job_complete;
 
-    for(const Math::Triangle& triangle_clipped : triangles_clipped)
-    {
-        if(draw_filled == true)
-        {
-            this->fillTriangle(triangle_clipped, material_triangle->m_material);
-        }
-        else
-        {
-            this->drawLine(triangle_clipped.m_v0, triangle_clipped.m_v1, material_triangle->m_material);
-            this->drawLine(triangle_clipped.m_v0, triangle_clipped.m_v2, material_triangle->m_material);
-            this->drawLine(triangle_clipped.m_v1, triangle_clipped.m_v2, material_triangle->m_material);
-        }
-    }
+    m_has_job = true;
+
+    lock.unlock();
+    m_object_condition_variable.notify_all();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -55,6 +55,13 @@
 -   Draw methods of the renderer will clip triangles to be within -1 and 1 in the x,y,z view frustum.
 */
 
+struct TileRendererJob
+{
+    MaterialTriangle* m_material_triangle = nullptr;
+    bool              m_draw_filled;
+    bool*             m_parent_job_complete;
+};
+
 struct TileRenderer
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -71,19 +78,43 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
+    // Multithreading.
+    //---------------------------------------------------------------------------------------------------------------------//
+    std::thread              m_worker_thread;
+
+    std::mutex               m_object_mutex;
+    std::condition_variable  m_object_condition_variable;
+
+    bool                     m_running;
+    bool                     m_has_job;
+
+    std::mutex*              m_parent_object_mutex;
+    std::condition_variable* m_parent_condition_variable;
+
+    TileRendererJob          m_tile_renderer_job;
+
+    void start();
+    void stop();
+
+    void workerFunction();
+    void parentRequestDrawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, bool* parent_job_complete);
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
     TileRenderer
     (
-        Backbuffer* backbuffer,
-        float       x_min,
-        float       x_max,
-        float       y_min,
-        float       y_max,
-        float       z_min,
-        float       z_max
+        std::mutex*              parent_object_mutex,
+        std::condition_variable* parent_condition_variable,
+        Backbuffer*              backbuffer,
+        float                    x_min,
+        float                    x_max,
+        float                    y_min,
+        float                    y_max,
+        float                    z_min,
+        float                    z_max
     );
-
     ~TileRenderer();
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -107,6 +138,19 @@ struct Renderer
     */
     //---------------------------------------------------------------------------------------------------------------------//
     TileRenderer m_tile_renderer_0;
+    bool         m_tile_renderer_0_job_complete;
+
+    TileRenderer m_tile_renderer_1;
+    bool         m_tile_renderer_1_job_complete;
+
+    TileRenderer m_tile_renderer_2;
+    bool         m_tile_renderer_2_job_complete;
+
+    TileRenderer m_tile_renderer_3;
+    bool         m_tile_renderer_3_job_complete;
+
+    std::mutex              m_renderer_mutex;
+    std::condition_variable m_renderer_condition_variable;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

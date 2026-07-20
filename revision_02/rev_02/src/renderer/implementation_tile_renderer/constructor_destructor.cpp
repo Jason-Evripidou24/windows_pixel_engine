@@ -20,15 +20,19 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 TileRenderer::TileRenderer
 (
-    Backbuffer* backbuffer,
-    float       x_min,
-    float       x_max,
-    float       y_min,
-    float       y_max,
-    float       z_min,
-    float       z_max
+    std::mutex*              parent_object_mutex,
+    std::condition_variable* parent_condition_variable,
+    Backbuffer*              backbuffer,
+    float                    x_min,
+    float                    x_max,
+    float                    y_min,
+    float                    y_max,
+    float                    z_min,
+    float                    z_max
 )
 :
+    m_parent_object_mutex(parent_object_mutex),
+    m_parent_condition_variable(parent_condition_variable),
     m_backbuffer(backbuffer),
     m_x_min(x_min),
     m_x_max(x_max),

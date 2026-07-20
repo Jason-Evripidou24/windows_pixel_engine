@@ -21,8 +21,15 @@
 Renderer::Renderer(Backbuffer* backbuffer)
 :
     //m_tile_renderer_0(backbuffer, -1.0f, 0.0f,  0.0f, 1.0f, -1.0f, 1.0f)
-    m_tile_renderer_0(backbuffer, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f)
+    m_tile_renderer_0(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -1.0f, 0.0f,  0.0f, 1.0f, -1.0f, 1.0f),
+    m_tile_renderer_1(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.0f, 1.0f,  0.0f, 1.0f, -1.0f, 1.0f),
+    m_tile_renderer_2(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -1.0f, 0.0f, -1.0f, 0.0f, -1.0f, 1.0f),
+    m_tile_renderer_3(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.0f, 1.0f, -1.0f, 0.0f, -1.0f, 1.0f)
 {
+    m_tile_renderer_0.start();
+    m_tile_renderer_1.start();
+    m_tile_renderer_2.start();
+    m_tile_renderer_3.start();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -30,5 +37,6 @@ Renderer::Renderer(Backbuffer* backbuffer)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Renderer::~Renderer()
 {
+    m_tile_renderer_0.stop();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
