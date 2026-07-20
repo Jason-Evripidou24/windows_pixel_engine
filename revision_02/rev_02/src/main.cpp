@@ -133,9 +133,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    backbuffer.resize(window.m_width / 2, window.m_height / 2);
+    backbuffer.resize(window.m_width / 3, window.m_height / 3);
 
-    Renderer renderer;
+    Renderer renderer(&backbuffer);
 
     Math::Mat4_f projection_matrix = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
     Math::Mat4_f view_matrix;
@@ -155,7 +155,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         for(const Model& cube_model : cube_models)
         {
             std::queue<MaterialTriangle*> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
-            renderer.drawMaterialTriangles(backbuffer, model_material_triangles, draw_filled);
+            renderer.drawMaterialTriangles(model_material_triangles, draw_filled);
         }
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
