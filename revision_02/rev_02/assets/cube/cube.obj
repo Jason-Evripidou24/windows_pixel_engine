@@ -10,26 +10,26 @@ mtllib cube.mtl
 # Front Top Left            Magenta
 v -0.5  0.5  0.5            1.0 0.0 1.0
 
-# Front Top Right           Magenta
-v  0.5  0.5  0.5            1.0 0.0 1.0
+# Front Top Right           Cyan
+v  0.5  0.5  0.5            0.0 1.0 1.0
 
 # Front Bottom Left         Cyan
 v -0.5 -0.5  0.5            0.0 1.0 1.0
 
-# Front Bottom Right        Cyan
-v  0.5 -0.5  0.5            0.0 1.0 1.0
+# Front Bottom Right        Magenta
+v  0.5 -0.5  0.5            1.0 0.0 1.0
 
 # Back Top Left             Magenta
 v -0.5  0.5 -0.5            1.0 0.0 1.0
 
-# Back Top Right            Magenta
-v  0.5  0.5 -0.5            1.0 0.0 1.0
+# Back Top Right            Cyan
+v  0.5  0.5 -0.5            0.0 1.0 1.0
 
 # Back Bottom Left          Cyan
 v -0.5 -0.5 -0.5            0.0 1.0 1.0
 
-# Back Bottom Right         Cyan
-v  0.5 -0.5 -0.5            0.0 1.0 1.0
+# Back Bottom Right         Magenta
+v  0.5 -0.5 -0.5            1.0 0.0 1.0
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
@@ -76,32 +76,38 @@ vn 0.0 0.0 -1.0
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Front face (+Z)
-usemtl Red
+# usemtl Red
+usemtl White
 f 1/1/5 3/3/5 2/2/5
 f 2/2/5 3/3/5 4/4/5
 
 # Back face (-Z)
-usemtl Green
+# usemtl Green
+usemtl White
 f 6/1/6 8/3/6 5/2/6
 f 5/2/6 8/3/6 7/4/6
 
 # Top face (+Y)
-usemtl Blue
+# usemtl Blue
+usemtl White
 f 5/1/3 1/3/3 6/2/3
 f 6/2/3 1/3/3 2/4/3
 
 # Bottom face (-Y)
-usemtl Yellow
+# usemtl Yellow
+usemtl White
 f 3/1/4 7/3/4 4/2/4
 f 4/2/4 7/3/4 8/4/4
 
 # Left face (-X)
-usemtl Cyan
+# usemtl Cyan
+usemtl White
 f 5/1/2 7/3/2 1/2/2
 f 1/2/2 7/3/2 3/4/2
 
 # Right face (+X)
-usemtl Magenta
+# usemtl Magenta
+usemtl White
 f 2/1/1 4/3/1 6/2/1
 f 6/2/1 4/3/1 8/4/1
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #

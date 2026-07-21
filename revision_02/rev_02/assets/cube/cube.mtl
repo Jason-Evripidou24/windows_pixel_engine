@@ -17,6 +17,7 @@ Kd 1.0 0.0 0.0
 
 newmtl White
 Kd 1.0 1.0 1.0
+map_Kd container.jpg
 
 newmtl Yellow
 Kd 1.0 1.0 0.0

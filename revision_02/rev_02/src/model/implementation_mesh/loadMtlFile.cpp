@@ -33,7 +33,6 @@ std::string parseName(std::stringstream& stream)
 {
     std::string name;
 
-    // Invalid normal direction.
     if(!(stream >> name)) { return std::string(""); }
 
     return name;
@@ -68,6 +67,8 @@ std::vector<Material> Mesh::loadMtlFile(const std::string& file_folder, const st
 
     Material curr_material = Material();
     curr_material.m_name = std::string("DEFAULT");
+
+    std::unordered_map<std::string, Texture*> m_diffuse_textures;
 
     std::string line;
     while(std::getline(file, line))
@@ -105,6 +106,23 @@ std::vector<Material> Mesh::loadMtlFile(const std::string& file_folder, const st
         else if(prefix == "Kd")
         {
             curr_material.m_diffuse = parseColor(ss);
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Diffuse texture.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "map_Kd")
+        {
+            const std::string diffuse_texture_name = parseName(ss);
+
+            Texture* temp = Texture::loadTextureJpgFile(file_folder, diffuse_texture_name);
+
+            if(m_diffuse_textures.find(diffuse_texture_name) == m_diffuse_textures.end())
+            {
+                m_diffuse_textures[diffuse_texture_name] = Texture::loadTextureJpgFile(file_folder, diffuse_texture_name);
+            }
+            curr_material.m_diffuse_texture = m_diffuse_textures[diffuse_texture_name];
         }
         //-----------------------------------------------------------------------------------------------------------------//
     }

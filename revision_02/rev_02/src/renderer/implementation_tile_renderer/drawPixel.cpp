@@ -32,9 +32,19 @@ void TileRenderer::drawPixel(const Math::Vertex& vertex, const Material& materia
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate color using vertex color and material color.
     //---------------------------------------------------------------------------------------------------------------------//
+    uint32_t material_diffuse_texture_color = 0xFFFFFFFF;
+    if( (material.m_diffuse_texture != nullptr) && (material.m_diffuse_texture->m_data != nullptr) )
+    {
+        material_diffuse_texture_color = material.m_diffuse_texture->getColorAtCoords
+        (
+            vertex.m_tex_coords.m_data[0],
+            vertex.m_tex_coords.m_data[1]
+        );
+    }
+
     uint32_t material_diffuse_color = Math::convertVec3fToColor(material.m_diffuse);
     uint32_t vertex_color = Math::convertVec4fToColor(vertex.m_color);
-    uint32_t pixel_color = Math::interpolateUint32(vertex_color, material_diffuse_color, color_mix);
+    uint32_t pixel_color = Math::interpolateUint32(vertex_color, material_diffuse_texture_color, color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

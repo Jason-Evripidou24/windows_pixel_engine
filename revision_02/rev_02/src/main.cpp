@@ -155,7 +155,7 @@ void processInput(Window& window, float delta_time)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Mesh loaded_cube_mesh = Mesh::loadObjFile("../assets/cube/", "cube.obj");
+    Mesh loaded_cube_mesh = loaded_cube_mesh.loadObjFile("../assets/cube/", "cube.obj");
 
     std::vector<Model> cube_models(10);
     for(size_t i = 0; i < 10; i++)

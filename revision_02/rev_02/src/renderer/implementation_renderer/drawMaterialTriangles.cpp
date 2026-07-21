@@ -34,7 +34,13 @@ void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_tria
         }
         for(int i = 0; i < 16; i++)
         {
-            m_tile_renderers[i].first->parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, color_mix, &(m_tile_renderers[i].second));
+            m_tile_renderers[i].first->parentRequestDrawMaterialTriangle
+            (
+                &material_triangle,
+                draw_filled,
+                color_mix,
+                &(m_tile_renderers[i].second)
+            );
         }
 
         std::unique_lock renderer_lock(m_renderer_mutex);
@@ -44,25 +50,16 @@ void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_tria
             renderer_lock,
             [&]
             {
-                return
-                (
-                    (m_tile_renderers[0].second == true) &&
-                    (m_tile_renderers[1].second == true) &&
-                    (m_tile_renderers[2].second == true) &&
-                    (m_tile_renderers[3].second == true) &&
-                    (m_tile_renderers[4].second == true) &&
-                    (m_tile_renderers[5].second == true) &&
-                    (m_tile_renderers[6].second == true) &&
-                    (m_tile_renderers[7].second == true) &&
-                    (m_tile_renderers[8].second == true) &&
-                    (m_tile_renderers[9].second == true) &&
-                    (m_tile_renderers[10].second == true) &&
-                    (m_tile_renderers[11].second == true) &&
-                    (m_tile_renderers[12].second == true) &&
-                    (m_tile_renderers[13].second == true) &&
-                    (m_tile_renderers[14].second == true) &&
-                    (m_tile_renderers[15].second == true)
-                );
+                bool all_tile_renderers_finished_triangle = true;
+                for(int i = 0; i < 16; i++)
+                {
+                    if(m_tile_renderers[i].second == false)
+                    {
+                        all_tile_renderers_finished_triangle = false;
+                        break;
+                    }
+                }
+                return all_tile_renderers_finished_triangle;
             }
         );
     }
