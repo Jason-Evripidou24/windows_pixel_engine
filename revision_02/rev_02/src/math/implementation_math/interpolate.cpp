@@ -153,7 +153,7 @@ Math::Vertex Math::interpolateVertex(const Vertex& start, const Vertex& end, flo
     result.m_position = Math::interpolateVec4f(start.m_position, end.m_position, t);
     result.m_tex_coords = Math::interpolateVec2f(start.m_tex_coords, end.m_tex_coords, t);
     result.m_normal = Math::normalise(Math::interpolateVec3f(start.m_normal, end.m_normal, t));
-    result.m_color = Math::interpolateUint32(start.m_color, end.m_color, t);
+    result.m_color = Math::interpolateVec4f(start.m_color, end.m_color, t);
 
     return result;
 }

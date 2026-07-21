@@ -6,7 +6,7 @@ REM Compiler setup (MSVC)
 REM ================================
 call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
 set "COMPILER=cl"
-set "CFLAGS=/nologo /EHsc /std:c++17 /Zi /W4"
+set "CFLAGS=/nologo /EHsc /std:c++17 /W4"
 
 REM ================================
 REM Directories

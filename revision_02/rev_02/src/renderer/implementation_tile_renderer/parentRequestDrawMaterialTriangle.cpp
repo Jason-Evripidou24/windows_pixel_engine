@@ -18,7 +18,13 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::parentRequestDrawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, bool* parent_job_complete)
+void TileRenderer::parentRequestDrawMaterialTriangle
+(
+    MaterialTriangle* material_triangle,
+    bool draw_filled,
+    float color_mix,
+    bool* parent_job_complete
+)
 {
     std::unique_lock<std::mutex> lock(m_object_mutex);
     
@@ -26,6 +32,7 @@ void TileRenderer::parentRequestDrawMaterialTriangle(MaterialTriangle* material_
 
     m_tile_renderer_job.m_material_triangle = material_triangle;
     m_tile_renderer_job.m_draw_filled = draw_filled;
+    m_tile_renderer_job.m_color_mix = color_mix;
     m_tile_renderer_job.m_parent_job_complete = parent_job_complete;
 
     m_has_job = true;

@@ -7,29 +7,29 @@ mtllib cube.mtl
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 # Vertex Positions: (x, y, z)
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
-# Front Top Left
-v -0.5  0.5  0.5
+# Front Top Left            Magenta
+v -0.5  0.5  0.5            1.0 0.0 1.0
 
-# Front Top Right
-v  0.5  0.5  0.5
+# Front Top Right           Magenta
+v  0.5  0.5  0.5            1.0 0.0 1.0
 
-# Front Bottom Left
-v -0.5 -0.5  0.5
+# Front Bottom Left         Cyan
+v -0.5 -0.5  0.5            0.0 1.0 1.0
 
-# Front Bottom Right
-v  0.5 -0.5  0.5
+# Front Bottom Right        Cyan
+v  0.5 -0.5  0.5            0.0 1.0 1.0
 
-# Back Top Left
-v -0.5  0.5 -0.5
+# Back Top Left             Magenta
+v -0.5  0.5 -0.5            1.0 0.0 1.0
 
-# Back Top Right
-v  0.5  0.5 -0.5
+# Back Top Right            Magenta
+v  0.5  0.5 -0.5            1.0 0.0 1.0
 
-# Back Bottom Left
-v -0.5 -0.5 -0.5
+# Back Bottom Left          Cyan
+v -0.5 -0.5 -0.5            0.0 1.0 1.0
 
-# Back Bottom Right
-v  0.5 -0.5 -0.5
+# Back Bottom Right         Cyan
+v  0.5 -0.5 -0.5            0.0 1.0 1.0
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #
 
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- #

@@ -19,40 +19,44 @@
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Renderer::Renderer(Backbuffer* backbuffer)
-:
-    m_tile_renderer_00(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -1.0f, -0.5f,  0.5f,  1.0f, -1.0f, 1.0f),
-    m_tile_renderer_01(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -0.5f,  0.0f,  0.5f,  1.0f, -1.0f, 1.0f),
-    m_tile_renderer_02(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.0f,  0.5f,  0.5f,  1.0f, -1.0f, 1.0f),
-    m_tile_renderer_03(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.5f,  1.0f,  0.5f,  1.0f, -1.0f, 1.0f),
-    m_tile_renderer_04(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -1.0f, -0.5f,  0.0f,  0.5f, -1.0f, 1.0f),
-    m_tile_renderer_05(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -0.5f,  0.0f,  0.0f,  0.5f, -1.0f, 1.0f),
-    m_tile_renderer_06(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.0f,  0.5f,  0.0f,  0.5f, -1.0f, 1.0f),
-    m_tile_renderer_07(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.5f,  1.0f,  0.0f,  0.5f, -1.0f, 1.0f),
-    m_tile_renderer_08(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -1.0f, -0.5f, -0.5f,  0.0f, -1.0f, 1.0f),
-    m_tile_renderer_09(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -0.5f,  0.0f, -0.5f,  0.0f, -1.0f, 1.0f),
-    m_tile_renderer_10(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.0f,  0.5f, -0.5f,  0.0f, -1.0f, 1.0f),
-    m_tile_renderer_11(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.5f,  1.0f, -0.5f,  0.0f, -1.0f, 1.0f),
-    m_tile_renderer_12(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -1.0f, -0.5f, -1.0f, -0.5f, -1.0f, 1.0f),
-    m_tile_renderer_13(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer, -0.5f,  0.0f, -1.0f, -0.5f, -1.0f, 1.0f),
-    m_tile_renderer_14(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.0f,  0.5f, -1.0f, -0.5f, -1.0f, 1.0f),
-    m_tile_renderer_15(&m_renderer_mutex, &m_renderer_condition_variable, backbuffer,  0.5f,  1.0f, -1.0f, -0.5f, -1.0f, 1.0f)
 {
-    m_tile_renderer_00.start();
-    m_tile_renderer_01.start();
-    m_tile_renderer_02.start();
-    m_tile_renderer_03.start();
-    m_tile_renderer_04.start();
-    m_tile_renderer_05.start();
-    m_tile_renderer_06.start();
-    m_tile_renderer_07.start();
-    m_tile_renderer_08.start();
-    m_tile_renderer_09.start();
-    m_tile_renderer_10.start();
-    m_tile_renderer_11.start();
-    m_tile_renderer_12.start();
-    m_tile_renderer_13.start();
-    m_tile_renderer_14.start();
-    m_tile_renderer_15.start();
+    float increment = 0.5f;
+
+    for(int y = 0; y < 4; y++)
+    {
+        for(int x = 0; x < 4; x++)
+        {
+            float x_min = -1.0f + (x * increment);
+            float x_max = x_min + increment;
+
+            float y_max = 1.0f - (y * increment);
+            float y_min = y_max - increment;
+
+            m_tile_renderers.push_back
+            (
+                {
+                    std::make_unique<TileRenderer>
+                    (
+                        &m_renderer_mutex,
+                        &m_renderer_condition_variable,
+                        backbuffer,
+                        x_min,
+                        x_max,
+                        y_min,
+                        y_max,
+                        -1.0f,
+                        1.0f
+                    ),
+                    false
+                }
+            );
+
+        }
+    }
+    for(int i = 0; i < 16; i++)
+    {
+        m_tile_renderers[i].first->start();
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -60,21 +64,9 @@ Renderer::Renderer(Backbuffer* backbuffer)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Renderer::~Renderer()
 {
-    m_tile_renderer_00.stop();
-    m_tile_renderer_01.stop();
-    m_tile_renderer_02.stop();
-    m_tile_renderer_03.stop();
-    m_tile_renderer_04.stop();
-    m_tile_renderer_05.stop();
-    m_tile_renderer_06.stop();
-    m_tile_renderer_07.stop();
-    m_tile_renderer_08.stop();
-    m_tile_renderer_09.stop();
-    m_tile_renderer_10.stop();
-    m_tile_renderer_11.stop();
-    m_tile_renderer_12.stop();
-    m_tile_renderer_13.stop();
-    m_tile_renderer_14.stop();
-    m_tile_renderer_15.stop();
+    for(int i = 0; i < 16; i++)
+    {
+        m_tile_renderers[i].first->stop();
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

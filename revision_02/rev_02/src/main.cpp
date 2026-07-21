@@ -43,27 +43,34 @@ static Camera camera
 
 std::string controls_string =
     std::string("CONTROLS") + std::string("\n") +
-    std::string("W/A                : ") + std::string("MOVE FORWARD/BACKWARD")        + std::string("\n") +
-    std::string("S/D                : ") + std::string("MOVE LEFT/RIGHT")              + std::string("\n") +
-    std::string("Q/E                : ") + std::string("MOVE UP/DOWN")                 + std::string("\n") +
-    std::string("LEFT MOUSE AND DRAG: ") + std::string("LOOK AROUND")                  + std::string("\n") +
-    std::string("0                  : ") + std::string("TOGGLE FILLED/WIREFRAME MODE") + std::string("\n") +
-    std::string("1                  : ") + std::string("INCREASE MOVE SPEED")          + std::string("\n") +
-    std::string("2                  : ") + std::string("DECREASE MOVE SPEED");
+    std::string("W/A                : ") + std::string("MOVE FORWARD/BACKWARD")                        + std::string("\n") +
+    std::string("S/D                : ") + std::string("MOVE LEFT/RIGHT")                              + std::string("\n") +
+    std::string("Q/E                : ") + std::string("MOVE UP/DOWN")                                 + std::string("\n") +
+    std::string("LEFT MOUSE AND DRAG: ") + std::string("LOOK AROUND")                                  + std::string("\n") +
+    std::string("0                  : ") + std::string("TOGGLE FILLED/WIREFRAME MODE")                 + std::string("\n") +
+    std::string("1                  : ") + std::string("INCREASE MOVE SPEED")                          + std::string("\n") +
+    std::string("2                  : ") + std::string("DECREASE MOVE SPEED")                          + std::string("\n") +
+    std::string("8/9                : ") + std::string("CHANGE MIX BETWEEN VERTEX AND MATERIAL COLOR");
 
+// Zero key toggles wireframe/filled mode.
 static bool prev_zero_key = false;
 static bool draw_filled = true;
+
+// Eight and Nine keys change the color mix between vertex color and material color.
+static bool prev_eight_key = false;
+static bool prev_nine_key = false;
+static float vertex_material_color_mix = 0.5f;
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 0.2f;
+static float camera_move_speed = 1.0f;
 static float camera_look_speed = 0.002f;
 
 void processInput(Window& window, float delta_time)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Keyboard.
+    // Movement.
     //---------------------------------------------------------------------------------------------------------------------//
     float movement = camera_move_speed * delta_time;
 
@@ -76,15 +83,22 @@ void processInput(Window& window, float delta_time)
     // Move camera along z
     if(window.m_input.isKeyDown('W') == true) { camera.moveForward(movement); }
     if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-movement); }
+    //---------------------------------------------------------------------------------------------------------------------//
 
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Wireframe and Filled mode.
+    //---------------------------------------------------------------------------------------------------------------------//
     bool curr_zero_key = window.m_input.isKeyDown('0');
     if( (curr_zero_key == true) && (prev_zero_key == false) )
     {
         draw_filled = !draw_filled;
     }
     prev_zero_key = curr_zero_key;
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    // Increase and decrease move speed.
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Movement speed.
+    //---------------------------------------------------------------------------------------------------------------------//
     if(window.m_input.isKeyDown('1') == true)
     {
         camera_move_speed += 0.1f;
@@ -94,6 +108,26 @@ void processInput(Window& window, float delta_time)
         camera_move_speed -= 0.1f;
         if(camera_move_speed <= 0.0f) { camera_move_speed = 0.0f; }
     }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Color mixing between vertex color and material color.
+    //---------------------------------------------------------------------------------------------------------------------//
+    bool curr_eight_key = window.m_input.isKeyDown('8');
+    if( (curr_eight_key == true) && (prev_eight_key == false) )
+    {
+        vertex_material_color_mix -= 0.1f;
+        if(vertex_material_color_mix <= 0.0f) { vertex_material_color_mix = 0.0f; }
+    }
+    prev_eight_key = curr_eight_key;
+
+    bool curr_nine_key = window.m_input.isKeyDown('9');
+    if( (curr_nine_key == true) && (prev_nine_key == false) )
+    {
+        vertex_material_color_mix += 0.1f;
+        if(vertex_material_color_mix >= 1.0f) { vertex_material_color_mix = 1.0f; }
+    }
+    prev_nine_key = curr_nine_key;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -147,10 +181,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     timer.init();
 
     Window window;
-    if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
+    //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
+    if(!window.create(L"Pixel Engine", 1350, 900, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    backbuffer.resize(window.m_width / 2, window.m_height / 2);
+    int pixel_size = 2;
+    int backbuffer_width = window.m_width / pixel_size;
+    int backbuffer_height = window.m_height / pixel_size;
+    backbuffer.resize(backbuffer_width, backbuffer_height);
 
     Renderer renderer(&backbuffer);
 
@@ -174,12 +212,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         for(const Model& cube_model : cube_models)
         {
             std::queue<MaterialTriangle> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
-            renderer.drawMaterialTriangles(model_material_triangles, draw_filled);
+            renderer.drawMaterialTriangles(model_material_triangles, draw_filled, vertex_material_color_mix);
         }
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
-        backbuffer.setText(10, 280, controls_string.c_str(), static_cast<int>(controls_string.size()), 0xFFFFFFFF);
+        backbuffer.setText(10, 360, controls_string.c_str(), static_cast<int>(controls_string.size()), 0xFFFFFFFF);
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

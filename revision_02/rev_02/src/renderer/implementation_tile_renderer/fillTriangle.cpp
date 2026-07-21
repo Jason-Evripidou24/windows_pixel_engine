@@ -58,7 +58,11 @@ uint32_t mixColor(uint32_t color_a, float alpha, uint32_t color_b, float beta, u
     return result;
 }
 
-void TileRenderer::fillTriangle(const Math::Triangle& triangle, const Material& material)
+/*
+-   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from triangle vertex colors and 1 is 100% color from
+    material.
+*/
+void TileRenderer::fillTriangle(const Math::Triangle& triangle, const Material& material, float color_mix)
 {
     //-----------------------------------------------------------------------------------------------------------------//
     // Material colors that do not depend on texture coords.
@@ -71,19 +75,19 @@ void TileRenderer::fillTriangle(const Math::Triangle& triangle, const Material& 
     int v0_x = m_backbuffer->toBackbufferCoordX(v0.m_position.m_data[0]);
     int v0_y = m_backbuffer->toBackbufferCoordY(v0.m_position.m_data[1]);
     float v0_z = v0.m_position.m_data[2];
-    uint32_t v0_color = v0.m_color;
+    uint32_t v0_color = Math::convertVec4fToColor(v0.m_color);
 
     const Math::Vertex& v1 = triangle.m_v1;
     int v1_x = m_backbuffer->toBackbufferCoordX(v1.m_position.m_data[0]);
     int v1_y = m_backbuffer->toBackbufferCoordY(v1.m_position.m_data[1]);
     float v1_z = v1.m_position.m_data[2];
-    uint32_t v1_color = v1.m_color;
+    uint32_t v1_color = Math::convertVec4fToColor(v1.m_color);
 
     const Math::Vertex& v2 = triangle.m_v2;
     int v2_x = m_backbuffer->toBackbufferCoordX(v2.m_position.m_data[0]);
     int v2_y = m_backbuffer->toBackbufferCoordY(v2.m_position.m_data[1]);
     float v2_z = v2.m_position.m_data[2];
-    uint32_t v2_color = v2.m_color;
+    uint32_t v2_color = Math::convertVec4fToColor(v2.m_color);
 
     float area = edge((float)v0_x, (float)v0_y, (float)v1_x, (float)v1_y, (float)v2_x, (float)v2_y);
     if(Utils::checkFloatEquals(area, 0.0f)) { return; }
@@ -139,7 +143,7 @@ void TileRenderer::fillTriangle(const Math::Triangle& triangle, const Material& 
             float z = (alpha * v0_z) + (beta * v1_z) + (gamma * v2_z);
             uint32_t color = mixColor(v0_color, alpha, v1_color, beta, v2_color, gamma);
 
-            uint32_t output_color = Math::interpolateUint32(color, material_diffuse_color, 0.5f);
+            uint32_t output_color = Math::interpolateUint32(color, material_diffuse_color, color_mix);
 
             m_backbuffer->setPixel(x, y, z, output_color);
         }

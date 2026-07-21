@@ -21,46 +21,21 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_triangles_queue, bool draw_filled)
+void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_triangles_queue, bool draw_filled, float color_mix)
 {
     while(material_triangles_queue.empty() == false)
     {
         MaterialTriangle material_triangle = material_triangles_queue.front();
         material_triangles_queue.pop();
 
-        m_tile_renderer_00_job_complete = false;
-        m_tile_renderer_01_job_complete = false;
-        m_tile_renderer_02_job_complete = false;
-        m_tile_renderer_03_job_complete = false;
-        m_tile_renderer_04_job_complete = false;
-        m_tile_renderer_05_job_complete = false;
-        m_tile_renderer_06_job_complete = false;
-        m_tile_renderer_07_job_complete = false;
-        m_tile_renderer_08_job_complete = false;
-        m_tile_renderer_09_job_complete = false;
-        m_tile_renderer_10_job_complete = false;
-        m_tile_renderer_11_job_complete = false;
-        m_tile_renderer_12_job_complete = false;
-        m_tile_renderer_13_job_complete = false;
-        m_tile_renderer_14_job_complete = false;
-        m_tile_renderer_15_job_complete = false;
-
-        m_tile_renderer_00.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_00_job_complete);
-        m_tile_renderer_01.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_01_job_complete);
-        m_tile_renderer_02.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_02_job_complete);
-        m_tile_renderer_03.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_03_job_complete);
-        m_tile_renderer_04.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_04_job_complete);
-        m_tile_renderer_05.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_05_job_complete);
-        m_tile_renderer_06.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_06_job_complete);
-        m_tile_renderer_07.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_07_job_complete);
-        m_tile_renderer_08.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_08_job_complete);
-        m_tile_renderer_09.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_09_job_complete);
-        m_tile_renderer_10.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_10_job_complete);
-        m_tile_renderer_11.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_11_job_complete);
-        m_tile_renderer_12.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_12_job_complete);
-        m_tile_renderer_13.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_13_job_complete);
-        m_tile_renderer_14.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_14_job_complete);
-        m_tile_renderer_15.parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, &m_tile_renderer_15_job_complete);
+        for(int i = 0; i < 16; i++)
+        {
+            m_tile_renderers[i].second = false;
+        }
+        for(int i = 0; i < 16; i++)
+        {
+            m_tile_renderers[i].first->parentRequestDrawMaterialTriangle(&material_triangle, draw_filled, color_mix, &(m_tile_renderers[i].second));
+        }
 
         std::unique_lock renderer_lock(m_renderer_mutex);
 
@@ -71,22 +46,22 @@ void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_tria
             {
                 return
                 (
-                    (m_tile_renderer_00_job_complete == true) &&
-                    (m_tile_renderer_01_job_complete == true) &&
-                    (m_tile_renderer_02_job_complete == true) &&
-                    (m_tile_renderer_03_job_complete == true) &&
-                    (m_tile_renderer_04_job_complete == true) &&
-                    (m_tile_renderer_05_job_complete == true) &&
-                    (m_tile_renderer_06_job_complete == true) &&
-                    (m_tile_renderer_07_job_complete == true) &&
-                    (m_tile_renderer_08_job_complete == true) &&
-                    (m_tile_renderer_09_job_complete == true) &&
-                    (m_tile_renderer_10_job_complete == true) &&
-                    (m_tile_renderer_11_job_complete == true) &&
-                    (m_tile_renderer_12_job_complete == true) &&
-                    (m_tile_renderer_13_job_complete == true) &&
-                    (m_tile_renderer_14_job_complete == true) &&
-                    (m_tile_renderer_15_job_complete == true)
+                    (m_tile_renderers[0].second == true) &&
+                    (m_tile_renderers[1].second == true) &&
+                    (m_tile_renderers[2].second == true) &&
+                    (m_tile_renderers[3].second == true) &&
+                    (m_tile_renderers[4].second == true) &&
+                    (m_tile_renderers[5].second == true) &&
+                    (m_tile_renderers[6].second == true) &&
+                    (m_tile_renderers[7].second == true) &&
+                    (m_tile_renderers[8].second == true) &&
+                    (m_tile_renderers[9].second == true) &&
+                    (m_tile_renderers[10].second == true) &&
+                    (m_tile_renderers[11].second == true) &&
+                    (m_tile_renderers[12].second == true) &&
+                    (m_tile_renderers[13].second == true) &&
+                    (m_tile_renderers[14].second == true) &&
+                    (m_tile_renderers[15].second == true)
                 );
             }
         );

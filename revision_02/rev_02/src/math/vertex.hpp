@@ -36,7 +36,7 @@ namespace Math
         Vec4_f m_position;
         Vec2_f m_tex_coords;
         Vec3_f m_normal;
-        uint32_t m_color;
+        Vec4_f m_color; // a-r-g-b
         //-----------------------------------------------------------------------------------------------------------------//
 
         //-----------------------------------------------------------------------------------------------------------------//
@@ -47,10 +47,10 @@ namespace Math
             m_position   = Vec4_f();
             m_tex_coords = Vec2_f();
             m_normal     = Vec3_f();
-            m_color      = 0xFF000000; // Black.
+            m_color      = Vec4_f(); // Black.
         }
 
-        Vertex(const Vec4_f& position, const Vec2_f& tex_coords, const Vec3_f& normal, uint32_t color)
+        Vertex(const Vec4_f& position, const Vec2_f& tex_coords, const Vec3_f& normal, const Vec4_f& color)
         {
             m_position   = position;
             m_tex_coords = tex_coords;
@@ -91,7 +91,7 @@ namespace Math
                 std::string("POSITION:   ") + m_position.toStringRow(min_num_width, num_decimals) + std::string("\n") +
                 std::string("TEX COORDS: ") + m_tex_coords.toStringRow(min_num_width, num_decimals) + std::string("\n") +
                 std::string("NORMAL:     ") + m_normal.toStringRow(min_num_width, num_decimals) + std::string("\n") +
-                std::string("COLOR:      ") + std::to_string(m_color)
+                std::string("COLOR:      ") + m_color.toStringRow(min_num_width, num_decimals)
             );
         }
         //-----------------------------------------------------------------------------------------------------------------//

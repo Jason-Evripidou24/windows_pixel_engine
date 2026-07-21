@@ -59,6 +59,7 @@ struct TileRendererJob
 {
     MaterialTriangle* m_material_triangle = nullptr;
     bool              m_draw_filled;
+    float             m_color_mix;
     bool*             m_parent_job_complete;
 };
 
@@ -97,7 +98,13 @@ struct TileRenderer
     void stop();
 
     void workerFunction();
-    void parentRequestDrawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, bool* parent_job_complete);
+    void parentRequestDrawMaterialTriangle
+    (
+        MaterialTriangle* material_triangle,
+        bool draw_filled,
+        float color_mix,
+        bool* parent_job_complete
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -121,10 +128,10 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Drawing functions. Each drawing function only draws within the bounding box of the TileRenderer object.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled);
-    void fillTriangle(const Math::Triangle& triangle, const Material& material);
-    void drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material);
-    void drawPixel(const Math::Vertex& vertex, const Material& material);
+    void drawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, float color_mix);
+    void fillTriangle(const Math::Triangle& triangle, const Material& material, float color_mix);
+    void drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material, float color_mix);
+    void drawPixel(const Math::Vertex& vertex, const Material& material, float color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 
@@ -137,38 +144,8 @@ struct Renderer
         multithreading by having each TileRenderer contain a thread. For now no multithreading.
     */
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRenderer m_tile_renderer_00;
-    bool         m_tile_renderer_00_job_complete;
-    TileRenderer m_tile_renderer_01;
-    bool         m_tile_renderer_01_job_complete;
-    TileRenderer m_tile_renderer_02;
-    bool         m_tile_renderer_02_job_complete;
-    TileRenderer m_tile_renderer_03;
-    bool         m_tile_renderer_03_job_complete;
-    TileRenderer m_tile_renderer_04;
-    bool         m_tile_renderer_04_job_complete;
-    TileRenderer m_tile_renderer_05;
-    bool         m_tile_renderer_05_job_complete;
-    TileRenderer m_tile_renderer_06;
-    bool         m_tile_renderer_06_job_complete;
-    TileRenderer m_tile_renderer_07;
-    bool         m_tile_renderer_07_job_complete;
-    TileRenderer m_tile_renderer_08;
-    bool         m_tile_renderer_08_job_complete;
-    TileRenderer m_tile_renderer_09;
-    bool         m_tile_renderer_09_job_complete;
-    TileRenderer m_tile_renderer_10;
-    bool         m_tile_renderer_10_job_complete;
-    TileRenderer m_tile_renderer_11;
-    bool         m_tile_renderer_11_job_complete;
-    TileRenderer m_tile_renderer_12;
-    bool         m_tile_renderer_12_job_complete;
-    TileRenderer m_tile_renderer_13;
-    bool         m_tile_renderer_13_job_complete;
-    TileRenderer m_tile_renderer_14;
-    bool         m_tile_renderer_14_job_complete;
-    TileRenderer m_tile_renderer_15;
-    bool         m_tile_renderer_15_job_complete;
+    // Each pair contains a TileRenderer object and its associated job_complete check.
+    std::vector<std::pair<std::unique_ptr<TileRenderer>, bool>> m_tile_renderers;
 
     std::mutex              m_renderer_mutex;
     std::condition_variable m_renderer_condition_variable;
@@ -184,7 +161,7 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Functions.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawMaterialTriangles(std::queue<MaterialTriangle>& material_triangles_queue, bool draw_filled);
+    void drawMaterialTriangles(std::queue<MaterialTriangle>& material_triangles_queue, bool draw_filled, float color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

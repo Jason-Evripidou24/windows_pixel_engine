@@ -48,16 +48,51 @@
     -   d / Tr (opacity)
 */
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Math::Vec4_f parseVertexPosition(std::stringstream& stream)
+std::pair<Math::Vec4_f, Math::Vec4_f> parseVertexPositionAndColor(std::stringstream& stream)
 {
     float x;
     float y;
     float z;
 
     // Invalid position coordinate.
-    if(!(stream >> x >> y >> z)) { return Math::Vec4_f(0.0f, 0.0f, 0.0f, 1.0f); }
+    if(!(stream >> x >> y >> z))
+    {
+        return std::pair<Math::Vec4_f, Math::Vec4_f>
+        (
+            Math::Vec4_f(0.0f, 0.0f, 0.0f, 1.0f),
+            Math::Vec4_f(1.0f, 1.0f, 1.0f, 1.0f)
+        );
+    }
 
-    return Math::Vec4_f(x, y, z, 1.0f);
+    float r;
+    float g;
+    float b;
+
+    if(!(stream >> r >> g >> b))
+    {
+        return std::pair<Math::Vec4_f, Math::Vec4_f>
+        (
+            Math::Vec4_f(x, y, z, 1.0f),
+            Math::Vec4_f(1.0f, 1.0f, 1.0f, 1.0f)
+        );
+    }
+
+    float a;
+
+    if(!(stream >> a))
+    {
+        return std::pair<Math::Vec4_f, Math::Vec4_f>
+        (
+            Math::Vec4_f(x, y, z, 1.0f),
+            Math::Vec4_f(1.0f, r, g, b)
+        );
+    }
+
+    return std::pair<Math::Vec4_f, Math::Vec4_f>
+    (
+        Math::Vec4_f(x, y, z, 1.0f),
+        Math::Vec4_f(a, r, g, b)
+    );
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -157,7 +192,7 @@ std::vector<OBJIndex> parseFace(std::stringstream& stream)
 std::vector<Math::Triangle> createTriangles
 (
     const std::vector<OBJIndex>& face_indices,
-    const std::vector<Math::Vec4_f>& vertex_positions,
+    const std::vector<std::pair<Math::Vec4_f, Math::Vec4_f>>& vertex_positions_and_colors,
     const std::vector<Math::Vec2_f>& vertex_tex_coords,
     const std::vector<Math::Vec3_f>& vertex_normals
 )
@@ -171,22 +206,22 @@ std::vector<Math::Triangle> createTriangles
         const OBJIndex& i2 = face_indices[i + 1];
 
         Math::Vertex vertex0;
-        vertex0.m_position = vertex_positions[i0.position];
+        vertex0.m_position = vertex_positions_and_colors[i0.position].first;
         vertex0.m_tex_coords = vertex_tex_coords[i0.texcoord];
         vertex0.m_normal = vertex_normals[i0.normal];
-        vertex0.m_color = 0xFFFFFFFF; // White default.
+        vertex0.m_color = vertex_positions_and_colors[i0.position].second;
 
         Math::Vertex vertex1;
-        vertex1.m_position = vertex_positions[i1.position];
+        vertex1.m_position = vertex_positions_and_colors[i1.position].first;
         vertex1.m_tex_coords = vertex_tex_coords[i1.texcoord];
         vertex1.m_normal = vertex_normals[i1.normal];
-        vertex1.m_color = 0xFFFFFFFF; // White default.
+        vertex1.m_color = vertex_positions_and_colors[i1.position].second;
 
         Math::Vertex vertex2;
-        vertex2.m_position = vertex_positions[i2.position];
+        vertex2.m_position = vertex_positions_and_colors[i2.position].first;
         vertex2.m_tex_coords = vertex_tex_coords[i2.texcoord];
         vertex2.m_normal = vertex_normals[i2.normal];
-        vertex2.m_color = 0xFFFFFFFF; // White default.
+        vertex2.m_color = vertex_positions_and_colors[i2.position].second;
 
         triangles.push_back(Math::Triangle(vertex0, vertex1, vertex2));
     }
@@ -211,7 +246,7 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
     if(!file.is_open()) { return mesh; }
     //---------------------------------------------------------------------------------------------------------------------//
 
-    std::vector<Math::Vec4_f> vertex_positions;
+    std::vector<std::pair<Math::Vec4_f, Math::Vec4_f>> vertex_positions_and_colors;
     std::vector<Math::Vec2_f> vertex_tex_coords;
     std::vector<Math::Vec3_f> vertex_normals;
 
@@ -237,7 +272,7 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         //-----------------------------------------------------------------------------------------------------------------//
         if(prefix == "v")
         {
-            vertex_positions.push_back(parseVertexPosition(ss));
+            vertex_positions_and_colors.push_back(parseVertexPositionAndColor(ss));
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
@@ -299,7 +334,7 @@ Mesh Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
             std::vector<Math::Triangle> new_triangles = createTriangles
             (
                 face_indices,
-                vertex_positions,
+                vertex_positions_and_colors,
                 vertex_tex_coords,
                 vertex_normals
             );

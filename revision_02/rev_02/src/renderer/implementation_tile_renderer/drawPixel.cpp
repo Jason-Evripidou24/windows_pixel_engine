@@ -24,15 +24,17 @@
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 /*
--   Vertexe is (should be) within clip space.
+-   Vertex is (should be) within clip space.
+-   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from vertex and 1 is 100% color from material.
 */
-void TileRenderer::drawPixel(const Math::Vertex& vertex, const Material& material)
+void TileRenderer::drawPixel(const Math::Vertex& vertex, const Material& material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate color using vertex color and material color.
     //---------------------------------------------------------------------------------------------------------------------//
     uint32_t material_diffuse_color = Math::convertVec3fToColor(material.m_diffuse);
-    uint32_t pixel_color = Math::interpolateUint32(vertex.m_color, material_diffuse_color, 0.5f);
+    uint32_t vertex_color = Math::convertVec4fToColor(vertex.m_color);
+    uint32_t pixel_color = Math::interpolateUint32(vertex_color, material_diffuse_color, color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

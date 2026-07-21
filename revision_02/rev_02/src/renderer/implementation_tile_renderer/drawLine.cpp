@@ -25,7 +25,7 @@
 /*
 -   Vertexes are (should be) within clip space.
 */
-void TileRenderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material)
+void TileRenderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate the backbuffer pixel width and height that will be required.
@@ -46,7 +46,7 @@ void TileRenderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, co
 
     if(steps == 0)
     {
-        this->drawPixel(v_0, material);
+        this->drawPixel(v_0, material, color_mix);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -56,7 +56,7 @@ void TileRenderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, co
         float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
 
         Math::Vertex curr_vert = Math::interpolateVertex(v_0, v_1, t);
-        this->drawPixel(curr_vert, material);
+        this->drawPixel(curr_vert, material, color_mix);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }

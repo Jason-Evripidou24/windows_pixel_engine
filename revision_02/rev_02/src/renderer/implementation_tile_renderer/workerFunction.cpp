@@ -37,7 +37,12 @@ void TileRenderer::workerFunction()
         if(m_running == false) { break; } 
         //-----------------------------------------------------------------------------------------------------------------//
 
-        this->drawMaterialTriangle(m_tile_renderer_job.m_material_triangle, m_tile_renderer_job.m_draw_filled);
+        this->drawMaterialTriangle
+        (
+            m_tile_renderer_job.m_material_triangle,
+            m_tile_renderer_job.m_draw_filled,
+            m_tile_renderer_job.m_color_mix
+        );
 
         m_tile_renderer_job.m_material_triangle = nullptr;
 

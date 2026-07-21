@@ -21,7 +21,7 @@
 /*
 -   Triangle has been transformed to clip space and undergone perspective divide but no clipping against x,y,z planes.
 */
-void TileRenderer::drawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled)
+void TileRenderer::drawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, float color_mix)
 {
     if(material_triangle == nullptr) { return; }
 
@@ -40,13 +40,13 @@ void TileRenderer::drawMaterialTriangle(MaterialTriangle* material_triangle, boo
     {
         if(draw_filled == true)
         {
-            this->fillTriangle(triangle_clipped, material_triangle->m_material);
+            this->fillTriangle(triangle_clipped, material_triangle->m_material, color_mix);
         }
         else
         {
-            this->drawLine(triangle_clipped.m_v0, triangle_clipped.m_v1, material_triangle->m_material);
-            this->drawLine(triangle_clipped.m_v0, triangle_clipped.m_v2, material_triangle->m_material);
-            this->drawLine(triangle_clipped.m_v1, triangle_clipped.m_v2, material_triangle->m_material);
+            this->drawLine(triangle_clipped.m_v0, triangle_clipped.m_v1, material_triangle->m_material, color_mix);
+            this->drawLine(triangle_clipped.m_v0, triangle_clipped.m_v2, material_triangle->m_material, color_mix);
+            this->drawLine(triangle_clipped.m_v1, triangle_clipped.m_v2, material_triangle->m_material, color_mix);
         }
     }
 }
