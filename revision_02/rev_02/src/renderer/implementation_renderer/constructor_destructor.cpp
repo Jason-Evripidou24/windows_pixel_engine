@@ -20,11 +20,11 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Renderer::Renderer(Backbuffer* backbuffer)
 {
-    float increment = 0.5f;
+    float increment = 0.4f;
 
-    for(int y = 0; y < 4; y++)
+    for(int y = 0; y < 5; y++)
     {
-        for(int x = 0; x < 4; x++)
+        for(int x = 0; x < 5; x++)
         {
             float x_min = -1.0f + (x * increment);
             float x_max = x_min + increment;
@@ -53,7 +53,7 @@ Renderer::Renderer(Backbuffer* backbuffer)
 
         }
     }
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < 25; i++)
     {
         m_tile_renderers[i].first->start();
     }
@@ -64,7 +64,7 @@ Renderer::Renderer(Backbuffer* backbuffer)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Renderer::~Renderer()
 {
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < 25; i++)
     {
         m_tile_renderers[i].first->stop();
     }

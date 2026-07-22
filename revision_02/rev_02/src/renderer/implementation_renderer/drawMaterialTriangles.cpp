@@ -28,11 +28,11 @@ void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_tria
         MaterialTriangle material_triangle = material_triangles_queue.front();
         material_triangles_queue.pop();
 
-        for(int i = 0; i < 16; i++)
+        for(int i = 0; i < 25; i++)
         {
             m_tile_renderers[i].second = false;
         }
-        for(int i = 0; i < 16; i++)
+        for(int i = 0; i < 25; i++)
         {
             m_tile_renderers[i].first->parentRequestDrawMaterialTriangle
             (
@@ -51,7 +51,7 @@ void Renderer::drawMaterialTriangles(std::queue<MaterialTriangle>& material_tria
             [&]
             {
                 bool all_tile_renderers_finished_triangle = true;
-                for(int i = 0; i < 16; i++)
+                for(int i = 0; i < 25; i++)
                 {
                     if(m_tile_renderers[i].second == false)
                     {

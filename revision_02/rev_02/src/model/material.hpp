@@ -24,6 +24,7 @@
 
 #include "../math/vec3_f.hpp"
 #include "../math/vertex.hpp"
+#include "../math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -90,6 +91,27 @@ struct Material
         m_diffuse = other.m_diffuse;
         m_diffuse_texture = other.m_diffuse_texture;
         return *this;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    uint32_t calcMaterialColor(float u, float v) const
+    {
+        uint32_t output_color;
+
+        uint32_t material_diffuse_color = Math::convertVec3fToColor(m_diffuse);
+
+        if( (m_diffuse_texture != nullptr) && (m_diffuse_texture->m_data != nullptr) )
+        {
+            uint32_t material_diffuse_texture_color = m_diffuse_texture->getColorAtCoords(u, v);
+            output_color = Math::interpolateUint32(material_diffuse_color, material_diffuse_texture_color, 0.5f);
+        }
+        else
+        {
+            output_color = material_diffuse_color;
+        }
+
+        return output_color;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 };

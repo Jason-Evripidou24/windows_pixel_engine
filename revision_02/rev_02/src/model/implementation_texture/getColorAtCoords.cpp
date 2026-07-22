@@ -25,11 +25,11 @@ uint32_t Texture::getColorAtCoords(const float x, const float y)
 {
     if(m_data == nullptr) { return 0xFF000000; }
 
-    int x_coord = static_cast<int>(x * static_cast<float>(m_width));
+    int x_coord = static_cast<int>(x * (static_cast<float>(m_width) - 1.0f));
     if(x_coord > (m_width - 1)) { x_coord = m_width - 1; }
     if(x_coord < 0) { x_coord = 0; }
 
-    int y_coord = static_cast<int>((1.0f - y) * static_cast<float>(m_height));
+    int y_coord = static_cast<int>((1.0f - y) * (static_cast<float>(m_height) - 1.0f));
     if(y_coord > (m_height - 1)) { y_coord = m_height - 1; }
     if(y_coord < 0) { y_coord = 0; }
 

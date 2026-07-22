@@ -59,7 +59,7 @@ static bool draw_filled = true;
 // Eight and Nine keys change the color mix between vertex color and material color.
 static bool prev_eight_key = false;
 static bool prev_nine_key = false;
-static float vertex_material_color_mix = 0.5f;
+static float vertex_material_color_mix = 1.0f;
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;

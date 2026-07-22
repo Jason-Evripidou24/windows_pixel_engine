@@ -130,6 +130,22 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawMaterialTriangle(MaterialTriangle* material_triangle, bool draw_filled, float color_mix);
     void fillTriangle(const Math::Triangle& triangle, const Material& material, float color_mix);
+    void fillFlatBottomTriangle
+    (
+        const Math::Vertex& top,
+        const Math::Vertex& left,
+        const Math::Vertex& right,
+        const Material& material,
+        float color_mix
+    );
+    void fillFlatTopTriangle
+    (
+        const Math::Vertex& top_left,
+        const Math::Vertex& top_right,
+        const Math::Vertex& bottom,
+        const Material& material,
+        float color_mix
+    );
     void drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material, float color_mix);
     void drawPixel(const Math::Vertex& vertex, const Material& material, float color_mix);
     //---------------------------------------------------------------------------------------------------------------------//

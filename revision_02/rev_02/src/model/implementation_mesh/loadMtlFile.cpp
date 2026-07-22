@@ -116,8 +116,6 @@ std::vector<Material> Mesh::loadMtlFile(const std::string& file_folder, const st
         {
             const std::string diffuse_texture_name = parseName(ss);
 
-            Texture* temp = Texture::loadTextureJpgFile(file_folder, diffuse_texture_name);
-
             if(m_diffuse_textures.find(diffuse_texture_name) == m_diffuse_textures.end())
             {
                 m_diffuse_textures[diffuse_texture_name] = Texture::loadTextureJpgFile(file_folder, diffuse_texture_name);
