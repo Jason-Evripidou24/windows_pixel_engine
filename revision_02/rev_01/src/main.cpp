@@ -24,6 +24,7 @@
 #include "utils/utils.hpp"
 #include "model/mesh.hpp"
 #include "model/model.hpp"
+#include "timer/timer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -40,46 +41,93 @@ static Camera camera
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
+std::string controls_string =
+    std::string("CONTROLS") + std::string("\n") +
+    std::string("W/A                : ") + std::string("MOVE FORWARD/BACKWARD")                        + std::string("\n") +
+    std::string("S/D                : ") + std::string("MOVE LEFT/RIGHT")                              + std::string("\n") +
+    std::string("Q/E                : ") + std::string("MOVE UP/DOWN")                                 + std::string("\n") +
+    std::string("LEFT MOUSE AND DRAG: ") + std::string("LOOK AROUND")                                  + std::string("\n") +
+    std::string("0                  : ") + std::string("TOGGLE FILLED/WIREFRAME MODE")                 + std::string("\n") +
+    std::string("1                  : ") + std::string("INCREASE MOVE SPEED")                          + std::string("\n") +
+    std::string("2                  : ") + std::string("DECREASE MOVE SPEED")                          + std::string("\n") +
+    std::string("8/9                : ") + std::string("CHANGE MIX BETWEEN VERTEX AND MATERIAL COLOR");
+
+// Zero key toggles wireframe/filled mode.
 static bool prev_zero_key = false;
 static bool draw_filled = true;
 
-static bool prev_one_key = false;
-static bool draw_with_tiles = false;
+// Eight and Nine keys change the color mix between vertex color and material color.
+static bool prev_eight_key = false;
+static bool prev_nine_key = false;
+static float vertex_material_color_mix = 1.0f;
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 0.002f;
+static float camera_move_speed = 1.0f;
 static float camera_look_speed = 0.002f;
 
-void processInput(Window& window)
+void processInput(Window& window, float delta_time)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Keyboard.
+    // Movement.
     //---------------------------------------------------------------------------------------------------------------------//
-    // Move camera along x
-    if(window.m_input.isKeyDown('A') == true) { camera.moveRight(-camera_move_speed); }
-    if(window.m_input.isKeyDown('D') == true) { camera.moveRight(camera_move_speed); }
-    // Move camera along y
-    if(window.m_input.isKeyDown('Q') == true) { camera.moveUp(camera_move_speed); }
-    if(window.m_input.isKeyDown('E') == true) { camera.moveUp(-camera_move_speed); }
-    // Move camera along z
-    if(window.m_input.isKeyDown('W') == true) { camera.moveForward(camera_move_speed); }
-    if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-camera_move_speed); }
+    float movement = camera_move_speed * delta_time;
 
+    // Move camera along x
+    if(window.m_input.isKeyDown('A') == true) { camera.moveRight(-movement); }
+    if(window.m_input.isKeyDown('D') == true) { camera.moveRight(movement); }
+    // Move camera along y
+    if(window.m_input.isKeyDown('Q') == true) { camera.moveUp(movement); }
+    if(window.m_input.isKeyDown('E') == true) { camera.moveUp(-movement); }
+    // Move camera along z
+    if(window.m_input.isKeyDown('W') == true) { camera.moveForward(movement); }
+    if(window.m_input.isKeyDown('S') == true) { camera.moveForward(-movement); }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Wireframe and Filled mode.
+    //---------------------------------------------------------------------------------------------------------------------//
     bool curr_zero_key = window.m_input.isKeyDown('0');
     if( (curr_zero_key == true) && (prev_zero_key == false) )
     {
         draw_filled = !draw_filled;
     }
     prev_zero_key = curr_zero_key;
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    bool curr_one_key = window.m_input.isKeyDown('1');
-    if( (curr_one_key == true) && (prev_one_key == false) )
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Movement speed.
+    //---------------------------------------------------------------------------------------------------------------------//
+    if(window.m_input.isKeyDown('1') == true)
     {
-        draw_with_tiles = !draw_with_tiles;
+        camera_move_speed += 0.1f;
     }
-    prev_one_key = curr_one_key;
+    if(window.m_input.isKeyDown('2') == true)
+    {
+        camera_move_speed -= 0.1f;
+        if(camera_move_speed <= 0.0f) { camera_move_speed = 0.0f; }
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Color mixing between vertex color and material color.
+    //---------------------------------------------------------------------------------------------------------------------//
+    bool curr_eight_key = window.m_input.isKeyDown('8');
+    if( (curr_eight_key == true) && (prev_eight_key == false) )
+    {
+        vertex_material_color_mix -= 0.1f;
+        if(vertex_material_color_mix <= 0.0f) { vertex_material_color_mix = 0.0f; }
+    }
+    prev_eight_key = curr_eight_key;
+
+    bool curr_nine_key = window.m_input.isKeyDown('9');
+    if( (curr_nine_key == true) && (prev_nine_key == false) )
+    {
+        vertex_material_color_mix += 0.1f;
+        if(vertex_material_color_mix >= 1.0f) { vertex_material_color_mix = 1.0f; }
+    }
+    prev_nine_key = curr_nine_key;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -107,10 +155,19 @@ void processInput(Window& window)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Mesh loaded_cube_mesh = Mesh::loadObjFile("../assets/cube/", "cube.obj");
+    Mesh loaded_cube_mesh;
+    loaded_cube_mesh.loadMeshObjAndMtlFiles("../assets/cube/", "obj.obj");
 
+    Model cube_model;
+    cube_model.m_mesh = &loaded_cube_mesh;
+    cube_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_model.m_rotate_rad = Math::convertDegreesToRadians(0.0f);
+    cube_model.m_rotate_axis = Math::Vec3_f(1.0f, 0.3f, 0.5f);
+    cube_model.m_position = Math::Vec3_f( 0.0f,  0.0f,  0.0f);
+
+    /*
     std::vector<Model> cube_models(10);
-    for(int i = 0; i < 10; i++)
+    for(size_t i = 0; i < 10; i++)
     {
         cube_models[i].m_mesh = &loaded_cube_mesh;
         cube_models[i].m_scale = Math::Vec3_f(0.5f, 0.5f, 0.5f);
@@ -127,15 +184,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     cube_models[7].m_position = Math::Vec3_f( 1.5f,  2.0f, -2.5f);
     cube_models[8].m_position = Math::Vec3_f( 1.5f,  0.2f, -1.5f);
     cube_models[9].m_position = Math::Vec3_f(-1.3f,  1.0f, -1.5f);
+    */
     //---------------------------------------------------------------------------------------------------------------------//
+
+    Timer timer;
+    timer.init();
 
     Window window;
     if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
+    //if(!window.create(L"Pixel Engine", 1350, 900, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    backbuffer.resize(window.m_width / 2, window.m_height / 2);
+    int pixel_size = 1;
+    int backbuffer_width = window.m_width / pixel_size;
+    int backbuffer_height = window.m_height / pixel_size;
+    backbuffer.resize(backbuffer_width, backbuffer_height);
 
-    Renderer renderer;
+    Renderer renderer(&backbuffer);
 
     Math::Mat4_f projection_matrix = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
     Math::Mat4_f view_matrix;
@@ -143,20 +208,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     while(window.processMessages())
     {
+        timer.tick();
+
         //backbuffer.clear(0xEBCE87FF); // Sky blue
         backbuffer.clear(0xFF000000); // Black
         //backbuffer.clear(0xFFFFFFFF); // White
 
-        processInput(window);
+        processInput(window, timer.deltaTime);
     
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
+        /*
         for(const Model& cube_model : cube_models)
         {
-            std::queue<MaterialTriangle*> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
-            renderer.drawMaterialTriangles(backbuffer, model_material_triangles, draw_filled);
+            std::vector<MaterialTriangle> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
+            renderer.drawMaterialTriangles(model_material_triangles, draw_filled, vertex_material_color_mix);
         }
+        */
+        renderer.drawModel(cube_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
+
+        std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
+        backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+        backbuffer.setText(10, 360, controls_string.c_str(), static_cast<int>(controls_string.size()), 0xFFFFFFFF);
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

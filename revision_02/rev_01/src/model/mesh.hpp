@@ -9,6 +9,7 @@
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -21,6 +22,7 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "material.hpp"
+#include "texture.hpp"
 
 #include "../math/triangle.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -31,15 +33,62 @@
 struct Mesh
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<Math::Triangle> m_triangles;
-    std::vector<Material> m_materials;
+    std::vector<Material*> m_materials;
+    std::unordered_map<std::string, int> m_material_name_to_index;
 
-    std::vector<int> m_triangles_material_index;
+    std::vector<Texture*> m_diffuse_textures;
+    std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
+
+    struct SubMesh
+    {
+        std::vector<Math::Triangle> m_triangles;
+        int m_material_index;
+    };
+    std::vector<SubMesh> m_sub_meshes;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    static Mesh loadObjFile(const std::string& file_folder, const std::string& filename);
-    static std::vector<Material> loadMtlFile(const std::string& file_folder, const std::string& filename);
+    Mesh()
+    {
+        m_sub_meshes.clear();
+        m_materials.clear();
+        m_material_name_to_index.clear();
+        m_diffuse_textures.clear();
+        m_diffuse_texture_name_to_index.clear();
+    }
+    ~Mesh()
+    {
+        m_sub_meshes.clear();
+
+        for(Material* material : m_materials)
+        {
+            if(material != nullptr)
+            {
+                delete material;
+            }
+        }
+        m_material_name_to_index.clear();
+
+        for(Texture* diffuse_texture : m_diffuse_textures)
+        {
+            if(diffuse_texture != nullptr)
+            {
+                delete diffuse_texture;
+            }
+        }
+        m_diffuse_texture_name_to_index.clear();
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Load mtl file(s) first. Populate material and texture data.
+    void loadMtlFile(const std::string& file_folder, const std::string& filename);
+
+    // Called after all mtl files have been loaded.
+    void loadObjFile(const std::string& file_folder, const std::string& filename);
+
+    // Scan for mtl files first and call loadMtlFile on each of them, then call loadObjFile.
+    void loadMeshObjAndMtlFiles(const std::string& file_folder, const std::string& filename);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -24,24 +24,26 @@
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 /*
--   Vertexe is (should be) within clip space.
+-   Vertex is (should be) within clip space.
+-   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from vertex and 1 is 100% color from material.
 */
-void Renderer::drawPixel(Backbuffer& backbuffer, const Math::Vertex& vertex, const Material& material)
+void Renderer::drawPixel(const Math::Vertex& vertex, const Material& material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate color using vertex color and material color.
     //---------------------------------------------------------------------------------------------------------------------//
-    uint32_t material_diffuse_color = Math::convertVec3fToColor(material.m_diffuse);
-    uint32_t pixel_color = Math::interpolateUint32(vertex.m_color, material_diffuse_color, 0.5f);
+    uint32_t vertex_color = Math::convertVec4fToColor(vertex.m_color);
+    uint32_t material_color = material.calcMaterialColor(vertex.m_tex_coords.m_data[0], vertex.m_tex_coords.m_data[1]);
+    uint32_t pixel_color = Math::interpolateUint32(vertex_color, material_color, color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate the backbuffer pixel width and height that will be required.
     //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x = backbuffer.toBackbufferCoordX(vertex.m_position.m_data[0]);
-    int backbuffer_y = backbuffer.toBackbufferCoordY(vertex.m_position.m_data[1]);
+    int backbuffer_x = m_backbuffer->toBackbufferCoordX(vertex.m_position.m_data[0]);
+    int backbuffer_y = m_backbuffer->toBackbufferCoordY(vertex.m_position.m_data[1]);
     //---------------------------------------------------------------------------------------------------------------------//
 
-    backbuffer.setPixel(backbuffer_x, backbuffer_y, vertex.m_position.m_data[2], pixel_color);
+    m_backbuffer->setPixel(backbuffer_x, backbuffer_y, vertex.m_position.m_data[2], pixel_color);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

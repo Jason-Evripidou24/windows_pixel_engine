@@ -25,16 +25,16 @@
 /*
 -   Vertexes are (should be) within clip space.
 */
-void Renderer::drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material)
+void Renderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate the backbuffer pixel width and height that will be required.
     //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x0 = backbuffer.toBackbufferCoordX(v_0.m_position.m_data[0]);
-    int backbuffer_y0 = backbuffer.toBackbufferCoordY(v_0.m_position.m_data[1]);
+    int backbuffer_x0 = m_backbuffer->toBackbufferCoordX(v_0.m_position.m_data[0]);
+    int backbuffer_y0 = m_backbuffer->toBackbufferCoordY(v_0.m_position.m_data[1]);
 
-    int backbuffer_x1 = backbuffer.toBackbufferCoordX(v_1.m_position.m_data[0]);
-    int backbuffer_y1 = backbuffer.toBackbufferCoordY(v_1.m_position.m_data[1]);
+    int backbuffer_x1 = m_backbuffer->toBackbufferCoordX(v_1.m_position.m_data[0]);
+    int backbuffer_y1 = m_backbuffer->toBackbufferCoordY(v_1.m_position.m_data[1]);
 
     int dx = backbuffer_x1 - backbuffer_x0;
     int dy = backbuffer_y1 - backbuffer_y0;
@@ -46,7 +46,7 @@ void Renderer::drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const M
 
     if(steps == 0)
     {
-        this->drawPixel(backbuffer, v_0, material);
+        this->drawPixel(v_0, material, color_mix);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -56,7 +56,7 @@ void Renderer::drawLine(Backbuffer& backbuffer, const Math::Vertex& v_0, const M
         float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
 
         Math::Vertex curr_vert = Math::interpolateVertex(v_0, v_1, t);
-        this->drawPixel(backbuffer, curr_vert, material);
+        this->drawPixel(curr_vert, material, color_mix);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }
