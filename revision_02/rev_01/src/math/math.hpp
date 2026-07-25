@@ -41,8 +41,35 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+enum class ClipPlane
+{
+    MIN_X,
+    MAX_X,
+    MIN_Y,
+    MAX_Y,
+    MIN_Z,
+    MAX_Z
+};
+
+
 namespace Math
 {
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Homogenous Space maths.
+    //---------------------------------------------------------------------------------------------------------------------//
+    float getVertexDistanceToPlaneMinX(const Math::Vertex& v);
+    bool checkVertexInsidePlaneMinX(const Math::Vertex& v);
+    Math::Vertex lineIntersectionWithPlaneMinX(const Math::Vertex& start, const Math::Vertex& end);
+    std::vector<Math::Triangle> clipAgainstPlaneMinX(const Math::Triangle& triangle);
+
+    float getVertexDistanceToPlaneMaxX(const Math::Vertex& v);
+    bool checkVertexInsidePlaneMaxX(const Math::Vertex& v);
+    Math::Vertex lineIntersectionWithPlaneMaxX(const Math::Vertex& start, const Math::Vertex& end);
+    std::vector<Math::Triangle> clipAgainstPlaneMaxX(const Math::Triangle& triangle);
+
+    std::vector<Math::Triangle> clipAgainstPlaneMinMaxX(const Math::Triangle& triangle);
+    //---------------------------------------------------------------------------------------------------------------------//
+    
     //---------------------------------------------------------------------------------------------------------------------//
     static const float  PI_f                 = 3.14159265358979323846f;
     static const double PI_d                 = 3.14159265358979323846;
@@ -110,31 +137,7 @@ namespace Math
     // Triangle transform, perspective divide and clipping between the geometric planes.
     //---------------------------------------------------------------------------------------------------------------------//
     Triangle transformTriangle(const Triangle& triangle, const Mat4_f& matrix);
-
     Triangle perspectiveDivideTriangle(const Triangle& triangle);
-
-    std::vector<Triangle> clipTriangleMinX(const Triangle& triangle, const float min_x_plane);
-    std::vector<Triangle> clipTriangleMaxX(const Triangle& triangle, const float max_x_plane);
-    std::vector<Triangle> clipTriangleBetweenX(const Triangle& triangle, const float min_x_plane, const float max_x_plane);
-
-    std::vector<Triangle> clipTriangleMinY(const Triangle& triangle, const float min_y_plane);
-    std::vector<Triangle> clipTriangleMaxY(const Triangle& triangle, const float max_y_plane);
-    std::vector<Triangle> clipTriangleBetweenY(const Triangle& triangle, const float min_y_plane, const float max_y_plane);
-
-    std::vector<Triangle> clipTriangleMinZ(const Triangle& triangle, const float min_z_plane);
-    std::vector<Triangle> clipTriangleMaxZ(const Triangle& triangle, const float max_z_plane);
-    std::vector<Triangle> clipTriangleBetweenZ(const Triangle& triangle, const float min_z_plane, const float max_z_plane);
-
-    std::vector<Triangle> clipTriangleBetweenXYZ
-    (
-        const Triangle& triangle,
-        const float min_x_plane,
-        const float max_x_plane,
-        const float min_y_plane,
-        const float max_y_plane,
-        const float min_z_plane,
-        const float max_z_plane
-    );
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

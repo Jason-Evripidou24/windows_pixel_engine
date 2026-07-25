@@ -2,7 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <vector>
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,43 +19,19 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-std::vector<Math::Triangle> Math::clipTriangleBetweenXYZ
-(
-    const Math::Triangle& triangle,
-    const float min_x_plane,
-    const float max_x_plane,
-    const float min_y_plane,
-    const float max_y_plane,
-    const float min_z_plane,
-    const float max_z_plane
-)
+std::vector<Math::Triangle> Math::clipAgainstPlaneMinMaxX(const Math::Triangle& triangle)
 {
-    std::vector<Math::Triangle> triangles_clipped_between_x = std::vector<Math::Triangle>();
-    std::vector<Math::Triangle> triangles_clipped_between_x_y = std::vector<Math::Triangle>();
-    std::vector<Math::Triangle> triangles_clipped_between_x_y_z = std::vector<Math::Triangle>();
+    std::vector<Math::Triangle> traingles_clipped_min_x = Math::clipAgainstPlaneMinX(triangle);
 
-    triangles_clipped_between_x = Math::clipTriangleBetweenX(triangle, min_x_plane, max_x_plane);
+    std::vector<Math::Triangle> traingles_clipped_min_max_x;
+    traingles_clipped_min_max_x.reserve(4); // 2 triangles can become 4.
 
-    for(const Math::Triangle& triangle_clipped_between_x : triangles_clipped_between_x)
+    for(const Math::Triangle& traingle_clipped_min_x : traingles_clipped_min_x)
     {
-        std::vector<Math::Triangle> temp_triangles = Math::clipTriangleBetweenY(triangle_clipped_between_x, min_y_plane, max_y_plane);
-
-        for(const Math::Triangle& temp_triangle : temp_triangles)
-        {
-            triangles_clipped_between_x_y.push_back(temp_triangle);
-        }
+        std::vector<Math::Triangle> clipped = Math::clipAgainstPlaneMaxX(traingle_clipped_min_x);
+        traingles_clipped_min_max_x.insert(traingles_clipped_min_max_x.end(), clipped.begin(), clipped.end());
     }
 
-    for(const Math::Triangle& triangle_clipped_between_x_y : triangles_clipped_between_x_y)
-    {
-        std::vector<Math::Triangle> temp_triangles = Math::clipTriangleBetweenZ(triangle_clipped_between_x_y, min_z_plane, max_z_plane);
-
-        for(const Math::Triangle& temp_triangle : temp_triangles)
-        {
-            triangles_clipped_between_x_y_z.push_back(temp_triangle);
-        }
-    }
-
-    return triangles_clipped_between_x_y_z;
+    return traingles_clipped_min_max_x;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

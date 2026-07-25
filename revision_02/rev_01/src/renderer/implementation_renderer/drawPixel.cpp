@@ -27,14 +27,18 @@
 -   Vertex is (should be) within clip space.
 -   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from vertex and 1 is 100% color from material.
 */
-void Renderer::drawPixel(const Math::Vertex& vertex, const Material& material, float color_mix)
+void Renderer::drawPixel(const Math::Vertex& vertex, const Material* material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate color using vertex color and material color.
     //---------------------------------------------------------------------------------------------------------------------//
-    uint32_t vertex_color = Math::convertVec4fToColor(vertex.m_color);
-    uint32_t material_color = material.calcMaterialColor(vertex.m_tex_coords.m_data[0], vertex.m_tex_coords.m_data[1]);
-    uint32_t pixel_color = Math::interpolateUint32(vertex_color, material_color, color_mix);
+    uint32_t pixel_color = Math::convertVec4fToColor(vertex.m_color);
+
+    if(material != nullptr)
+    {
+        uint32_t material_color = material->calcMaterialColor(vertex.m_tex_coords.m_data[0], vertex.m_tex_coords.m_data[1]);
+        pixel_color = Math::interpolateUint32(pixel_color, material_color, color_mix);
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

@@ -21,7 +21,7 @@
 /*
 -   Triangle has been transformed to clip space and undergone perspective divide but no clipping against x,y,z planes.
 */
-void Renderer::drawTriangle(const Math::Triangle& triangle, const Material& material, bool draw_filled, float color_mix)
+void Renderer::drawTriangle(const Math::Triangle& triangle, const Material* material, bool draw_filled, float color_mix)
 {
     /*
     const std::vector<Math::Triangle> triangles_clipped = Math::clipTriangleBetweenXYZ

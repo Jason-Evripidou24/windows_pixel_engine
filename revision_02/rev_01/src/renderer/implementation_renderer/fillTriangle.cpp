@@ -62,7 +62,7 @@ uint32_t mixColor(uint32_t color_a, float alpha, uint32_t color_b, float beta, u
 -   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from triangle vertex colors and 1 is 100% color from
     material.
 */
-void Renderer::fillTriangle(const Math::Triangle& triangle, const Material& material, float color_mix)
+void Renderer::fillTriangle(const Math::Triangle& triangle, const Material* material, float color_mix)
 {
     const Math::Vertex& v0 = triangle.m_v0;
     const Math::Vertex& v1 = triangle.m_v1;
@@ -96,7 +96,7 @@ void Renderer::fillTriangle(const Math::Triangle& triangle, const Material& mate
     uint32_t v1_color = Math::convertVec4fToColor(v1.m_color);
     uint32_t v2_color = Math::convertVec4fToColor(v2.m_color);
 
-    uint32_t material_diffuse_color = Math::convertVec3fToColor(material.m_diffuse);
+    uint32_t material_diffuse_color = Math::convertVec3fToColor(material->m_diffuse);
     //-----------------------------------------------------------------------------------------------------------------//
 
     //-----------------------------------------------------------------------------------------------------------------//
@@ -179,7 +179,7 @@ void Renderer::fillTriangle(const Math::Triangle& triangle, const Material& mate
             float v = v_over_w / inv_w;
 
             uint32_t vertex_color = mixColor(v0_color, alpha, v1_color, beta, v2_color, gamma);
-            uint32_t material_color = material.calcMaterialColor(u, v);
+            uint32_t material_color = material->calcMaterialColor(u, v);
             uint32_t output_color = Math::interpolateUint32(vertex_color, material_color, color_mix);
 
             m_backbuffer->setPixel(x, y, z, output_color);

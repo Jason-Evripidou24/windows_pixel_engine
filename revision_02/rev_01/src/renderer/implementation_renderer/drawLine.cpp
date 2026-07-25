@@ -25,7 +25,7 @@
 /*
 -   Vertexes are (should be) within clip space.
 */
-void Renderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material& material, float color_mix)
+void Renderer::drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material* material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate the backbuffer pixel width and height that will be required.
