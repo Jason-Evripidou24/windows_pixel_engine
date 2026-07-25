@@ -33,7 +33,6 @@ void Renderer::drawPixel(const Math::Vertex& vertex, const Material* material, f
     // Calculate color using vertex color and material color.
     //---------------------------------------------------------------------------------------------------------------------//
     uint32_t pixel_color = Math::convertVec4fToColor(vertex.m_color);
-
     if(material != nullptr)
     {
         uint32_t material_color = material->calcMaterialColor(vertex.m_tex_coords.m_data[0], vertex.m_tex_coords.m_data[1]);

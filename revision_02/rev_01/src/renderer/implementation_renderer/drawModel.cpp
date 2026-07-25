@@ -29,28 +29,12 @@ void Renderer::drawModel(const Model& model, const Math::Mat4_f& projection_view
     {
         for(size_t j = 0; j < model.m_mesh->m_sub_meshes[i].m_triangles.size(); j++)
         {
-            Math::Triangle triangle = model.m_mesh->m_sub_meshes[i].m_triangles[j];
-            int material_index = model.m_mesh->m_sub_meshes[i].m_material_index;
-
             Material* material = nullptr;
+            int material_index = model.m_mesh->m_sub_meshes[i].m_material_index;
             if(material_index != -1) { material = model.m_mesh->m_materials[material_index]; }
 
+            Math::Triangle triangle = model.m_mesh->m_sub_meshes[i].m_triangles[j];
             triangle = Math::transformTriangle(triangle, proj_view_model_matrix);
-            if
-            (
-                (triangle.m_v0.m_position.m_data[3] <= 0.0f) ||
-                (triangle.m_v1.m_position.m_data[3] <= 0.0f) ||
-                (triangle.m_v2.m_position.m_data[3] <= 0.0f)
-            )
-            {
-                continue;
-            }
-            if( (i == 0) && (j == 0) )
-            {
-                std::string info_string = triangle.toString(4, 2);
-                m_backbuffer->setText(10, 30, info_string.c_str(), info_string.size(), 0xFF00FF00);
-            }
-
             std::vector<Math::Triangle> triangles_clipped = Math::clipAgainstPlaneMinMaxXYZ(triangle);
 
             for(Math::Triangle& triangle_clipped : triangles_clipped)
@@ -67,21 +51,6 @@ void Renderer::drawModel(const Model& model, const Math::Mat4_f& projection_view
                 }
                 this->drawTriangle(triangle_clipped, material, draw_filled, color_mix);
             }
-            
-
-
-            /*
-            std::vector<Math::Triangle> triangles_clipped = Math::clipTriangleBetweenXYZ
-            (
-                triangle,
-                -1.0f,
-                1.0f,
-                -1.0f,
-                1.0f,
-                -1.0f,
-                1.0f
-            );
-            */
         }
     }
 }

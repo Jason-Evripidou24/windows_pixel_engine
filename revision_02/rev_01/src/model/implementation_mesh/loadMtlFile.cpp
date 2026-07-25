@@ -94,7 +94,7 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
                 else
                 {
                     m_materials.push_back(curr_material);
-                    m_material_name_to_index[curr_material_name] = m_materials.size() - 1;
+                    m_material_name_to_index[curr_material_name] = static_cast<int>(m_materials.size()) - 1;
                 }
             }
 
@@ -129,7 +129,7 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
                 new_texture->loadTextureJpgFile(file_folder, diffuse_texture_name);
 
                 m_diffuse_textures.push_back(new_texture);
-                m_diffuse_texture_name_to_index[diffuse_texture_name] = m_diffuse_textures.size() - 1;
+                m_diffuse_texture_name_to_index[diffuse_texture_name] = static_cast<int>(m_diffuse_textures.size()) - 1;
             }
 
             if(curr_material != nullptr)
@@ -149,7 +149,7 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
         else
         {
             m_materials.push_back(curr_material);
-            m_material_name_to_index[curr_material_name] = m_materials.size() - 1;
+            m_material_name_to_index[curr_material_name] = static_cast<int>(m_materials.size()) - 1;
         }
     }
 }

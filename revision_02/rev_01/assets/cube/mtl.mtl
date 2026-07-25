@@ -2,7 +2,7 @@
 
 newmtl Blue
 Kd 0.0 0.0 1.0
-map_Kd smile.jpg
+map_Kd container.jpg
 
 newmtl Cyan
 Kd 0.0 1.0 1.0
@@ -10,7 +10,7 @@ map_Kd container.jpg
 
 newmtl Green
 Kd 0.0 1.0 0.0
-map_Kd smile.jpg
+map_Kd container.jpg
 
 newmtl Magenta
 Kd 1.0 0.0 1.0
@@ -18,7 +18,7 @@ map_Kd container.jpg
 
 newmtl Red
 Kd 1.0 0.0 0.0
-map_Kd smile.jpg
+map_Kd container.jpg
 
 newmtl White
 Kd 1.0 1.0 1.0
@@ -26,4 +26,4 @@ map_Kd container.jpg
 
 newmtl Yellow
 Kd 1.0 1.0 0.0
-map_Kd smile.jpg
+map_Kd container.jpg

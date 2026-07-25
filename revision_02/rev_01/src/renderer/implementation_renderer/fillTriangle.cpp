@@ -95,8 +95,6 @@ void Renderer::fillTriangle(const Math::Triangle& triangle, const Material* mate
     uint32_t v0_color = Math::convertVec4fToColor(v0.m_color);
     uint32_t v1_color = Math::convertVec4fToColor(v1.m_color);
     uint32_t v2_color = Math::convertVec4fToColor(v2.m_color);
-
-    uint32_t material_diffuse_color = Math::convertVec3fToColor(material->m_diffuse);
     //-----------------------------------------------------------------------------------------------------------------//
 
     //-----------------------------------------------------------------------------------------------------------------//
@@ -178,11 +176,14 @@ void Renderer::fillTriangle(const Math::Triangle& triangle, const Material* mate
             float u = u_over_w / inv_w;
             float v = v_over_w / inv_w;
 
-            uint32_t vertex_color = mixColor(v0_color, alpha, v1_color, beta, v2_color, gamma);
-            uint32_t material_color = material->calcMaterialColor(u, v);
-            uint32_t output_color = Math::interpolateUint32(vertex_color, material_color, color_mix);
+            uint32_t pixel_color = mixColor(v0_color, alpha, v1_color, beta, v2_color, gamma);
+            if(material != nullptr)
+            {
+                uint32_t material_color = material->calcMaterialColor(u, v);
+                pixel_color = Math::interpolateUint32(pixel_color, material_color, color_mix);
+            }
 
-            m_backbuffer->setPixel(x, y, z, output_color);
+            m_backbuffer->setPixel(x, y, z, pixel_color);
         }
     }
     //-----------------------------------------------------------------------------------------------------------------//

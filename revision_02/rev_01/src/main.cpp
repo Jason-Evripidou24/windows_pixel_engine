@@ -36,8 +36,8 @@ static Camera camera
     Math::convertDegreesToRadians(0.0f),
     Math::convertDegreesToRadians(180.0f),
     Math::convertDegreesToRadians(45.0f),
-    0.5f,
-    5.0f,
+    0.1f,
+    100.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
@@ -158,14 +158,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Mesh loaded_cube_mesh;
     loaded_cube_mesh.loadMeshObjAndMtlFiles("../assets/cube/", "obj.obj");
 
-    Model cube_model;
-    cube_model.m_mesh = &loaded_cube_mesh;
-    cube_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_model.m_rotate_rad = Math::convertDegreesToRadians(0.0f);
-    cube_model.m_rotate_axis = Math::Vec3_f(1.0f, 0.3f, 0.5f);
-    cube_model.m_position = Math::Vec3_f( 0.0f,  0.0f,  0.0f);
-
-    /*
     std::vector<Model> cube_models(10);
     for(size_t i = 0; i < 10; i++)
     {
@@ -184,18 +176,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     cube_models[7].m_position = Math::Vec3_f( 1.5f,  2.0f, -2.5f);
     cube_models[8].m_position = Math::Vec3_f( 1.5f,  0.2f, -1.5f);
     cube_models[9].m_position = Math::Vec3_f(-1.3f,  1.0f, -1.5f);
-    */
     //---------------------------------------------------------------------------------------------------------------------//
 
     Timer timer;
     timer.init();
 
     Window window;
-    if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
-    //if(!window.create(L"Pixel Engine", 1350, 900, hInstance)) { return -1; }
+    //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
+    if(!window.create(L"Pixel Engine", 1350, 900, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    int pixel_size = 1;
+    int pixel_size = 2;
     int backbuffer_width = window.m_width / pixel_size;
     int backbuffer_height = window.m_height / pixel_size;
     backbuffer.resize(backbuffer_width, backbuffer_height);
@@ -219,14 +210,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        /*
         for(const Model& cube_model : cube_models)
         {
-            std::vector<MaterialTriangle> model_material_triangles = cube_model.transformModelForRendering(proj_view_matrix);
-            renderer.drawMaterialTriangles(model_material_triangles, draw_filled, vertex_material_color_mix);
+            renderer.drawModel(cube_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
         }
-        */
-        renderer.drawModel(cube_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
