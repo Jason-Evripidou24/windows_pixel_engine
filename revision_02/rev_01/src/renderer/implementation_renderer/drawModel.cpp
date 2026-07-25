@@ -51,17 +51,7 @@ void Renderer::drawModel(const Model& model, const Math::Mat4_f& projection_view
                 m_backbuffer->setText(10, 30, info_string.c_str(), info_string.size(), 0xFF00FF00);
             }
 
-            //std::vector<Math::Triangle> triangles_clipped = Math::clipAgainstPlaneMinX(triangle);
-            std::vector<Math::Triangle> triangles_clipped = Math::clipAgainstPlaneMinMaxX(triangle);
-            //polygon = clipAgainstPlane(polygon, ClipPlane::MIN_X);
-            //polygon = clipAgainstPlane(polygon, ClipPlane::MAX_X);
-
-            //polygon = clipAgainstPlane(polygon, ClipPlane::MIN_Y);
-            //polygon = clipAgainstPlane(polygon, ClipPlane::MAX_Y);
-
-            //polygon = clipAgainstPlane(polygon, ClipPlane::MIN_Z);
-            //polygon = clipAgainstPlane(polygon, ClipPlane::MAX_Z);
-
+            std::vector<Math::Triangle> triangles_clipped = Math::clipAgainstPlaneMinMaxXYZ(triangle);
 
             for(Math::Triangle& triangle_clipped : triangles_clipped)
             {

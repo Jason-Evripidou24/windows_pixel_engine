@@ -36,8 +36,8 @@ static Camera camera
     Math::convertDegreesToRadians(0.0f),
     Math::convertDegreesToRadians(180.0f),
     Math::convertDegreesToRadians(45.0f),
-    0.1f,
-    100.0f,
+    0.5f,
+    5.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 

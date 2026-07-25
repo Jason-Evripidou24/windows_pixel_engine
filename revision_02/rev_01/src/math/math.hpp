@@ -68,6 +68,32 @@ namespace Math
     std::vector<Math::Triangle> clipAgainstPlaneMaxX(const Math::Triangle& triangle);
 
     std::vector<Math::Triangle> clipAgainstPlaneMinMaxX(const Math::Triangle& triangle);
+
+    float getVertexDistanceToPlaneMinY(const Math::Vertex& v);
+    bool checkVertexInsidePlaneMinY(const Math::Vertex& v);
+    Math::Vertex lineIntersectionWithPlaneMinY(const Math::Vertex& start, const Math::Vertex& end);
+    std::vector<Math::Triangle> clipAgainstPlaneMinY(const Math::Triangle& triangle);
+
+    float getVertexDistanceToPlaneMaxY(const Math::Vertex& v);
+    bool checkVertexInsidePlaneMaxY(const Math::Vertex& v);
+    Math::Vertex lineIntersectionWithPlaneMaxY(const Math::Vertex& start, const Math::Vertex& end);
+    std::vector<Math::Triangle> clipAgainstPlaneMaxY(const Math::Triangle& triangle);
+
+    std::vector<Math::Triangle> clipAgainstPlaneMinMaxY(const Math::Triangle& triangle);
+
+    float getVertexDistanceToPlaneMinZ(const Math::Vertex& v);
+    bool checkVertexInsidePlaneMinZ(const Math::Vertex& v);
+    Math::Vertex lineIntersectionWithPlaneMinZ(const Math::Vertex& start, const Math::Vertex& end);
+    std::vector<Math::Triangle> clipAgainstPlaneMinZ(const Math::Triangle& triangle);
+
+    float getVertexDistanceToPlaneMaxZ(const Math::Vertex& v);
+    bool checkVertexInsidePlaneMaxZ(const Math::Vertex& v);
+    Math::Vertex lineIntersectionWithPlaneMaxZ(const Math::Vertex& start, const Math::Vertex& end);
+    std::vector<Math::Triangle> clipAgainstPlaneMaxZ(const Math::Triangle& triangle);
+
+    std::vector<Math::Triangle> clipAgainstPlaneMinMaxZ(const Math::Triangle& triangle);
+
+    std::vector<Math::Triangle> clipAgainstPlaneMinMaxXYZ(const Math::Triangle& triangle);
     //---------------------------------------------------------------------------------------------------------------------//
     
     //---------------------------------------------------------------------------------------------------------------------//

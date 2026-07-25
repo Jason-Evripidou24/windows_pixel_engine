@@ -58,9 +58,9 @@ std::vector<Math::Triangle> Math::clipAgainstPlaneMaxX(const Math::Triangle& tri
     const Math::Vertex& v1 = triangle.m_v1;
     const Math::Vertex& v2 = triangle.m_v2;
 
-    bool checkInsideV0 = checkVertexInsidePlaneMaxX(v0);
-    bool checkInsideV1 = checkVertexInsidePlaneMaxX(v1);
-    bool checkInsideV2 = checkVertexInsidePlaneMaxX(v2);
+    bool checkInsideV0 = Math::checkVertexInsidePlaneMaxX(v0);
+    bool checkInsideV1 = Math::checkVertexInsidePlaneMaxX(v1);
+    bool checkInsideV2 = Math::checkVertexInsidePlaneMaxX(v2);
 
     // Case 1: All vertices are outside.
     if( (checkInsideV0 == false) && (checkInsideV1 == false) && (checkInsideV2 == false) )
