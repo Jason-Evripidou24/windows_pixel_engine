@@ -45,7 +45,7 @@ struct Texture
         }
     }
 
-    void loadTextureJpgFile(const std::string& file_folder, const std::string& filename);
+    void loadTextureJpgPngFile(const std::string& file_folder, const std::string& filename);
 
     uint32_t getColorAtCoords(const float x, const float y);
 };

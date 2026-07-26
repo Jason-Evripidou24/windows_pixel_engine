@@ -20,18 +20,20 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 TileRenderer::TileRenderer
 (
-    std::mutex*              parent_object_mutex,
-    std::condition_variable* parent_condition_variable,
     Backbuffer*              backbuffer,
+    std::atomic<int>*        extern_pending_jobs,
+    std::mutex*              extern_pending_jobs_mutex,
+    std::condition_variable* extern_pending_jobs_condition_variable,
     int                      tile_x_min,
     int                      tile_x_max,
     int                      tile_y_min,
     int                      tile_y_max
 )
 :
-    m_parent_object_mutex(parent_object_mutex),
-    m_parent_condition_variable(parent_condition_variable),
     m_backbuffer(backbuffer),
+    m_extern_pending_jobs(extern_pending_jobs),
+    m_extern_pending_jobs_mutex(extern_pending_jobs_mutex),
+    m_extern_pending_jobs_condition_variable(extern_pending_jobs_condition_variable),
     m_tile_x_min(tile_x_min),
     m_tile_x_max(tile_x_max),
     m_tile_y_min(tile_y_min),

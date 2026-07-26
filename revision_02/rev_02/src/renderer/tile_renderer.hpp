@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <mutex>
 #include <thread>
+#include <queue>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -36,11 +37,29 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TileRendererJob
 {
-    Math::Triangle*   m_triangle = nullptr;
-    Material*         m_material = nullptr;
-    bool              m_draw_filled;
-    float             m_color_mix;
-    bool*             m_parent_job_complete;
+    const Math::Triangle*    m_triangle;
+    const Material*          m_material;
+    float                    m_color_mix;
+
+    TileRendererJob()
+    {
+        m_triangle = nullptr;
+        m_material = nullptr;
+        m_color_mix = 0.0f;
+    }
+
+    TileRendererJob
+    (
+        const Math::Triangle* triangle,
+        const Material* material,
+        float color_mix
+    )
+    :
+    m_triangle(triangle),
+    m_material(material),
+    m_color_mix(color_mix)
+    {
+    }
 };
 
 struct TileRenderer
@@ -49,7 +68,7 @@ struct TileRenderer
     // The backbuffer that the TileRenderer object draws to.
     Backbuffer* m_backbuffer;
 
-    // The bounding box in clip space that the TileRenderer object is responsible for drawing within.
+    // The bounding box (tile) in screen space that the TileRenderer object is responsible for drawing within.
     int m_tile_x_min;
     int m_tile_x_max;
     int m_tile_y_min;
@@ -59,30 +78,27 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Multithreading.
     //---------------------------------------------------------------------------------------------------------------------//
-    std::thread              m_worker_thread;
+    std::thread                 m_worker_thread;
 
-    std::mutex               m_object_mutex;
-    std::condition_variable  m_object_condition_variable;
+    std::atomic<bool>           m_running;
 
-    bool                     m_running;
-    bool                     m_has_job;
+    std::queue<TileRendererJob> m_jobs;
+    std::mutex                  m_jobs_mutex;
+    std::condition_variable     m_jobs_condition_variable;
 
-    std::mutex*              m_parent_object_mutex;
-    std::condition_variable* m_parent_condition_variable;
-
-    TileRendererJob          m_tile_renderer_job;
+    std::atomic<int>*        m_extern_pending_jobs;
+    std::mutex*              m_extern_pending_jobs_mutex;
+    std::condition_variable* m_extern_pending_jobs_condition_variable;
 
     void start();
     void stop();
 
     void workerFunction();
-    void parentRequestDrawTriangle
+    void submitJob
     (
-        Math::Triangle*   triangle,
-        Material*         material,
-        bool              draw_filled,
-        float             color_mix,
-        bool*             parent_job_complete
+        const Math::Triangle* triangle,
+        const Material* material,
+        float color_mix
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -91,9 +107,10 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     TileRenderer
     (
-        std::mutex*              parent_object_mutex,
-        std::condition_variable* parent_condition_variable,
         Backbuffer*              backbuffer,
+        std::atomic<int>*        extern_pending_jobs,
+        std::mutex*              extern_pending_jobs_mutex,
+        std::condition_variable* extern_pending_jobs_condition_variable,
         int                      tile_x_min,
         int                      tile_x_max,
         int                      tile_y_min,

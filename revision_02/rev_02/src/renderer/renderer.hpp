@@ -69,16 +69,25 @@ struct Renderer
     */
     //---------------------------------------------------------------------------------------------------------------------//
     // Each pair contains a TileRenderer object and its associated job_complete check.
-    std::vector<std::pair<std::unique_ptr<TileRenderer>, bool>> m_tile_renderers;
+    int m_tiles_x;
+    int m_tiles_y;
 
-    std::mutex              m_renderer_mutex;
-    std::condition_variable m_renderer_condition_variable;
+    int m_tile_width;
+    int m_tile_height;
+
+    std::vector<std::unique_ptr<TileRenderer>> m_tile_renderers;
+
+    std::atomic<int>        m_pending_jobs;
+    std::mutex              m_pending_jobs_mutex;
+    std::condition_variable m_pending_jobs_condition_variable;
+
+    void waitForTiles();
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(Backbuffer* backbuffer);
+    Renderer(Backbuffer* backbuffer, int tile_split);
     ~Renderer();
     //---------------------------------------------------------------------------------------------------------------------//
 

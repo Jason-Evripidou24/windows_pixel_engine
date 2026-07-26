@@ -156,7 +156,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     Mesh loaded_cube_mesh;
-    loaded_cube_mesh.loadMeshObjAndMtlFiles("../assets/cube/", "obj.obj");
+    loaded_cube_mesh.loadMeshObjAndMtlFiles("../assets/cottage/", "obj.obj");
 
     std::vector<Model> cube_models(10);
     for(size_t i = 0; i < 10; i++)
@@ -186,12 +186,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     if(!window.create(L"Pixel Engine", 1350, 900, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    int pixel_size = 2;
+    int pixel_size = 2; // Backbuffer size is now: 675x450
     int backbuffer_width = window.m_width / pixel_size;
     int backbuffer_height = window.m_height / pixel_size;
     backbuffer.resize(backbuffer_width, backbuffer_height);
 
-    Renderer renderer(&backbuffer);
+    Renderer renderer(&backbuffer, 5); // Must divide backbuffer width and height perfectly.
 
     Math::Mat4_f projection_matrix = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
     Math::Mat4_f view_matrix;
@@ -210,9 +210,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        for(const Model& cube_model : cube_models)
+        for(size_t i = 0; i < cube_models.size(); i++)
         {
-            renderer.drawModel(cube_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
+            if(i == 0)
+            {
+                renderer.drawModel(cube_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
+            }
         }
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);

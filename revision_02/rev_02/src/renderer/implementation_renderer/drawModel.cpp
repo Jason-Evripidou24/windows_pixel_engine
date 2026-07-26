@@ -49,6 +49,7 @@ void Renderer::drawModel(const Model& model, const Math::Mat4_f& projection_view
                 {
                     continue;
                 }
+                
                 this->drawTriangle(triangle_clipped, material, draw_filled, color_mix);
             }
         }

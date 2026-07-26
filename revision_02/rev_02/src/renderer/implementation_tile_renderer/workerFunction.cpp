@@ -20,39 +20,44 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::workerFunction()
 {
-    while(m_running == true)
+    while(m_running.load() == true)
     {
+        TileRendererJob tile_renderer_job;
+
         //-----------------------------------------------------------------------------------------------------------------//
-        std::unique_lock<std::mutex> object_lock(m_object_mutex);
-        
-        m_object_condition_variable.wait
+        std::unique_lock<std::mutex> jobs_lock(m_jobs_mutex);
+
+        m_jobs_condition_variable.wait
         (
-            object_lock,
+            jobs_lock,
             [&]
             {
-                return (m_has_job == true) || (m_running == false);
+                return (m_jobs.empty() == false) || (m_running.load() == false);
             }
         );
 
-        if(m_running == false) { break; } 
+        if(m_running.load() == false) { break; }
+
+        tile_renderer_job = m_jobs.front();
+        m_jobs.pop();
+
+        jobs_lock.unlock();
         //-----------------------------------------------------------------------------------------------------------------//
 
-        this->fillTriangle
-        (
-            m_tile_renderer_job.m_triangle,
-            m_tile_renderer_job.m_material,
-            m_tile_renderer_job.m_color_mix
-        );
+        this->fillTriangle(tile_renderer_job.m_triangle, tile_renderer_job.m_material, tile_renderer_job.m_color_mix);
 
-        m_tile_renderer_job.m_triangle = nullptr;
-        m_tile_renderer_job.m_material = nullptr;
-        
-        m_has_job = false;
+        //-----------------------------------------------------------------------------------------------------------------//
+        std::unique_lock<std::mutex> extern_jobs_pending_lock(*m_extern_pending_jobs_mutex);
 
-        std::unique_lock<std::mutex> parent_lock(*(m_parent_object_mutex));
-        (*m_tile_renderer_job.m_parent_job_complete) = true;
-        parent_lock.unlock();
-        m_parent_condition_variable->notify_all();
+        m_extern_pending_jobs->fetch_sub(1);
+
+        if(m_extern_pending_jobs->load() == 0)
+        {
+            m_extern_pending_jobs_condition_variable->notify_all();
+        }
+
+        extern_jobs_pending_lock.unlock();
+        //-----------------------------------------------------------------------------------------------------------------//
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

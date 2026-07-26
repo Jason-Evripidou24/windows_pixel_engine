@@ -22,8 +22,7 @@ void TileRenderer::start()
 {
     if(m_worker_thread.joinable()) { return; }
 
-    m_running = true;
-    m_has_job = false;
+    m_running.store(true);
 
     m_worker_thread = std::thread(&TileRenderer::workerFunction, this);
 }
@@ -33,11 +32,12 @@ void TileRenderer::start()
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::stop()
 {
-    std::unique_lock<std::mutex> lock(m_object_mutex);
-    m_running = false;
+    std::unique_lock<std::mutex> lock(m_jobs_mutex);
+    
+    m_running.store(false);
 
     lock.unlock();
-    m_object_condition_variable.notify_all();
+    m_jobs_condition_variable.notify_all();
 
     if(m_worker_thread.joinable()) { m_worker_thread.join(); }
 }

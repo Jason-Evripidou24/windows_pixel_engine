@@ -126,7 +126,7 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
             if(m_diffuse_texture_name_to_index.find(diffuse_texture_name) == m_diffuse_texture_name_to_index.end())
             {
                 Texture* new_texture = new Texture();
-                new_texture->loadTextureJpgFile(file_folder, diffuse_texture_name);
+                new_texture->loadTextureJpgPngFile(file_folder, diffuse_texture_name);
 
                 m_diffuse_textures.push_back(new_texture);
                 m_diffuse_texture_name_to_index[diffuse_texture_name] = static_cast<int>(m_diffuse_textures.size()) - 1;

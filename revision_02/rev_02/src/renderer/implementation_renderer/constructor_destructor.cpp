@@ -18,42 +18,39 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Renderer::Renderer(Backbuffer* backbuffer)
+Renderer::Renderer(Backbuffer* backbuffer, int tile_split)
 {
     m_backbuffer = backbuffer;
 
-    const int tiles_x = 5;
-    const int tiles_y = 5;
+    m_tiles_x = tile_split;
+    m_tiles_y = tile_split;
 
-    const int tile_width  = m_backbuffer->m_width / tiles_x;
-    const int tile_height = m_backbuffer->m_height / tiles_y;
+    m_tile_width  = m_backbuffer->m_width / m_tiles_x;
+    m_tile_height = m_backbuffer->m_height / m_tiles_y;
 
-    for(int x = 0; x < tiles_x; x++)
+    for(int y = 0; y < m_tiles_y; y++)
     {
-        for(int y = 0; y < tiles_y; y++)
+        for(int x = 0; x < m_tiles_x; x++)
         {
             m_tile_renderers.push_back
             (
-                {
-                    std::make_unique<TileRenderer>
-                    (
-                        &m_renderer_mutex,
-                        &m_renderer_condition_variable,
-                        backbuffer,
-                        x * tile_width,
-                        ((x + 1) * tile_width) - 1,
-                        y * tile_height,
-                        ((y + 1) * tile_height) - 1
-                    )
-                    ,
-                    false
-                }
+                std::make_unique<TileRenderer>
+                (
+                    backbuffer,
+                    &m_pending_jobs,
+                    &m_pending_jobs_mutex,
+                    &m_pending_jobs_condition_variable,
+                    x * m_tile_width,
+                    ((x + 1) * m_tile_width) - 1,
+                    y * m_tile_height,
+                    ((y + 1) * m_tile_height) - 1
+                )
             );
         }
     }
     for(size_t i = 0; i < m_tile_renderers.size(); i++)
     {
-        m_tile_renderers[i].first->start();
+        m_tile_renderers[i]->start();
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -64,7 +61,7 @@ Renderer::~Renderer()
 {
     for(size_t i = 0; i < m_tile_renderers.size(); i++)
     {
-        m_tile_renderers[i].first->stop();
+        m_tile_renderers[i]->stop();
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
