@@ -47,13 +47,13 @@ void TileRenderer::workerFunction()
         this->fillTriangle(tile_renderer_job.m_triangle, tile_renderer_job.m_material, tile_renderer_job.m_color_mix);
 
         //-----------------------------------------------------------------------------------------------------------------//
-        std::unique_lock<std::mutex> extern_jobs_pending_lock(*m_extern_pending_jobs_mutex);
+        std::unique_lock<std::mutex> extern_jobs_pending_lock(*(tile_renderer_job.m_extern_pending_jobs_mutex));
 
-        m_extern_pending_jobs->fetch_sub(1);
+        (tile_renderer_job.m_extern_pending_jobs)->fetch_sub(1);
 
-        if(m_extern_pending_jobs->load() == 0)
+        if((tile_renderer_job.m_extern_pending_jobs)->load() == 0)
         {
-            m_extern_pending_jobs_condition_variable->notify_all();
+            (tile_renderer_job.m_extern_pending_jobs_condition_variable)->notify_all();
         }
 
         extern_jobs_pending_lock.unlock();

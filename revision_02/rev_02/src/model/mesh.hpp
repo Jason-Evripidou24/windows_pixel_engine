@@ -30,6 +30,12 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+struct SubMesh
+{
+    std::vector<Math::Triangle> m_triangles;
+    int m_material_index;
+};
+
 struct Mesh
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -39,11 +45,6 @@ struct Mesh
     std::vector<Texture*> m_diffuse_textures;
     std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
 
-    struct SubMesh
-    {
-        std::vector<Math::Triangle> m_triangles;
-        int m_material_index;
-    };
     std::vector<SubMesh> m_sub_meshes;
     //---------------------------------------------------------------------------------------------------------------------//
 

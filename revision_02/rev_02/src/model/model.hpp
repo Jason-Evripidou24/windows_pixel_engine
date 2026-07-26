@@ -41,6 +41,8 @@ struct Model
     Math::Vec3_f m_scale;
     float m_rotate_rad;
     Math::Vec3_f m_rotate_axis;
+
+    std::vector<SubMesh> m_sub_meshes_for_transform;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -51,6 +53,16 @@ struct Model
         m_scale = Math::Vec3_f();
         m_rotate_rad = 0.0f;
         m_rotate_axis = Math::Vec3_f();
+    }
+
+    Model(Mesh* mesh)
+    {
+        m_mesh = mesh;
+        m_position = Math::Vec3_f();
+        m_scale = Math::Vec3_f();
+        m_rotate_rad = 0.0f;
+        m_rotate_axis = Math::Vec3_f();
+        m_sub_meshes_for_transform = mesh->m_sub_meshes;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 

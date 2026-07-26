@@ -295,7 +295,7 @@ void Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
     if(!file.is_open()) { return; }
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Mesh::SubMesh curr_sub_mesh;
+    SubMesh curr_sub_mesh;
     curr_sub_mesh.m_triangles.clear();
     curr_sub_mesh.m_material_index = -1;
     

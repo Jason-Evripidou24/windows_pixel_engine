@@ -40,6 +40,9 @@ struct TileRendererJob
     const Math::Triangle*    m_triangle;
     const Material*          m_material;
     float                    m_color_mix;
+    std::atomic<int>*        m_extern_pending_jobs;
+    std::mutex*              m_extern_pending_jobs_mutex;
+    std::condition_variable* m_extern_pending_jobs_condition_variable;
 
     TileRendererJob()
     {
@@ -50,14 +53,20 @@ struct TileRendererJob
 
     TileRendererJob
     (
-        const Math::Triangle* triangle,
-        const Material* material,
-        float color_mix
+        const Math::Triangle*    triangle,
+        const Material*          material,
+        float                    color_mix,
+        std::atomic<int>*        extern_pending_jobs,
+        std::mutex*              extern_pending_jobs_mutex,
+        std::condition_variable* extern_pending_jobs_condition_variable
     )
     :
     m_triangle(triangle),
     m_material(material),
-    m_color_mix(color_mix)
+    m_color_mix(color_mix),
+    m_extern_pending_jobs(extern_pending_jobs),
+    m_extern_pending_jobs_mutex(extern_pending_jobs_mutex),
+    m_extern_pending_jobs_condition_variable(extern_pending_jobs_condition_variable)
     {
     }
 };
@@ -86,19 +95,18 @@ struct TileRenderer
     std::mutex                  m_jobs_mutex;
     std::condition_variable     m_jobs_condition_variable;
 
-    std::atomic<int>*        m_extern_pending_jobs;
-    std::mutex*              m_extern_pending_jobs_mutex;
-    std::condition_variable* m_extern_pending_jobs_condition_variable;
-
     void start();
     void stop();
 
     void workerFunction();
     void submitJob
     (
-        const Math::Triangle* triangle,
-        const Material* material,
-        float color_mix
+        const Math::Triangle*    triangle,
+        const Material*          material,
+        float                    color_mix,
+        std::atomic<int>*        extern_pending_jobs,
+        std::mutex*              extern_pending_jobs_mutex,
+        std::condition_variable* extern_pending_jobs_condition_variable
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -108,9 +116,6 @@ struct TileRenderer
     TileRenderer
     (
         Backbuffer*              backbuffer,
-        std::atomic<int>*        extern_pending_jobs,
-        std::mutex*              extern_pending_jobs_mutex,
-        std::condition_variable* extern_pending_jobs_condition_variable,
         int                      tile_x_min,
         int                      tile_x_max,
         int                      tile_y_min,

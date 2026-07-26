@@ -98,8 +98,11 @@ struct Material
 
         if( (m_diffuse_texture != nullptr) && (m_diffuse_texture->m_data != nullptr) )
         {
+            output_color = m_diffuse_texture->getColorAtCoords(u, v);
+            /*
             uint32_t material_diffuse_texture_color = m_diffuse_texture->getColorAtCoords(u, v);
             output_color = Math::interpolateUint32(material_diffuse_color, material_diffuse_texture_color, 0.5f);
+            */
         }
         else
         {

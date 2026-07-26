@@ -32,12 +32,12 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 static Camera camera
 (
-    Math::Vec3_f(0.0f, 0.0f, 5.0f),
+    Math::Vec3_f(0.0f, 1.0f, 5.0f),
     Math::convertDegreesToRadians(0.0f),
     Math::convertDegreesToRadians(180.0f),
     Math::convertDegreesToRadians(45.0f),
     0.1f,
-    100.0f,
+    50.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
@@ -155,14 +155,44 @@ void processInput(Window& window, float delta_time)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Mesh loaded_cube_mesh;
-    loaded_cube_mesh.loadMeshObjAndMtlFiles("../assets/cottage/", "obj.obj");
+    Mesh ground_mesh;
+    ground_mesh.loadMeshObjAndMtlFiles("../assets/ground/", "obj.obj");
+    std::vector<Model> ground_models(100, Model(&ground_mesh));
+    int index = 0;
+    for(int z = 0; z < 10; z++)
+    {
+        for(int x = 0; x < 10; x++)
+        {
+            ground_models[index].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+            ground_models[index].m_rotate_rad = 0.0f;
+            ground_models[index].m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+            ground_models[index].m_position = Math::Vec3_f(x - 9.5f, 0.0f, z - 9.5f);
+            index++;
+        }
+    }
 
-    std::vector<Model> cube_models(10);
+    Mesh dragon_mesh;
+    dragon_mesh.loadMeshObjAndMtlFiles("../assets/dragon/", "obj.obj");
+    Model dragon_model(&dragon_mesh);
+    dragon_model.m_position = Math::Vec3_f(-5.0f, 0.0f, -5.0f);
+    dragon_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    dragon_model.m_rotate_rad = 0.0f;
+    dragon_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
+    Mesh cottage_mesh;
+    cottage_mesh.loadMeshObjAndMtlFiles("../assets/cottage/", "obj.obj");
+    Model cottage_model(&cottage_mesh);
+    cottage_model.m_position = Math::Vec3_f(20.0f, 0.0f, -20.0f);
+    cottage_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cottage_model.m_rotate_rad = 0.0f;
+    cottage_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
+    Mesh cube_mesh;
+    cube_mesh.loadMeshObjAndMtlFiles("../assets/cube/", "obj.obj");
+    std::vector<Model> cube_models(10, Model(&cube_mesh));
     for(size_t i = 0; i < 10; i++)
     {
-        cube_models[i].m_mesh = &loaded_cube_mesh;
-        cube_models[i].m_scale = Math::Vec3_f(0.5f, 0.5f, 0.5f);
+        cube_models[i].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
         cube_models[i].m_rotate_rad = Math::convertDegreesToRadians(20.0f * (float)i);
         cube_models[i].m_rotate_axis = Math::Vec3_f(1.0f, 0.3f, 0.5f);
     }
@@ -201,8 +231,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     {
         timer.tick();
 
-        //backbuffer.clear(0xEBCE87FF); // Sky blue
-        backbuffer.clear(0xFF000000); // Black
+        backbuffer.clear(0xFF87CEEB); // Sky blue
+        //backbuffer.clear(0xFFFF0000); // Red
+        //backbuffer.clear(0xFF000000); // Black
         //backbuffer.clear(0xFFFFFFFF); // White
 
         processInput(window, timer.deltaTime);
@@ -210,13 +241,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
+        for(size_t i = 0; i < ground_models.size(); i++)
+        {
+            renderer.drawModel(ground_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
+        }
+        
         for(size_t i = 0; i < cube_models.size(); i++)
         {
-            if(i == 0)
-            {
-                renderer.drawModel(cube_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
-            }
+            renderer.drawModel(cube_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
         }
+        /*
+        renderer.drawModel(cottage_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
+        renderer.drawModel(dragon_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
+        */
+
+        std::thread cottage_thread(
+            [&]()
+            {
+                renderer.drawModel
+                (
+                    cottage_model,
+                    proj_view_matrix,
+                    draw_filled,
+                    vertex_material_color_mix
+                );
+            }
+        );
+        std::thread dragon_thread(
+            [&]()
+            {
+                renderer.drawModel
+                (
+                    dragon_model,
+                    proj_view_matrix,
+                    draw_filled,
+                    vertex_material_color_mix
+                );
+            }
+        );
+        cottage_thread.join();
+        dragon_thread.join();
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);

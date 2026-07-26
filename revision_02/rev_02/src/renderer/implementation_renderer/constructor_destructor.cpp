@@ -37,9 +37,6 @@ Renderer::Renderer(Backbuffer* backbuffer, int tile_split)
                 std::make_unique<TileRenderer>
                 (
                     backbuffer,
-                    &m_pending_jobs,
-                    &m_pending_jobs_mutex,
-                    &m_pending_jobs_condition_variable,
                     x * m_tile_width,
                     ((x + 1) * m_tile_width) - 1,
                     y * m_tile_height,

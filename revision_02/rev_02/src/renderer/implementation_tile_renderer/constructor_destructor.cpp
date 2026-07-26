@@ -21,9 +21,6 @@
 TileRenderer::TileRenderer
 (
     Backbuffer*              backbuffer,
-    std::atomic<int>*        extern_pending_jobs,
-    std::mutex*              extern_pending_jobs_mutex,
-    std::condition_variable* extern_pending_jobs_condition_variable,
     int                      tile_x_min,
     int                      tile_x_max,
     int                      tile_y_min,
@@ -31,9 +28,6 @@ TileRenderer::TileRenderer
 )
 :
     m_backbuffer(backbuffer),
-    m_extern_pending_jobs(extern_pending_jobs),
-    m_extern_pending_jobs_mutex(extern_pending_jobs_mutex),
-    m_extern_pending_jobs_condition_variable(extern_pending_jobs_condition_variable),
     m_tile_x_min(tile_x_min),
     m_tile_x_max(tile_x_max),
     m_tile_y_min(tile_y_min),
