@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <random>
 #include <string>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -32,7 +33,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 static Camera camera
 (
-    Math::Vec3_f(0.0f, 1.0f, 5.0f),
+    Math::Vec3_f(0.0f, 1.7f, 5.0f),
     Math::convertDegreesToRadians(0.0f),
     Math::convertDegreesToRadians(180.0f),
     Math::convertDegreesToRadians(45.0f),
@@ -64,7 +65,7 @@ static float vertex_material_color_mix = 1.0f;
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
 
-static float camera_move_speed = 1.0f;
+static float camera_move_speed = 5.0f;
 static float camera_look_speed = 0.002f;
 
 void processInput(Window& window, float delta_time)
@@ -157,55 +158,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     //---------------------------------------------------------------------------------------------------------------------//
     Mesh ground_mesh;
     ground_mesh.loadMeshObjAndMtlFiles("../assets/ground/", "obj.obj");
-    std::vector<Model> ground_models(100, Model(&ground_mesh));
-    int index = 0;
-    for(int z = 0; z < 10; z++)
+    Model ground_model(&ground_mesh);
+    ground_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
+    ground_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    ground_model.m_rotate_rad = 0.0f;
+    ground_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::uniform_real_distribution<float> pos_dist(-19.8f, 19.8f);
+    std::uniform_real_distribution<float> scale_dist(0.2f, 0.3f);
+    std::uniform_real_distribution<float> rotation_dist(0.0f, 2.0f * 3.1415f);
+    Mesh tree_mesh;
+    tree_mesh.loadMeshObjAndMtlFiles("../assets/tree_001/", "obj.obj");
+    std::vector<Model> tree_models(10, Model(&tree_mesh));
+
+    for (size_t i = 0; i < tree_models.size(); i++)
     {
-        for(int x = 0; x < 10; x++)
-        {
-            ground_models[index].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-            ground_models[index].m_rotate_rad = 0.0f;
-            ground_models[index].m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
-            ground_models[index].m_position = Math::Vec3_f(x - 9.5f, 0.0f, z - 9.5f);
-            index++;
-        }
+        float scale = scale_dist(rng);
+
+        tree_models[i].m_position = Math::Vec3_f(pos_dist(rng), 0.0f, pos_dist(rng));
+        tree_models[i].m_scale = Math::Vec3_f(scale, scale, scale);
+
+        tree_models[i].m_rotate_rad = rotation_dist(rng);
+        tree_models[i].m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
     }
 
-    Mesh dragon_mesh;
-    dragon_mesh.loadMeshObjAndMtlFiles("../assets/dragon/", "obj.obj");
-    Model dragon_model(&dragon_mesh);
-    dragon_model.m_position = Math::Vec3_f(-5.0f, 0.0f, -5.0f);
-    dragon_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    dragon_model.m_rotate_rad = 0.0f;
-    dragon_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
-
     Mesh cottage_mesh;
-    cottage_mesh.loadMeshObjAndMtlFiles("../assets/cottage/", "obj.obj");
+    cottage_mesh.loadMeshObjAndMtlFiles("../assets/car_001/", "obj.obj");
     Model cottage_model(&cottage_mesh);
-    cottage_model.m_position = Math::Vec3_f(20.0f, 0.0f, -20.0f);
+    cottage_model.m_position = Math::Vec3_f(-7.0f, 0.0f, 12.0f);
     cottage_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
     cottage_model.m_rotate_rad = 0.0f;
     cottage_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
-
-    Mesh cube_mesh;
-    cube_mesh.loadMeshObjAndMtlFiles("../assets/cube/", "obj.obj");
-    std::vector<Model> cube_models(10, Model(&cube_mesh));
-    for(size_t i = 0; i < 10; i++)
-    {
-        cube_models[i].m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-        cube_models[i].m_rotate_rad = Math::convertDegreesToRadians(20.0f * (float)i);
-        cube_models[i].m_rotate_axis = Math::Vec3_f(1.0f, 0.3f, 0.5f);
-    }
-    cube_models[0].m_position = Math::Vec3_f( 0.0f,  0.0f,  0.0f);
-    cube_models[1].m_position = Math::Vec3_f( 2.0f,  5.0f, -15.0f);
-    cube_models[2].m_position = Math::Vec3_f(-1.5f, -2.2f, -2.5f);
-    cube_models[3].m_position = Math::Vec3_f(-3.8f, -2.0f, -12.3f);
-    cube_models[4].m_position = Math::Vec3_f( 2.4f, -0.4f, -3.5f);
-    cube_models[5].m_position = Math::Vec3_f(-1.7f,  3.0f, -7.5f);
-    cube_models[6].m_position = Math::Vec3_f( 1.3f, -2.0f, -2.5f);
-    cube_models[7].m_position = Math::Vec3_f( 1.5f,  2.0f, -2.5f);
-    cube_models[8].m_position = Math::Vec3_f( 1.5f,  0.2f, -1.5f);
-    cube_models[9].m_position = Math::Vec3_f(-1.3f,  1.0f, -1.5f);
     //---------------------------------------------------------------------------------------------------------------------//
 
     Timer timer;
@@ -216,12 +201,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     if(!window.create(L"Pixel Engine", 1350, 900, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    int pixel_size = 2; // Backbuffer size is now: 675x450
+    int pixel_size = 1; // Backbuffer size is now: 675x450
     int backbuffer_width = window.m_width / pixel_size;
     int backbuffer_height = window.m_height / pixel_size;
     backbuffer.resize(backbuffer_width, backbuffer_height);
 
-    Renderer renderer(&backbuffer, 5); // Must divide backbuffer width and height perfectly.
+    Renderer renderer(&backbuffer, 10); // Must divide backbuffer width and height perfectly.
 
     Math::Mat4_f projection_matrix = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
     Math::Mat4_f view_matrix;
@@ -241,21 +226,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        for(size_t i = 0; i < ground_models.size(); i++)
-        {
-            renderer.drawModel(ground_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
-        }
-        
-        for(size_t i = 0; i < cube_models.size(); i++)
-        {
-            renderer.drawModel(cube_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
-        }
         /*
-        renderer.drawModel(cottage_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
-        renderer.drawModel(dragon_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
-        */
-
-        std::thread cottage_thread(
+        std::thread cottage_thread
+        (
             [&]()
             {
                 renderer.drawModel
@@ -267,20 +240,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
                 );
             }
         );
-        std::thread dragon_thread(
-            [&]()
-            {
-                renderer.drawModel
-                (
-                    dragon_model,
-                    proj_view_matrix,
-                    draw_filled,
-                    vertex_material_color_mix
-                );
-            }
-        );
-        cottage_thread.join();
-        dragon_thread.join();
+        */
+        std::thread t_00([&]() { renderer.drawModel(tree_models[0], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_01([&]() { renderer.drawModel(tree_models[1], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_02([&]() { renderer.drawModel(tree_models[2], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_03([&]() { renderer.drawModel(tree_models[3], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_04([&]() { renderer.drawModel(tree_models[4], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_05([&]() { renderer.drawModel(tree_models[5], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_06([&]() { renderer.drawModel(tree_models[6], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_07([&]() { renderer.drawModel(tree_models[7], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_08([&]() { renderer.drawModel(tree_models[8], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_09([&]() { renderer.drawModel(tree_models[9], proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        t_00.join();
+        t_01.join();
+        t_02.join();
+        t_03.join();
+        t_04.join();
+        t_05.join();
+        t_06.join();
+        t_07.join();
+        t_08.join();
+        t_09.join();
+        /*
+        for(size_t i = 0; i < tree_models.size(); i++)
+        {
+            renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
+        }
+        */
+        renderer.drawModel(ground_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
+
+
+        //cottage_thread.join();
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);

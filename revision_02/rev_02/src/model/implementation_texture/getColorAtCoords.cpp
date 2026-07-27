@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -25,6 +26,7 @@ uint32_t Texture::getColorAtCoords(const float x, const float y)
 {
     if(m_data == nullptr) { return 0xFF000000; }
 
+    /*
     int x_coord = static_cast<int>(x * (static_cast<float>(m_width) - 1.0f));
     if(x_coord > (m_width - 1)) { x_coord = m_width - 1; }
     if(x_coord < 0) { x_coord = 0; }
@@ -34,5 +36,17 @@ uint32_t Texture::getColorAtCoords(const float x, const float y)
     if(y_coord < 0) { y_coord = 0; }
 
     return m_data[(y_coord * m_width) + x_coord];
+    */
+
+    float u = x - std::floor(x);
+    float v = y - std::floor(y);
+
+    int x_coord = static_cast<int>(u * m_width);
+    int y_coord = static_cast<int>((1.0f - v) * m_height);
+
+    x_coord = (x_coord % m_width + m_width) % m_width;
+    y_coord = (y_coord % m_height + m_height) % m_height;
+
+    return m_data[y_coord * m_width + x_coord];
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

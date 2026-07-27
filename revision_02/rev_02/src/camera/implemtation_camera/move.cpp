@@ -20,7 +20,11 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Camera::moveForward(const float offset)
 {
-    m_position = m_position + (m_front * offset);
+    Math::Vec3_f forward = m_front;
+    forward.m_data[1] = 0.0f;
+    forward = Math::normalise(forward);
+
+    m_position = m_position + (forward * offset);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -28,7 +32,11 @@ void Camera::moveForward(const float offset)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Camera::moveRight(const float offset)
 {
-    m_position = m_position + (m_right * offset);
+    Math::Vec3_f right = m_right;
+    right.m_data[1] = 0.0f;
+    right = Math::normalise(right);
+
+    m_position = m_position + (right * offset);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -36,6 +44,6 @@ void Camera::moveRight(const float offset)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Camera::moveUp(const float offset)
 {
-    m_position = m_position + (m_up * offset);
+    //m_position = m_position + (m_up * offset);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
