@@ -21,7 +21,16 @@
 /*
 -   Triangle is in clip space.
 */
-void Renderer::drawPolygon(const std::vector<Math::Vertex>& polygon, Material* material, bool draw_filled, float color_mix)
+void Renderer::drawPolygon
+(
+    const std::vector<Math::Vertex>& polygon,
+    Material*                        material,
+    bool                             draw_filled,
+    float                            color_mix,
+    std::atomic<int>*                pending_jobs,
+    std::mutex*                      pending_jobs_mutex,
+    std::condition_variable*         pending_jobs_condition_variable
+)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Calculate bounding box of triangle in screen space (backbuffer pixel coordinates).
@@ -68,11 +77,7 @@ void Renderer::drawPolygon(const std::vector<Math::Vertex>& polygon, Material* m
     int tile_renderers_required = (tile_max_x - tile_min_x + 1) * (tile_max_y - tile_min_y + 1);
     //---------------------------------------------------------------------------------------------------------------------//
 
-    std::atomic<int>        pending_jobs;
-    std::mutex              pending_jobs_mutex;
-    std::condition_variable pending_jobs_condition_variable;
-
-    pending_jobs.store(tile_renderers_required);
+    pending_jobs->fetch_add(tile_renderers_required);
 
     for(int tile_y = tile_min_y; tile_y <= tile_max_y; tile_y++)
     {
@@ -84,21 +89,11 @@ void Renderer::drawPolygon(const std::vector<Math::Vertex>& polygon, Material* m
                 material,
                 draw_filled,
                 color_mix,
-                &pending_jobs,
-                &pending_jobs_mutex,
-                &pending_jobs_condition_variable
+                pending_jobs,
+                pending_jobs_mutex,
+                pending_jobs_condition_variable
             );
         }
     }
-
-    std::unique_lock lock(pending_jobs_mutex);
-    pending_jobs_condition_variable.wait
-    (
-        lock,
-        [&]
-        {
-            return pending_jobs.load() == 0;
-        }
-    );
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -23,6 +23,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix)
 {
+    std::atomic<int>        pending_jobs;
+    std::mutex              pending_jobs_mutex;
+    std::condition_variable pending_jobs_condition_variable;
+
     const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
 
     for(size_t i = 0; i < model.m_mesh->m_sub_meshes.size(); i++)
@@ -63,8 +67,27 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
             }
             if(model.m_polygon_buffers.m_buffer0[i][j].size() < 3) { continue; }
 
-            this->drawPolygon(model.m_polygon_buffers.m_buffer0[i][j], material, draw_filled, color_mix);
+            this->drawPolygon
+            (
+                model.m_polygon_buffers.m_buffer0[i][j],
+                material,
+                draw_filled,
+                color_mix,
+                &pending_jobs,
+                &pending_jobs_mutex,
+                &pending_jobs_condition_variable
+            );
         }
     }
+
+    std::unique_lock lock(pending_jobs_mutex);
+    pending_jobs_condition_variable.wait
+    (
+        lock,
+        [&]
+        {
+            return pending_jobs.load() == 0;
+        }
+    );
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -91,7 +91,17 @@ struct Renderer
     // Functions.
     //---------------------------------------------------------------------------------------------------------------------//
     void drawModel(Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix);
-    void drawPolygon(const std::vector<Math::Vertex>& polygon, Material* material, bool draw_filled, float color_mix);
+
+    void drawPolygon
+    (
+        const std::vector<Math::Vertex>& polygon,
+        Material*                        material,
+        bool                             draw_filled,
+        float                            color_mix,
+        std::atomic<int>*                pending_jobs,
+        std::mutex*                      pending_jobs_mutex,
+        std::condition_variable*         pending_jobs_condition_variable
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
