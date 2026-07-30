@@ -204,18 +204,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Timer timer;
     timer.init();
 
+    struct window_backbuffer_renderer_presets
+    {
+        int m_window_width;
+        int m_window_height;
+        int m_pixel_size;
+        int m_tile_split;
+        window_backbuffer_renderer_presets(int window_width, int window_height, int pixel_size, int tile_split)
+        :
+        m_window_width(window_width),
+        m_window_height(window_height),
+        m_pixel_size(pixel_size),
+        m_tile_split(tile_split)
+        {}
+    };
+    window_backbuffer_renderer_presets preset_00(1400, 900, 1, 10);
+    window_backbuffer_renderer_presets preset_01(1360, 900, 2, 10);
+    window_backbuffer_renderer_presets preset_02(1400, 900, 1, 25);
+    window_backbuffer_renderer_presets& preset_to_use = preset_00;
+
     Window window;
     //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
-    if(!window.create(L"Pixel Engine", 1360, 900, hInstance)) { return -1; }
+    if(!window.create(L"Pixel Engine", preset_to_use.m_window_width, preset_to_use.m_window_height, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
-    int pixel_size = 1;
-    //int pixel_size = 2; // Backbuffer size is now: 680x450
-    int backbuffer_width = window.m_width / pixel_size;
-    int backbuffer_height = window.m_height / pixel_size;
+    int backbuffer_width = window.m_width / preset_to_use.m_pixel_size;
+    int backbuffer_height = window.m_height / preset_to_use.m_pixel_size;
     backbuffer.resize(backbuffer_width, backbuffer_height);
 
-    Renderer renderer(&backbuffer, 10); // Must divide backbuffer width and height perfectly.
+    Renderer renderer(&backbuffer, preset_to_use.m_tile_split); // Must divide backbuffer width and height perfectly.
 
     Math::Mat4_f projection_matrix = camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
     Math::Mat4_f view_matrix;
@@ -235,14 +252,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        std::thread t_10([&]() { renderer.drawModel(car_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_00([&]() { renderer.drawModel(car_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_01([&]() { renderer.drawModel(house_003_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
 
         for(size_t i = 0; i < tree_models.size(); i++)
         {
             renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
         }
         renderer.drawModel(ground_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
-        t_10.join();
+        t_00.join();
+        t_01.join();
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);

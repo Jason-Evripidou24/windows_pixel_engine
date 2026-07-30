@@ -44,10 +44,11 @@ void TileRenderer::workerFunction()
         jobs_lock.unlock();
         //-----------------------------------------------------------------------------------------------------------------//
 
-        this->fillPolygon
+        this->drawPolygon
         (
             tile_renderer_job.m_polygon,
             tile_renderer_job.m_material,
+            tile_renderer_job.m_draw_filled,
             tile_renderer_job.m_color_mix
         );
 

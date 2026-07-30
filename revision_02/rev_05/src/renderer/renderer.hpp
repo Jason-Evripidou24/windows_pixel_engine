@@ -92,8 +92,6 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawModel(Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix);
     void drawPolygon(const std::vector<Math::Vertex>& polygon, Material* material, bool draw_filled, float color_mix);
-    void drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material* material, float color_mix);
-    void drawPixel(const Math::Vertex& vertex, const Material* material, float color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -39,6 +39,7 @@ struct TileRendererJob
 {
     const std::vector<Math::Vertex>* m_polygon;
     const Material*                  m_material;
+    bool                             m_draw_filled;
     float                            m_color_mix;
     std::atomic<int>*                m_extern_pending_jobs;
     std::mutex*                      m_extern_pending_jobs_mutex;
@@ -48,6 +49,7 @@ struct TileRendererJob
     {
         m_polygon = nullptr;
         m_material = nullptr;
+        m_draw_filled = false;
         m_color_mix = 0.0f;
         m_extern_pending_jobs = nullptr;
         m_extern_pending_jobs_mutex = nullptr;
@@ -58,6 +60,7 @@ struct TileRendererJob
     (
         const std::vector<Math::Vertex>* polygon,
         const Material*                  material,
+        bool                             draw_filled,
         float                            color_mix,
         std::atomic<int>*                extern_pending_jobs,
         std::mutex*                      extern_pending_jobs_mutex,
@@ -66,6 +69,7 @@ struct TileRendererJob
     :
     m_polygon(polygon),
     m_material(material),
+    m_draw_filled(draw_filled),
     m_color_mix(color_mix),
     m_extern_pending_jobs(extern_pending_jobs),
     m_extern_pending_jobs_mutex(extern_pending_jobs_mutex),
@@ -106,6 +110,7 @@ struct TileRenderer
     (
         const std::vector<Math::Vertex>* polygon,
         const Material*                  material,
+        bool                             draw_filled,
         float                            color_mix,
         std::atomic<int>*                extern_pending_jobs,
         std::mutex*                      extern_pending_jobs_mutex,
@@ -130,11 +135,12 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Drawing functions. Each drawing function only draws within the bounding box of the TileRenderer object.
     //---------------------------------------------------------------------------------------------------------------------//
-    void fillPolygon
+    void drawPolygon
     (
         const std::vector<Math::Vertex>* polygon,
-        const Material*                  material,
-        float                            color_mix
+        const Material* material,
+        bool draw_filled,
+        float color_mix
     );
 
     void fillTriangle
@@ -145,6 +151,10 @@ struct TileRenderer
         const Material* material,
         float color_mix
     );
+
+    void drawLine(const Math::Vertex* v0, const Math::Vertex* v1, const Material* material, float color_mix);
+
+    void drawPixel(const Math::Vertex* vertex, const Material* material, float color_mix);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -72,44 +72,33 @@ void Renderer::drawPolygon(const std::vector<Math::Vertex>& polygon, Material* m
     std::mutex              pending_jobs_mutex;
     std::condition_variable pending_jobs_condition_variable;
 
-    if(draw_filled == true)
-    {
-        pending_jobs.store(tile_renderers_required);
+    pending_jobs.store(tile_renderers_required);
 
-        for(int tile_y = tile_min_y; tile_y <= tile_max_y; tile_y++)
-        {
-            for(int tile_x = tile_min_x; tile_x <= tile_max_x; tile_x++)
-            {
-                m_tile_renderers[tile_x + (tile_y * m_tiles_x)]->submitJob
-                (
-                    &polygon,
-                    material,
-                    color_mix,
-                    &pending_jobs,
-                    &pending_jobs_mutex,
-                    &pending_jobs_condition_variable
-                );
-            }
-        }
-
-        std::unique_lock lock(pending_jobs_mutex);
-        pending_jobs_condition_variable.wait
-        (
-            lock,
-            [&]
-            {
-                return pending_jobs.load() == 0;
-            }
-        );
-    }
-    else
+    for(int tile_y = tile_min_y; tile_y <= tile_max_y; tile_y++)
     {
-        for(size_t i = 1; i < polygon.size() - 1; i++)
+        for(int tile_x = tile_min_x; tile_x <= tile_max_x; tile_x++)
         {
-            this->drawLine(polygon[0], polygon[i], material, color_mix);
-            this->drawLine(polygon[0], polygon[i + 1], material, color_mix);
-            this->drawLine(polygon[i], polygon[i + 1], material, color_mix);
+            m_tile_renderers[tile_x + (tile_y * m_tiles_x)]->submitJob
+            (
+                &polygon,
+                material,
+                draw_filled,
+                color_mix,
+                &pending_jobs,
+                &pending_jobs_mutex,
+                &pending_jobs_condition_variable
+            );
         }
     }
+
+    std::unique_lock lock(pending_jobs_mutex);
+    pending_jobs_condition_variable.wait
+    (
+        lock,
+        [&]
+        {
+            return pending_jobs.load() == 0;
+        }
+    );
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

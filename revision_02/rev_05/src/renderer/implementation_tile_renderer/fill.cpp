@@ -58,23 +58,6 @@ uint32_t mixColor(uint32_t color_a, float alpha, uint32_t color_b, float beta, u
     return result;
 }
 
-void TileRenderer::fillPolygon
-(
-    const std::vector<Math::Vertex>* polygon,
-    const Material*                  material,
-    float                            color_mix
-)
-{
-    for(size_t i = 1; i < polygon->size() - 1; i++)
-    {
-        const Math::Vertex* v0 = &((*polygon)[0]);
-        const Math::Vertex* v1 = &((*polygon)[i]);
-        const Math::Vertex* v2 = &((*polygon)[i + 1]);
-
-        fillTriangle(v0, v1, v2, material, color_mix);
-    }
-}
-
 /*
 -   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from triangle vertex colors and 1 is 100% color from
     material.

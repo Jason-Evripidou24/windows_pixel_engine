@@ -2,7 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,40 +12,46 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../backbuffer/backbuffer.hpp"
-#include "../../math/math.hpp"
-#include "../../math/vertex.hpp"
+#include "../tile_renderer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Vertex is (should be) within clip space.
--   color_mix is 0.0f <= color_mix <= 1.0f where 0 is 100% color from vertex and 1 is 100% color from material.
-*/
-void Renderer::drawPixel(const Math::Vertex& vertex, const Material* material, float color_mix)
+void TileRenderer::drawLine(const Math::Vertex* v0, const Math::Vertex* v1, const Material* material, float color_mix)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Calculate color using vertex color and material color.
+    // Calculate the backbuffer pixel width and height that will be required.
     //---------------------------------------------------------------------------------------------------------------------//
-    uint32_t pixel_color = Math::convertVec4fToColor(vertex.m_color);
-    if(material != nullptr)
+    int backbuffer_x0 = m_backbuffer->toBackbufferCoordX(v0->m_position.m_data[0]);
+    int backbuffer_y0 = m_backbuffer->toBackbufferCoordY(v0->m_position.m_data[1]);
+
+    int backbuffer_x1 = m_backbuffer->toBackbufferCoordX(v1->m_position.m_data[0]);
+    int backbuffer_y1 = m_backbuffer->toBackbufferCoordY(v1->m_position.m_data[1]);
+
+    int dx = backbuffer_x1 - backbuffer_x0;
+    int dy = backbuffer_y1 - backbuffer_y0;
+
+    int abs_dx = dx; if(abs_dx < 0) { abs_dx *= -1; }
+    int abs_dy = dy; if(abs_dy < 0) { abs_dy *= -1; }
+
+    int steps = abs_dx; if(abs_dy > steps) { steps = abs_dy; }
+
+    if(steps == 0)
     {
-        uint32_t material_color = material->calcMaterialColor(vertex.m_tex_coords.m_data[0], vertex.m_tex_coords.m_data[1]);
-        pixel_color = Math::interpolateUint32(pixel_color, material_color, color_mix);
+        this->drawPixel(v0, material, color_mix);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Calculate the backbuffer pixel width and height that will be required.
-    //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x = m_backbuffer->toBackbufferCoordX(vertex.m_position.m_data[0]);
-    int backbuffer_y = m_backbuffer->toBackbufferCoordY(vertex.m_position.m_data[1]);
-    //---------------------------------------------------------------------------------------------------------------------//
+    for(int i = 0; i <= steps; i++)
+    {
+        float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
 
-    m_backbuffer->setPixel(backbuffer_x, backbuffer_y, vertex.m_position.m_data[2], pixel_color);
+        Math::Vertex curr_vert;
+        Math::interpolateVertex(curr_vert, *v0, *v1, t);
+        this->drawPixel(&curr_vert, material, color_mix);
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

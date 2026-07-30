@@ -18,52 +18,37 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::submitJob
+void TileRenderer::drawPolygon
 (
     const std::vector<Math::Vertex>* polygon,
-    const Material*                  material,
-    bool                             draw_filled,
-    float                            color_mix,
-    std::atomic<int>*                extern_pending_jobs,
-    std::mutex*                      extern_pending_jobs_mutex,
-    std::condition_variable*         extern_pending_jobs_condition_variable
+    const Material* material,
+    bool draw_filled,
+    float color_mix
 )
 {
-    std::unique_lock<std::mutex> lock(m_jobs_mutex);
-    
-    if( (m_running.load() == false) || (polygon == nullptr) )
+    if(draw_filled == true)
     {
-        //-----------------------------------------------------------------------------------------------------------------//
-        std::unique_lock<std::mutex> extern_jobs_pending_lock(*extern_pending_jobs_mutex);
-
-        extern_pending_jobs->fetch_sub(1);
-
-        if(extern_pending_jobs->load() == 0)
+        for(size_t i = 1; i < polygon->size() - 1; i++)
         {
-            extern_pending_jobs_condition_variable->notify_all();
+            const Math::Vertex* v0 = &((*polygon)[0]);
+            const Math::Vertex* v1 = &((*polygon)[i]);
+            const Math::Vertex* v2 = &((*polygon)[i + 1]);
+
+            fillTriangle(v0, v1, v2, material, color_mix);
         }
+    }
+    else
+    {
+        for(size_t i = 1; i < polygon->size() - 1; i++)
+        {
+            const Math::Vertex* v0 = &((*polygon)[0]);
+            const Math::Vertex* v1 = &((*polygon)[i]);
+            const Math::Vertex* v2 = &((*polygon)[i + 1]);
 
-        extern_jobs_pending_lock.unlock();
-        //-----------------------------------------------------------------------------------------------------------------//
-
-        return;
+            drawLine(v0, v1, material, color_mix);
+            drawLine(v0, v2, material, color_mix);
+            drawLine(v1, v2, material, color_mix);
+        }
     }
 
-    m_jobs.push
-    (
-        TileRendererJob
-        (
-            polygon,
-            material,
-            draw_filled,
-            color_mix,
-            extern_pending_jobs,
-            extern_pending_jobs_mutex,
-            extern_pending_jobs_condition_variable
-        )
-    );
-
-    lock.unlock();
-    m_jobs_condition_variable.notify_all();
 }
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
