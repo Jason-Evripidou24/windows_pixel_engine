@@ -1,0 +1,91 @@
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+//-------------------------------------------------------------------------------------------------------------------------//
+// Standard library.
+//-------------------------------------------------------------------------------------------------------------------------//
+#include <cmath>
+//-------------------------------------------------------------------------------------------------------------------------//
+
+//-------------------------------------------------------------------------------------------------------------------------//
+// Third party.
+//-------------------------------------------------------------------------------------------------------------------------//
+//-------------------------------------------------------------------------------------------------------------------------//
+
+//-------------------------------------------------------------------------------------------------------------------------//
+// Internal.
+//-------------------------------------------------------------------------------------------------------------------------//
+#include "../math.hpp"
+//-------------------------------------------------------------------------------------------------------------------------//
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+// Vertex is in Homogenous Space.
+float Math::getVertexDistanceToPlaneMinZ(const Math::Vertex& v)
+{
+    // z + w
+    return v.m_position.m_data[2] + v.m_position.m_data[3];
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+// Vertex is in Homogenous Space.
+bool Math::checkVertexInsidePlaneMinZ(const Math::Vertex& v)
+{
+    // (z >= -w) => (z + w >= 0)
+    return Math::getVertexDistanceToPlaneMinZ(v) >= 0.0f;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   Vertices are in Homogenous Space.
+-   Assumed the line between start and end cross min plane x.
+*/
+Math::Vertex Math::lineIntersectionWithPlaneMinZ(const Math::Vertex& start, const Math::Vertex& end)
+{
+    float d0 = Math::getVertexDistanceToPlaneMinZ(start);
+    float d1 = Math::getVertexDistanceToPlaneMinZ(end);
+
+    float t = d0 / (d0 - d1);
+
+    Math::Vertex result;
+    Math::interpolateVertex(result, start, end, t);
+    return result;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+std::vector<Math::Vertex> Math::clipPolygonAgainstPlaneMinZ(std::vector<Math::Vertex>& polygon)
+{
+    std::vector<Math::Vertex> clipped_polygon;
+    if(polygon.empty() == true) { return clipped_polygon; }
+
+    for(size_t i = 0; i < polygon.size(); i++)
+    {
+        const Math::Vertex& current  = polygon[i];
+        const Math::Vertex& previous = polygon[(i + polygon.size() - 1) % polygon.size()];
+
+        bool current_inside = Math::checkVertexInsidePlaneMinZ(current);
+        bool previous_inside = Math::checkVertexInsidePlaneMinZ(previous);
+
+        if( (current_inside == true) && (previous_inside == true) )
+        {
+            clipped_polygon.push_back(current);
+        }
+        else if( (current_inside == false) && (previous_inside == true) )
+        {
+            clipped_polygon.push_back( Math::lineIntersectionWithPlaneMinZ(previous, current) );
+        }
+        else if( (current_inside == true) && (previous_inside == false) )
+        {
+            clipped_polygon.push_back( Math::lineIntersectionWithPlaneMinZ(previous, current) );
+            clipped_polygon.push_back(current);
+        }
+    }
+
+    return clipped_polygon;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
