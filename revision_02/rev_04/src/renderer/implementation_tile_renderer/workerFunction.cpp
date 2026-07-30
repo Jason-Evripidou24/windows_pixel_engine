@@ -56,9 +56,7 @@ void TileRenderer::workerFunction()
         //-----------------------------------------------------------------------------------------------------------------//
         std::unique_lock<std::mutex> extern_jobs_pending_lock(*(tile_renderer_job.m_extern_pending_jobs_mutex));
 
-        (tile_renderer_job.m_extern_pending_jobs)->fetch_sub(1);
-
-        if((tile_renderer_job.m_extern_pending_jobs)->load() == 0)
+        if(tile_renderer_job.m_extern_pending_jobs->fetch_sub(1) == 1)
         {
             (tile_renderer_job.m_extern_pending_jobs_condition_variable)->notify_all();
         }

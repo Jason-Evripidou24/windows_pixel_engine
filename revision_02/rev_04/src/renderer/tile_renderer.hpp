@@ -37,11 +37,11 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TileRendererJob
 {
-    const Math::Vertex*            m_v0;
-    const Math::Vertex*            m_v1;
-    const Math::Vertex*            m_v2;
-    const Material*                m_material;
-    float                          m_color_mix;
+    const Math::Vertex*      m_v0;
+    const Math::Vertex*      m_v1;
+    const Math::Vertex*      m_v2;
+    const Material*          m_material;
+    float                    m_color_mix;
     std::atomic<int>*        m_extern_pending_jobs;
     std::mutex*              m_extern_pending_jobs_mutex;
     std::condition_variable* m_extern_pending_jobs_condition_variable;
@@ -128,11 +128,11 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     TileRenderer
     (
-        Backbuffer*              backbuffer,
-        int                      tile_x_min,
-        int                      tile_x_max,
-        int                      tile_y_min,
-        int                      tile_y_max
+        Backbuffer* backbuffer,
+        int         tile_x_min,
+        int         tile_x_max,
+        int         tile_y_min,
+        int         tile_y_max
     );
     ~TileRenderer();
     //---------------------------------------------------------------------------------------------------------------------//

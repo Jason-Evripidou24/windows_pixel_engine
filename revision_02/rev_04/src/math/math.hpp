@@ -128,8 +128,6 @@ namespace Math
     // Triangle transform, perspective divide and clipping between the geometric planes.
     //---------------------------------------------------------------------------------------------------------------------//
     Triangle transformTriangle(const Triangle& triangle, const Mat4_f& matrix);
-    Vertex perspectiveDivideVertex(const Vertex& vertex);
-    Triangle perspectiveDivideTriangle(const Triangle& triangle);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

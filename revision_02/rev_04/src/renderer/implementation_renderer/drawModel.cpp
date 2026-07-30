@@ -55,28 +55,13 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
                     polygon.clear();
                     break;
                 }
-
-                polygon[k] = Math::perspectiveDivideVertex(polygon[k]);
+                polygon[k].perspectiveDivide();
             }
             if(polygon.size() < 3) { continue; }
-            //std::vector<Math::Triangle> triangles_clipped = Math::clipAgainstPlaneMinMaxXYZ(transform_triangle);
 
             for(size_t k = 1; k < polygon.size() - 1; k++)
             {
-                /*
-                triangle_clipped = Math::perspectiveDivideTriangle(triangle_clipped);
-                if
-                (
-                    (Utils::checkFloatEquals(triangle_clipped.m_v0.m_position.m_data[3], 0.0f) == true) ||
-                    (Utils::checkFloatEquals(triangle_clipped.m_v1.m_position.m_data[3], 0.0f) == true) ||
-                    (Utils::checkFloatEquals(triangle_clipped.m_v2.m_position.m_data[3], 0.0f) == true)
-                )
-                {
-                    continue;
-                }
-                */
-                Math::Triangle triangle_clipped(polygon[0], polygon[k], polygon[k + 1]);
-                this->drawTriangle(triangle_clipped, material, draw_filled, color_mix);
+                this->drawTriangle(Math::Triangle(polygon[0], polygon[k], polygon[k + 1]), material, draw_filled, color_mix);
             }
         }
     }
