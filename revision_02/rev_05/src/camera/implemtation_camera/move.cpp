@@ -44,6 +44,11 @@ void Camera::moveRight(const float offset)
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Camera::moveUp(const float offset)
 {
-    //m_position = m_position + (m_up * offset);
+    Math::Vec3_f up = m_up;
+    up.m_data[0] = 0.0f;
+    up.m_data[2] = 0.0f;
+    up.normalise();
+
+    m_position = m_position + (up * offset);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

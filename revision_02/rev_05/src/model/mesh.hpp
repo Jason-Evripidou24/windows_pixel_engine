@@ -23,8 +23,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "material.hpp"
 #include "texture.hpp"
-
-#include "../math/triangle.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -39,6 +37,9 @@ struct SubMesh
 struct Mesh
 {
     //---------------------------------------------------------------------------------------------------------------------//
+    std::string m_mesh_name;
+    int m_mesh_id;
+
     std::vector<Material*> m_materials;
     std::unordered_map<std::string, int> m_material_name_to_index;
 
@@ -89,7 +90,13 @@ struct Mesh
     void loadObjFile(const std::string& file_folder, const std::string& filename);
 
     // Scan for mtl files first and call loadMtlFile on each of them, then call loadObjFile.
-    void loadMeshObjAndMtlFiles(const std::string& file_folder, const std::string& filename);
+    void loadMeshObjAndMtlFiles
+    (
+        const std::string& mesh_name,
+        int mesh_id,
+        const std::string& file_folder,
+        const std::string& filename
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

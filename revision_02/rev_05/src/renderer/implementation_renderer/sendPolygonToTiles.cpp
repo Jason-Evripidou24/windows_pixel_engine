@@ -21,7 +21,7 @@
 /*
 -   Triangle is in clip space.
 */
-void Renderer::drawPolygon
+void Renderer::sendPolygonToTiles
 (
     const std::vector<Math::Vertex>& polygon,
     Material*                        material,

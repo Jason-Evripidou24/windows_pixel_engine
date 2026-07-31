@@ -30,7 +30,6 @@
 
 #include "../math/math.hpp"
 #include "../model/model.hpp"
-#include "../model/material_triangle.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -92,7 +91,7 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawModel(Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix);
 
-    void drawPolygon
+    void sendPolygonToTiles
     (
         const std::vector<Math::Vertex>& polygon,
         Material*                        material,

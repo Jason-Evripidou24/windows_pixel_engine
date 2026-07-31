@@ -24,17 +24,3 @@ void Math::transformVertex(Vertex& output, const Vertex& vertex, const Mat4_f& m
     output.m_position = matrix * vertex.m_position;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Math::Triangle Math::transformTriangle(const Math::Triangle& triangle, const Math::Mat4_f& matrix)
-{
-    Math::Triangle triangle_transformed = triangle;
-
-    triangle_transformed.m_v0.m_position = matrix * triangle_transformed.m_v0.m_position;
-    triangle_transformed.m_v1.m_position = matrix * triangle_transformed.m_v1.m_position;
-    triangle_transformed.m_v2.m_position = matrix * triangle_transformed.m_v2.m_position;
-
-    return triangle_transformed;
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

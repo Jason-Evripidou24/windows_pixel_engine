@@ -19,7 +19,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../mesh.hpp"
 
-#include "../../math/triangle.hpp"
 #include "../../math/vec2_f.hpp"
 #include "../../math/vec3_f.hpp"
 #include "../../math/vec4_f.hpp"
@@ -29,9 +28,18 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Mesh::loadMeshObjAndMtlFiles(const std::string& file_folder, const std::string& filename)
+void Mesh::loadMeshObjAndMtlFiles
+(
+    const std::string& mesh_name,
+    int mesh_id,
+    const std::string& file_folder,
+    const std::string& filename
+)
 {
     //---------------------------------------------------------------------------------------------------------------------//
+    m_mesh_name = mesh_name;
+    m_mesh_id = mesh_id;
+
     std::ifstream file(file_folder + filename);
     if(!file.is_open()) { return; }
     std::string line;

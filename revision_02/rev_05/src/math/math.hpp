@@ -29,7 +29,6 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "mat4_f.hpp"
-#include "triangle.hpp"
 #include "vec2_f.hpp"
 #include "vec3_f.hpp"
 #include "vec3_i.hpp"
@@ -128,7 +127,6 @@ namespace Math
     // Triangle transform, perspective divide and clipping between the geometric planes.
     //---------------------------------------------------------------------------------------------------------------------//
     void transformVertex(Vertex& output, const Vertex& vertex, const Mat4_f& matrix);
-    Triangle transformTriangle(const Triangle& triangle, const Mat4_f& matrix);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

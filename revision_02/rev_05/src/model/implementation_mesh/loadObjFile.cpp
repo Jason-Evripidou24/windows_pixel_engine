@@ -18,7 +18,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../mesh.hpp"
 
-#include "../../math/triangle.hpp"
 #include "../../math/vec2_f.hpp"
 #include "../../math/vec3_f.hpp"
 #include "../../math/vec4_f.hpp"

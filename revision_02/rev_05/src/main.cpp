@@ -38,7 +38,7 @@ static Camera camera
     Math::convertDegreesToRadians(180.0f),
     Math::convertDegreesToRadians(45.0f),
     0.1f,
-    50.0f,
+    100.0f,
     Math::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 
@@ -157,7 +157,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     Mesh ground_mesh;
-    ground_mesh.loadMeshObjAndMtlFiles("../assets/ground/", "obj.obj");
+    ground_mesh.loadMeshObjAndMtlFiles("ground_mesh", 0, "../assets/ground/", "obj.obj");
     Model ground_model(&ground_mesh);
     ground_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
     ground_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
@@ -170,7 +170,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     std::uniform_real_distribution<float> scale_dist(0.2f, 0.3f);
     std::uniform_real_distribution<float> rotation_dist(0.0f, 2.0f * 3.1415f);
     Mesh tree_mesh;
-    tree_mesh.loadMeshObjAndMtlFiles("../assets/tree_001/", "obj.obj");
+    tree_mesh.loadMeshObjAndMtlFiles("tree_mesh", 1, "../assets/tree_001/", "obj.obj");
     std::vector<Model> tree_models(10, Model(&tree_mesh));
 
     for (size_t i = 0; i < tree_models.size(); i++)
@@ -184,16 +184,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         tree_models[i].m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
     }
 
-    Mesh car_mesh;
-    car_mesh.loadMeshObjAndMtlFiles("../assets/car_001/", "obj.obj");
-    Model car_model(&car_mesh);
+    Mesh car_001_mesh;
+    car_001_mesh.loadMeshObjAndMtlFiles("car_001_mesh", 2, "../assets/car_001/", "obj.obj");
+    Model car_model(&car_001_mesh);
     car_model.m_position = Math::Vec3_f(-7.0f, 0.0f, 12.0f);
     car_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
     car_model.m_rotate_rad = 0.0f;
     car_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
+    Mesh house_001_mesh;
+    house_001_mesh.loadMeshObjAndMtlFiles("house_001_mesh", 3, "../assets/house_001/", "obj.obj");
+    Model house_001_model(&house_001_mesh);
+    house_001_model.m_position = Math::Vec3_f(-30.0f, 0.0f, 30.0f);
+    house_001_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
+    house_001_model.m_rotate_rad = Math::convertDegreesToRadians(310.0f);
+    house_001_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
+    Mesh house_002_mesh;
+    house_002_mesh.loadMeshObjAndMtlFiles("house_002_mesh", 4, "../assets/house_002/", "obj.obj");
+    Model house_002_model(&house_002_mesh);
+    house_002_model.m_position = Math::Vec3_f(-30.0f, 0.0f, -30.0f);
+    house_002_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
+    house_002_model.m_rotate_rad = Math::convertDegreesToRadians(220.0f);
+    house_002_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
     Mesh house_003_mesh;
-    house_003_mesh.loadMeshObjAndMtlFiles("../assets/house_003/", "obj.obj");
+    house_003_mesh.loadMeshObjAndMtlFiles("house_003_mesh", 5, "../assets/house_003/", "obj.obj");
     Model house_003_model(&house_003_mesh);
     house_003_model.m_position = Math::Vec3_f(20.0f, 1.5f, 20.0f);
     house_003_model.m_scale = Math::Vec3_f(3.0f, 3.0f, 3.0f);
@@ -204,24 +220,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Timer timer;
     timer.init();
 
-    struct window_backbuffer_renderer_presets
+    struct presets
     {
         int m_window_width;
         int m_window_height;
         int m_pixel_size;
         int m_tile_split;
-        window_backbuffer_renderer_presets(int window_width, int window_height, int pixel_size, int tile_split)
+        int m_control_string_x;
+        int m_control_string_y;
+        presets
+        (
+            int window_width,
+            int window_height,
+            int pixel_size,
+            int tile_split,
+            int control_string_x,
+            int control_string_y
+        )
         :
         m_window_width(window_width),
         m_window_height(window_height),
         m_pixel_size(pixel_size),
-        m_tile_split(tile_split)
+        m_tile_split(tile_split),
+        m_control_string_x(control_string_x),
+        m_control_string_y(control_string_y)
         {}
     };
-    window_backbuffer_renderer_presets preset_00(1400, 900, 1, 10);
-    window_backbuffer_renderer_presets preset_01(1360, 900, 2, 10);
-    window_backbuffer_renderer_presets preset_02(1400, 900, 1, 25);
-    window_backbuffer_renderer_presets& preset_to_use = preset_00;
+    presets preset_00(1400, 900, 1, 10, 10, 800);
+    presets preset_01(1360, 900, 2, 10, 10, 360);
+    presets& preset_to_use = preset_01;
 
     Window window;
     //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
@@ -253,8 +280,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         proj_view_matrix = projection_matrix * view_matrix;
 
         std::thread t_00([&]() { renderer.drawModel(car_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
-        std::thread t_01([&]() { renderer.drawModel(house_003_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
-
+        std::thread t_01([&]() { renderer.drawModel(house_001_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_02([&]() { renderer.drawModel(house_002_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        std::thread t_03([&]() { renderer.drawModel(house_003_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         for(size_t i = 0; i < tree_models.size(); i++)
         {
             renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
@@ -262,10 +290,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.drawModel(ground_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
         t_00.join();
         t_01.join();
+        t_02.join();
+        t_03.join();
 
         std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
         backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
-        backbuffer.setText(10, 360, controls_string.c_str(), static_cast<int>(controls_string.size()), 0xFFFFFFFF);
+
+        backbuffer.setText
+        (
+            preset_to_use.m_control_string_x,
+            preset_to_use.m_control_string_y,
+            controls_string.c_str(),
+            static_cast<int>(controls_string.size()),
+            0xFFFFFFFF
+        );
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

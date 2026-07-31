@@ -67,7 +67,7 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
             }
             if(model.m_polygon_buffers.m_buffer0[i][j].size() < 3) { continue; }
 
-            this->drawPolygon
+            this->sendPolygonToTiles
             (
                 model.m_polygon_buffers.m_buffer0[i][j],
                 material,
