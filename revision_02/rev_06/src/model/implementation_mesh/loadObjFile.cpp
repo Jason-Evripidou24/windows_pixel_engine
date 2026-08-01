@@ -262,7 +262,7 @@ void Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
     //---------------------------------------------------------------------------------------------------------------------//
 
     SubMesh curr_sub_mesh;
-    curr_sub_mesh.m_polygons.clear();
+    curr_sub_mesh.m_wireframe.clear();
     curr_sub_mesh.m_material_index = -1;
     
     std::string current_material_name = std::string("NULL");
@@ -315,12 +315,12 @@ void Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         {
             ss >> current_material_name;
 
-            if(curr_sub_mesh.m_polygons.empty() == false)
+            if(curr_sub_mesh.m_wireframe.m_num_polygons > 0)
             {
                 m_sub_meshes.push_back(curr_sub_mesh);
             }
 
-            curr_sub_mesh.m_polygons.clear();
+            curr_sub_mesh.m_wireframe.clear();
             curr_sub_mesh.m_material_index = -1;
             if(m_material_name_to_index.find(current_material_name) != m_material_name_to_index.end())
             {
@@ -344,12 +344,12 @@ void Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
                 vertex_normals
             );
 
-            curr_sub_mesh.m_polygons.push_back(new_polygon);
+            curr_sub_mesh.m_wireframe.addPolygon(new_polygon);
         }
         //-----------------------------------------------------------------------------------------------------------------//
     }
 
-    if(curr_sub_mesh.m_polygons.empty() == false)
+    if(curr_sub_mesh.m_wireframe.m_num_polygons > 0)
     {
         m_sub_meshes.push_back(curr_sub_mesh);
     }

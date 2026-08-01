@@ -38,6 +38,23 @@ namespace Geometry
             m_vertices = std::vector<Math::Vertex>();
         }
 
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Copy constructors.
+        //-----------------------------------------------------------------------------------------------------------------//
+        Polygon(const Polygon& other)
+        {
+            m_num_vertices = other.m_num_vertices;
+            m_vertices = other.m_vertices;
+        }
+
+        Polygon& operator=(const Polygon& other)
+        {
+            m_num_vertices = other.m_num_vertices;
+            m_vertices = other.m_vertices;
+            return *this;
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
         inline void clear()
         {
             m_num_vertices = 0;

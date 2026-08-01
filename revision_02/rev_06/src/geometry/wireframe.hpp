@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef WIREFRAME_HPP
+#define WIREFRAME_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -21,7 +20,6 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "polygon.hpp"
-#include "wireframe.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -29,18 +27,61 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 namespace Geometry
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Homogenous Space clipping of polygons.
-    //---------------------------------------------------------------------------------------------------------------------//
-    void clipPolygonAgainstPlaneMinX(Geometry::Polygon& output, const Geometry::Polygon& polygon);
-    void clipPolygonAgainstPlaneMaxX(Geometry::Polygon& output, const Geometry::Polygon& polygon);
-    void clipPolygonAgainstPlaneMinY(Geometry::Polygon& output, const Geometry::Polygon& polygon);
-    void clipPolygonAgainstPlaneMaxY(Geometry::Polygon& output, const Geometry::Polygon& polygon);
-    void clipPolygonAgainstPlaneMinZ(Geometry::Polygon& output, const Geometry::Polygon& polygon);
-    void clipPolygonAgainstPlaneMaxZ(Geometry::Polygon& output, const Geometry::Polygon& polygon);
-    //---------------------------------------------------------------------------------------------------------------------//
+    struct Wireframe
+    {
+        size_t m_num_polygons;
+        std::vector<Geometry::Polygon> m_polygons;
 
-    void transformPolygon(Geometry::Polygon& output, const Geometry::Polygon& polygon, const Math::Mat4_f& matrix);
+        Wireframe()
+        {
+            m_num_polygons = 0;
+            m_polygons = std::vector<Geometry::Polygon>();
+        }
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Copy constructors.
+        //-----------------------------------------------------------------------------------------------------------------//
+        Wireframe(const Wireframe& other)
+        {
+            m_num_polygons = other.m_num_polygons;
+            m_polygons = other.m_polygons;
+        }
+
+        Wireframe& operator=(const Wireframe& other)
+        {
+            m_num_polygons = other.m_num_polygons;
+            m_polygons = other.m_polygons;
+            return *this;
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        inline void clear()
+        {
+            m_num_polygons = 0;
+        }
+
+        inline void resize(size_t size)
+        {
+            m_num_polygons = size;
+            if(m_polygons.size() < size)
+            {
+                m_polygons.resize(size);
+            }
+        }
+
+        inline void addPolygon(const Geometry::Polygon& polygon)
+        {
+            if(m_num_polygons < m_polygons.size())
+            {
+                m_polygons[m_num_polygons] = polygon;
+            }
+            else
+            {
+                m_polygons.push_back(polygon);
+            }
+            m_num_polygons++;
+        }
+    };
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

@@ -40,15 +40,15 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
         int material_index = model_sub_mesh.m_material_index;
         if(material_index != -1) { material = model.m_mesh->m_materials[material_index]; }
 
-        size_t num_polygons = model_sub_mesh.m_polygons.size();
+        size_t num_polygons = model_sub_mesh.m_wireframe.m_num_polygons;
         for(size_t j = 0; j < num_polygons; j++)
         {
-            model_sub_mesh_buffer0[j].resize(model_sub_mesh.m_polygons[j].m_num_vertices);
+            model_sub_mesh_buffer0[j].resize(model_sub_mesh.m_wireframe.m_polygons[j].m_num_vertices);
 
             Geometry::transformPolygon
             (
                 model_sub_mesh_buffer0[j],
-                model_sub_mesh.m_polygons[j],
+                model_sub_mesh.m_wireframe.m_polygons[j],
                 proj_view_model_matrix
             );
 

@@ -120,7 +120,8 @@ void TileRenderer::fillTriangle
     // Triangle area.
     //-----------------------------------------------------------------------------------------------------------------//
     float area = edge((float)v0_x, (float)v0_y, (float)v1_x, (float)v1_y, (float)v2_x, (float)v2_y);
-    if(Utils::checkFloatEquals(area, 0.0f)) { return; }
+    if(Utils::checkFloatEquals(area, 0.0f)) { return; } // Accept both clockwise and anti clockwise.
+    // if(area <= 0.0f) { return; } // Accept only counter clockwise winding order.
     //-----------------------------------------------------------------------------------------------------------------//
 
     //-----------------------------------------------------------------------------------------------------------------//
@@ -166,7 +167,12 @@ void TileRenderer::fillTriangle
             // Accept either winding order.
             bool all_non_negative = ( (w0 >= 0.0f) && (w1 >= 0.0f) && (w2 >= 0.0f) );
             bool all_non_positive = ( (w0 <= 0.0f) && (w1 <= 0.0f) && (w2 <= 0.0f) );
-            if(!(all_non_negative || all_non_positive)) { continue; }
+            if( (all_non_negative == false) && (all_non_positive == false) ) { continue; }
+
+            /*
+            // Accept only counter clockwise winding order.
+            if( (w0 < 0.0f) || (w1 < 0.0f) || (w2 < 0.0f) ) { continue; }
+            */
 
             // Compute barycentric coordinates.
             float alpha = w0 / area;

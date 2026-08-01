@@ -186,6 +186,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     ground_model.m_rotate_rad = 0.0f;
     ground_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
+    Mesh cube_mesh;
+    cube_mesh.loadMeshObjAndMtlFiles(6, "cube_mesh", "../assets/cube/", "obj.obj");
+    Model cube_model(16, "cube_model", &cube_mesh);
+    cube_model.m_position = Math::Vec3_f(0.0f, 2.0f, 0.0f);
+    cube_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_model.m_rotate_rad = 0.0f;
+    cube_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
     Mesh car_001_mesh;
     car_001_mesh.loadMeshObjAndMtlFiles(2, "car_001_mesh", "../assets/car_001/", "obj.obj");
     Model car_model(12, "car_001_model", &car_001_mesh);
@@ -290,6 +298,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
         }
         renderer.drawModel(ground_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
+        renderer.drawModel(cube_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
         t_00.join();
         t_01.join();
         t_02.join();

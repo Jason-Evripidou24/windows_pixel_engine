@@ -81,14 +81,14 @@ struct Model
 
         for(size_t i = 0; i < num_sub_meshes; i++)
         {
-            size_t polygon_count = m_mesh->m_sub_meshes[i].m_polygons.size();
+            size_t polygon_count = m_mesh->m_sub_meshes[i].m_wireframe.m_num_polygons;
 
             m_polygon_buffers.m_buffer0[i].resize(polygon_count);
             m_polygon_buffers.m_buffer1[i].resize(polygon_count);
 
             for(size_t j = 0; j < polygon_count; j++)
             {
-                size_t vertex_count = m_mesh->m_sub_meshes[i].m_polygons[j].m_num_vertices;
+                size_t vertex_count = m_mesh->m_sub_meshes[i].m_wireframe.m_polygons[j].m_num_vertices;
 
                 m_polygon_buffers.m_buffer0[i][j].resize(vertex_count + 6);
                 m_polygon_buffers.m_buffer1[i][j].resize(vertex_count + 6);

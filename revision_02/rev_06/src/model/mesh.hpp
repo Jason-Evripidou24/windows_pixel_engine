@@ -32,7 +32,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct SubMesh
 {
-    std::vector<Geometry::Polygon> m_polygons;
+    Geometry::Wireframe m_wireframe;
     int m_material_index;
 };
 
