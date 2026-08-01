@@ -64,6 +64,9 @@ struct Model
 
     Model(int model_id, const std::string& model_name, Mesh* mesh)
     {
+        m_model_id = model_id;
+        m_model_name = model_name;
+
         m_mesh = mesh;
         m_position = Math::Vec3_f();
         m_scale = Math::Vec3_f();

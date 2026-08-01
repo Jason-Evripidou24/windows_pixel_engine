@@ -41,56 +41,61 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-enum class ClipPlane
-{
-    MIN_X,
-    MAX_X,
-    MIN_Y,
-    MAX_Y,
-    MIN_Z,
-    MAX_Z
-};
-
-
 namespace Math
 {
+    //---------------------------------------------------------------------------------------------------------------------//
+    // World Space maths.
+    //---------------------------------------------------------------------------------------------------------------------//
+    /*
+    bool checkRayIntersectsPolygon
+    (
+        const Math::Vec3_f& origin,
+        const Math::Vec3_f& direction,
+        const Math::Polygon& polygon
+    );
+
+    bool checkLineSegmentIntersectsTriangle
+    (
+        const Math::Vec3_f& start_pos,
+        const Math::Vec3_f& end_pos,
+        const Math::Vec3_f& v0_pos,
+        const Math::Vec3_f& v1_pos,
+        const Math::Vec3_f& v2_pos
+    );
+    */
+    //---------------------------------------------------------------------------------------------------------------------//
+
     //---------------------------------------------------------------------------------------------------------------------//
     // Homogenous Space maths.
     //---------------------------------------------------------------------------------------------------------------------//
     float getVertexDistanceToPlaneMinX(const Math::Vertex& v);
     bool checkVertexInsidePlaneMinX(const Math::Vertex& v);
     Math::Vertex lineIntersectionWithPlaneMinX(const Math::Vertex& start, const Math::Vertex& end);
-    void clipPolygonAgainstPlaneMinX(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon);
     void clipPolygonAgainstPlaneMinX(Math::Polygon& output, const Math::Polygon& polygon);
 
     float getVertexDistanceToPlaneMaxX(const Math::Vertex& v);
     bool checkVertexInsidePlaneMaxX(const Math::Vertex& v);
     Math::Vertex lineIntersectionWithPlaneMaxX(const Math::Vertex& start, const Math::Vertex& end);
-    void clipPolygonAgainstPlaneMaxX(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon);
     void clipPolygonAgainstPlaneMaxX(Math::Polygon& output, const Math::Polygon& polygon);
 
     float getVertexDistanceToPlaneMinY(const Math::Vertex& v);
     bool checkVertexInsidePlaneMinY(const Math::Vertex& v);
     Math::Vertex lineIntersectionWithPlaneMinY(const Math::Vertex& start, const Math::Vertex& end);
-    void clipPolygonAgainstPlaneMinY(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon);
     void clipPolygonAgainstPlaneMinY(Math::Polygon& output, const Math::Polygon& polygon);
 
     float getVertexDistanceToPlaneMaxY(const Math::Vertex& v);
     bool checkVertexInsidePlaneMaxY(const Math::Vertex& v);
     Math::Vertex lineIntersectionWithPlaneMaxY(const Math::Vertex& start, const Math::Vertex& end);
-    void clipPolygonAgainstPlaneMaxY(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon);
     void clipPolygonAgainstPlaneMaxY(Math::Polygon& output, const Math::Polygon& polygon);
 
     float getVertexDistanceToPlaneMinZ(const Math::Vertex& v);
     bool checkVertexInsidePlaneMinZ(const Math::Vertex& v);
     Math::Vertex lineIntersectionWithPlaneMinZ(const Math::Vertex& start, const Math::Vertex& end);
-    void clipPolygonAgainstPlaneMinZ(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon);
     void clipPolygonAgainstPlaneMinZ(Math::Polygon& output, const Math::Polygon& polygon);
 
     float getVertexDistanceToPlaneMaxZ(const Math::Vertex& v);
     bool checkVertexInsidePlaneMaxZ(const Math::Vertex& v);
     Math::Vertex lineIntersectionWithPlaneMaxZ(const Math::Vertex& start, const Math::Vertex& end);
-    void clipPolygonAgainstPlaneMaxZ(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon);
     void clipPolygonAgainstPlaneMaxZ(Math::Polygon& output, const Math::Polygon& polygon);
     //---------------------------------------------------------------------------------------------------------------------//
     
@@ -134,6 +139,7 @@ namespace Math
     // Triangle transform, perspective divide and clipping between the geometric planes.
     //---------------------------------------------------------------------------------------------------------------------//
     void transformVertex(Vertex& output, const Vertex& vertex, const Mat4_f& matrix);
+    void transformPolygon(Polygon& output, const Polygon& polygon, const Mat4_f& matrix);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//

@@ -29,47 +29,50 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
 
     const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
 
-    for(size_t i = 0; i < model.m_mesh->m_sub_meshes.size(); i++)
+    size_t num_sub_meshes = model.m_mesh->m_sub_meshes.size();
+    for(size_t i = 0; i < num_sub_meshes; i++)
     {
+        SubMesh& model_sub_mesh = model.m_mesh->m_sub_meshes[i];
+        std::vector<Math::Polygon>& model_sub_mesh_buffer0 = model.m_polygon_buffers.m_buffer0[i];
+        std::vector<Math::Polygon>& model_sub_mesh_buffer1 = model.m_polygon_buffers.m_buffer1[i];
+
         Material* material = nullptr;
-        int material_index = model.m_mesh->m_sub_meshes[i].m_material_index;
+        int material_index = model_sub_mesh.m_material_index;
         if(material_index != -1) { material = model.m_mesh->m_materials[material_index]; }
 
-        for(size_t j = 0; j < model.m_mesh->m_sub_meshes[i].m_polygons.size(); j++)
+        size_t num_polygons = model_sub_mesh.m_polygons.size();
+        for(size_t j = 0; j < num_polygons; j++)
         {
-            model.m_polygon_buffers.m_buffer0[i][j].resize(model.m_mesh->m_sub_meshes[i].m_polygons[j].m_num_vertices);
+            model_sub_mesh_buffer0[j].resize(model_sub_mesh.m_polygons[j].m_num_vertices);
 
-            for(size_t k = 0; k < model.m_mesh->m_sub_meshes[i].m_polygons[j].m_num_vertices; k++)
+            Math::transformPolygon
+            (
+                model_sub_mesh_buffer0[j],
+                model_sub_mesh.m_polygons[j],
+                proj_view_model_matrix
+            );
+
+            Math::clipPolygonAgainstPlaneMinX(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
+            Math::clipPolygonAgainstPlaneMaxX(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+            Math::clipPolygonAgainstPlaneMinY(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
+            Math::clipPolygonAgainstPlaneMaxY(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+            Math::clipPolygonAgainstPlaneMinZ(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
+            Math::clipPolygonAgainstPlaneMaxZ(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+
+            for(size_t k = 0; k < model_sub_mesh_buffer0[j].m_num_vertices; k++)
             {
-                Math::transformVertex
-                (
-                    model.m_polygon_buffers.m_buffer0[i][j].m_vertices[k],
-                    model.m_mesh->m_sub_meshes[i].m_polygons[j].m_vertices[k],
-                    proj_view_model_matrix
-                );
-            }
-
-            Math::clipPolygonAgainstPlaneMinX(model.m_polygon_buffers.m_buffer1[i][j], model.m_polygon_buffers.m_buffer0[i][j]);
-            Math::clipPolygonAgainstPlaneMaxX(model.m_polygon_buffers.m_buffer0[i][j], model.m_polygon_buffers.m_buffer1[i][j]);
-            Math::clipPolygonAgainstPlaneMinY(model.m_polygon_buffers.m_buffer1[i][j], model.m_polygon_buffers.m_buffer0[i][j]);
-            Math::clipPolygonAgainstPlaneMaxY(model.m_polygon_buffers.m_buffer0[i][j], model.m_polygon_buffers.m_buffer1[i][j]);
-            Math::clipPolygonAgainstPlaneMinZ(model.m_polygon_buffers.m_buffer1[i][j], model.m_polygon_buffers.m_buffer0[i][j]);
-            Math::clipPolygonAgainstPlaneMaxZ(model.m_polygon_buffers.m_buffer0[i][j], model.m_polygon_buffers.m_buffer1[i][j]);
-
-            for(size_t k = 0; k < model.m_polygon_buffers.m_buffer0[i][j].m_num_vertices; k++)
-            {
-                if(Utils::checkFloatEquals(model.m_polygon_buffers.m_buffer0[i][j].m_vertices[k].m_position.m_data[3], 0.0f))
+                if(Utils::checkFloatEquals(model_sub_mesh_buffer0[j].m_vertices[k].m_position.m_data[3], 0.0f))
                 {
-                    model.m_polygon_buffers.m_buffer0[i][j].clear();
+                    model_sub_mesh_buffer0[j].clear();
                     break;
                 }
-                model.m_polygon_buffers.m_buffer0[i][j].m_vertices[k].perspectiveDivide();
+                model_sub_mesh_buffer0[j].m_vertices[k].perspectiveDivide();
             }
-            if(model.m_polygon_buffers.m_buffer0[i][j].m_num_vertices < 3) { continue; }
+            if(model_sub_mesh_buffer0[j].m_num_vertices < 3) { continue; }
 
             this->sendPolygonToTiles
             (
-                &(model.m_polygon_buffers.m_buffer0[i][j]),
+                &(model_sub_mesh_buffer0[j]),
                 material,
                 draw_filled,
                 color_mix,

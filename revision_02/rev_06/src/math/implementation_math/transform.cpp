@@ -24,3 +24,16 @@ void Math::transformVertex(Vertex& output, const Vertex& vertex, const Mat4_f& m
     output.m_position = matrix * vertex.m_position;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Math::transformPolygon(Polygon& output, const Polygon& polygon, const Mat4_f& matrix)
+{
+    output.resize(polygon.m_num_vertices);
+
+    for(size_t i = 0; i < polygon.m_num_vertices; i++)
+    {
+        Math::transformVertex(output.m_vertices[i], polygon.m_vertices[i], matrix);
+    }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
