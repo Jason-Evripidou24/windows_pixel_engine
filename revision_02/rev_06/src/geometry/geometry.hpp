@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef MODEL_HPP
-#define MODEL_HPP
+#ifndef GEOMETRY_HPP
+#define GEOMETRY_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <queue>
+#include <cstdint>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -20,87 +20,26 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "mesh.hpp"
-
-#include "../math/math.hpp"
-#include "../math/mat4_f.hpp"
-#include "../math/vec3_f.hpp"
+#include "polygon.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct PolygonBuffers
-{
-    std::vector<std::vector<Geometry::Polygon>> m_buffer0;
-    std::vector<std::vector<Geometry::Polygon>> m_buffer1;
-};
-
-struct Model
+namespace Geometry
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    int m_model_id;
-    std::string m_model_name;
-
-    Mesh* m_mesh;
-
-    Math::Vec3_f m_position;
-    Math::Vec3_f m_scale;
-    float m_rotate_rad;
-    Math::Vec3_f m_rotate_axis;
-
-    PolygonBuffers m_polygon_buffers;
+    // Homogenous Space clipping of polygons.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void clipPolygonAgainstPlaneMinX(Geometry::Polygon& output, const Geometry::Polygon& polygon);
+    void clipPolygonAgainstPlaneMaxX(Geometry::Polygon& output, const Geometry::Polygon& polygon);
+    void clipPolygonAgainstPlaneMinY(Geometry::Polygon& output, const Geometry::Polygon& polygon);
+    void clipPolygonAgainstPlaneMaxY(Geometry::Polygon& output, const Geometry::Polygon& polygon);
+    void clipPolygonAgainstPlaneMinZ(Geometry::Polygon& output, const Geometry::Polygon& polygon);
+    void clipPolygonAgainstPlaneMaxZ(Geometry::Polygon& output, const Geometry::Polygon& polygon);
     //---------------------------------------------------------------------------------------------------------------------//
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    Model()
-    {
-        m_mesh = nullptr;
-        m_position = Math::Vec3_f();
-        m_scale = Math::Vec3_f();
-        m_rotate_rad = 0.0f;
-        m_rotate_axis = Math::Vec3_f();
-    }
-
-    Model(int model_id, const std::string& model_name, Mesh* mesh)
-    {
-        m_model_id = model_id;
-        m_model_name = model_name;
-
-        m_mesh = mesh;
-        m_position = Math::Vec3_f();
-        m_scale = Math::Vec3_f();
-        m_rotate_rad = 0.0f;
-        m_rotate_axis = Math::Vec3_f();
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        size_t num_sub_meshes = m_mesh->m_sub_meshes.size();
-
-        m_polygon_buffers.m_buffer0.resize(num_sub_meshes);
-        m_polygon_buffers.m_buffer1.resize(num_sub_meshes);
-
-        for(size_t i = 0; i < num_sub_meshes; i++)
-        {
-            size_t polygon_count = m_mesh->m_sub_meshes[i].m_polygons.size();
-
-            m_polygon_buffers.m_buffer0[i].resize(polygon_count);
-            m_polygon_buffers.m_buffer1[i].resize(polygon_count);
-
-            for(size_t j = 0; j < polygon_count; j++)
-            {
-                size_t vertex_count = m_mesh->m_sub_meshes[i].m_polygons[j].m_num_vertices;
-
-                m_polygon_buffers.m_buffer0[i][j].resize(vertex_count + 6);
-                m_polygon_buffers.m_buffer1[i][j].resize(vertex_count + 6);
-            }
-        }
-        //-----------------------------------------------------------------------------------------------------------------//
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    Math::Mat4_f calcModelMatrix() const;
-    //---------------------------------------------------------------------------------------------------------------------//
+    void transformPolygon(Geometry::Polygon& output, const Geometry::Polygon& polygon, const Math::Mat4_f& matrix);
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

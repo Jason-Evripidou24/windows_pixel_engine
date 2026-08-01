@@ -33,8 +33,8 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
     for(size_t i = 0; i < num_sub_meshes; i++)
     {
         SubMesh& model_sub_mesh = model.m_mesh->m_sub_meshes[i];
-        std::vector<Math::Polygon>& model_sub_mesh_buffer0 = model.m_polygon_buffers.m_buffer0[i];
-        std::vector<Math::Polygon>& model_sub_mesh_buffer1 = model.m_polygon_buffers.m_buffer1[i];
+        std::vector<Geometry::Polygon>& model_sub_mesh_buffer0 = model.m_polygon_buffers.m_buffer0[i];
+        std::vector<Geometry::Polygon>& model_sub_mesh_buffer1 = model.m_polygon_buffers.m_buffer1[i];
 
         Material* material = nullptr;
         int material_index = model_sub_mesh.m_material_index;
@@ -45,19 +45,19 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
         {
             model_sub_mesh_buffer0[j].resize(model_sub_mesh.m_polygons[j].m_num_vertices);
 
-            Math::transformPolygon
+            Geometry::transformPolygon
             (
                 model_sub_mesh_buffer0[j],
                 model_sub_mesh.m_polygons[j],
                 proj_view_model_matrix
             );
 
-            Math::clipPolygonAgainstPlaneMinX(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
-            Math::clipPolygonAgainstPlaneMaxX(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
-            Math::clipPolygonAgainstPlaneMinY(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
-            Math::clipPolygonAgainstPlaneMaxY(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
-            Math::clipPolygonAgainstPlaneMinZ(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
-            Math::clipPolygonAgainstPlaneMaxZ(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+            Geometry::clipPolygonAgainstPlaneMinX(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
+            Geometry::clipPolygonAgainstPlaneMaxX(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+            Geometry::clipPolygonAgainstPlaneMinY(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
+            Geometry::clipPolygonAgainstPlaneMaxY(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+            Geometry::clipPolygonAgainstPlaneMinZ(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
+            Geometry::clipPolygonAgainstPlaneMaxZ(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
 
             for(size_t k = 0; k < model_sub_mesh_buffer0[j].m_num_vertices; k++)
             {

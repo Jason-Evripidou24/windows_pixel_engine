@@ -250,7 +250,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     };
     presets preset_00(1400, 900, 1, 10, 10, 800);
     presets preset_01(1360, 900, 2, 10, 10, 360);
-    presets& preset_to_use = preset_00;
+    presets& preset_to_use = preset_01;
 
     Window window;
     //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }

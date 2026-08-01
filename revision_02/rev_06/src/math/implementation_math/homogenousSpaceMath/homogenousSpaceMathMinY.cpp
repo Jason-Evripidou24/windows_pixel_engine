@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -12,43 +13,45 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../tile_renderer.hpp"
+#include "../../math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::drawPolygon
-(
-    const Geometry::Polygon* polygon,
-    const Material*          material,
-    bool                     draw_filled,
-    float                    color_mix
-)
+// Vertex is in Homogenous Space.
+float Math::getVertexDistanceToPlaneMinY(const Math::Vertex& v)
 {
-    if(draw_filled == true)
-    {
-        for(size_t i = 1; i < polygon->m_num_vertices - 1; i++)
-        {
-            const Math::Vertex* v0 = &((polygon->m_vertices)[0]);
-            const Math::Vertex* v1 = &((polygon->m_vertices)[i]);
-            const Math::Vertex* v2 = &((polygon->m_vertices)[i + 1]);
-
-            fillTriangle(v0, v1, v2, material, color_mix);
-        }
-    }
-    else
-    {
-        for(size_t i = 1; i < polygon->m_num_vertices - 1; i++)
-        {
-            const Math::Vertex* v0 = &((polygon->m_vertices)[0]);
-            const Math::Vertex* v1 = &((polygon->m_vertices)[i]);
-            const Math::Vertex* v2 = &((polygon->m_vertices)[i + 1]);
-
-            drawLine(v0, v1, material, color_mix);
-            drawLine(v0, v2, material, color_mix);
-            drawLine(v1, v2, material, color_mix);
-        }
-    }
-
+    // y + w
+    return v.m_position.m_data[1] + v.m_position.m_data[3];
 }
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+// Vertex is in Homogenous Space.
+bool Math::checkVertexInsidePlaneMinY(const Math::Vertex& v)
+{
+    // (y >= -w) => (y + w >= 0)
+    return Math::getVertexDistanceToPlaneMinY(v) >= 0.0f;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+/*
+-   Vertices are in Homogenous Space.
+-   Assumed the line between start and end cross min plane x.
+*/
+Math::Vertex Math::lineIntersectionWithPlaneMinY(const Math::Vertex& start, const Math::Vertex& end)
+{
+    float d0 = Math::getVertexDistanceToPlaneMinY(start);
+    float d1 = Math::getVertexDistanceToPlaneMinY(end);
+
+    float t = d0 / (d0 - d1);
+
+    Math::Vertex result;
+    Math::interpolateVertex(result, start, end, t);
+    return result;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

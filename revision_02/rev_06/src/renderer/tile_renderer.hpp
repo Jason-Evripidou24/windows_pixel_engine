@@ -36,7 +36,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TileRendererJob
 {
-    const Math::Polygon*     m_polygon;
+    const Geometry::Polygon* m_polygon;
     const Material*          m_material;
     bool                     m_draw_filled;
     float                    m_color_mix;
@@ -57,7 +57,7 @@ struct TileRendererJob
 
     TileRendererJob
     (
-        const Math::Polygon*     polygon,
+        const Geometry::Polygon* polygon,
         const Material*          material,
         bool                     draw_filled,
         float                    color_mix,
@@ -107,7 +107,7 @@ struct TileRenderer
     void workerFunction();
     void submitJob
     (
-        const Math::Polygon*     polygon,
+        const Geometry::Polygon* polygon,
         const Material*          material,
         bool                     draw_filled,
         float                    color_mix,
@@ -136,10 +136,10 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawPolygon
     (
-        const Math::Polygon* polygon,
-        const Material*      material,
-        bool                 draw_filled,
-        float                color_mix
+        const Geometry::Polygon* polygon,
+        const Material*          material,
+        bool                     draw_filled,
+        float                    color_mix
     );
 
     void fillTriangle

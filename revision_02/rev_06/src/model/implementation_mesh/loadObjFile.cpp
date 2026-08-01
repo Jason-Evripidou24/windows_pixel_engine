@@ -183,7 +183,7 @@ std::vector<ObjVertexInfo> parseFace(std::stringstream& stream)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Math::Polygon createPolygon
+Geometry::Polygon createPolygon
 (
     const std::vector<ObjVertexInfo>& face_vertices,
     const std::vector<std::pair<Math::Vec4_f, Math::Vec4_f>>& vertex_positions_and_colors,
@@ -191,7 +191,7 @@ Math::Polygon createPolygon
     const std::vector<Math::Vec3_f>& vertex_normals
 )
 {
-    Math::Polygon new_polygon;
+    Geometry::Polygon new_polygon;
 
     for(size_t i = 0; i < face_vertices.size(); i++)
     {
@@ -336,7 +336,7 @@ void Mesh::loadObjFile(const std::string& file_folder, const std::string& filena
         {
             std::vector<ObjVertexInfo> face_indices = parseFace(ss);
 
-            Math::Polygon new_polygon = createPolygon
+            Geometry::Polygon new_polygon = createPolygon
             (
                 face_indices,
                 vertex_positions_and_colors,

@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -12,43 +13,39 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../tile_renderer.hpp"
+#include "../geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::drawPolygon
-(
-    const Geometry::Polygon* polygon,
-    const Material*          material,
-    bool                     draw_filled,
-    float                    color_mix
-)
+void Geometry::clipPolygonAgainstPlaneMinY(Geometry::Polygon& output, const Geometry::Polygon& polygon)
 {
-    if(draw_filled == true)
-    {
-        for(size_t i = 1; i < polygon->m_num_vertices - 1; i++)
-        {
-            const Math::Vertex* v0 = &((polygon->m_vertices)[0]);
-            const Math::Vertex* v1 = &((polygon->m_vertices)[i]);
-            const Math::Vertex* v2 = &((polygon->m_vertices)[i + 1]);
+    output.clear();
 
-            fillTriangle(v0, v1, v2, material, color_mix);
+    if(polygon.m_num_vertices == 0) { return; }
+
+    for(size_t i = 0; i < polygon.m_num_vertices; i++)
+    {
+        const Math::Vertex& current  = polygon.m_vertices[i];
+        const Math::Vertex& previous = polygon.m_vertices[(i + polygon.m_num_vertices - 1) % polygon.m_num_vertices];
+
+        bool current_inside = Math::checkVertexInsidePlaneMinY(current);
+        bool previous_inside = Math::checkVertexInsidePlaneMinY(previous);
+
+        if( (current_inside == true) && (previous_inside == true) )
+        {
+            output.addVertex(current);
+        }
+        else if( (current_inside == false) && (previous_inside == true) )
+        {
+            output.addVertex( Math::lineIntersectionWithPlaneMinY(previous, current) );
+        }
+        else if( (current_inside == true) && (previous_inside == false) )
+        {
+            output.addVertex( Math::lineIntersectionWithPlaneMinY(previous, current) );
+            output.addVertex(current);
         }
     }
-    else
-    {
-        for(size_t i = 1; i < polygon->m_num_vertices - 1; i++)
-        {
-            const Math::Vertex* v0 = &((polygon->m_vertices)[0]);
-            const Math::Vertex* v1 = &((polygon->m_vertices)[i]);
-            const Math::Vertex* v2 = &((polygon->m_vertices)[i + 1]);
-
-            drawLine(v0, v1, material, color_mix);
-            drawLine(v0, v2, material, color_mix);
-            drawLine(v1, v2, material, color_mix);
-        }
-    }
-
 }
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

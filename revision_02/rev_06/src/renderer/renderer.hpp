@@ -93,7 +93,7 @@ struct Renderer
 
     void sendPolygonToTiles
     (
-        const Math::Polygon*     polygon,
+        const Geometry::Polygon* polygon,
         const Material*          material,
         bool                     draw_filled,
         float                    color_mix,

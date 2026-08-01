@@ -13,52 +13,13 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../math.hpp"
+#include "../geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-// Vertex is in Homogenous Space.
-float Math::getVertexDistanceToPlaneMaxY(const Math::Vertex& v)
-{
-    // y - w
-    return v.m_position.m_data[1] - v.m_position.m_data[3];
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-// Vertex is in Homogenous Space.
-bool Math::checkVertexInsidePlaneMaxY(const Math::Vertex& v)
-{
-    // (y <= w) => (y - w <= 0)
-    return Math::getVertexDistanceToPlaneMaxY(v) <= 0.0f;
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Vertices are in Homogenous Space.
--   Assumed the line between start and end cross min plane x.
-*/
-Math::Vertex Math::lineIntersectionWithPlaneMaxY(const Math::Vertex& start, const Math::Vertex& end)
-{
-    float d0 = Math::getVertexDistanceToPlaneMaxY(start);
-    float d1 = Math::getVertexDistanceToPlaneMaxY(end);
-
-    float t = d0 / (d0 - d1);
-
-    Math::Vertex result;
-    Math::interpolateVertex(result, start, end, t);
-    return result;
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Math::clipPolygonAgainstPlaneMaxY(Math::Polygon& output, const Math::Polygon& polygon)
+void Geometry::clipPolygonAgainstPlaneMaxZ(Geometry::Polygon& output, const Geometry::Polygon& polygon)
 {
     output.clear();
 
@@ -69,8 +30,8 @@ void Math::clipPolygonAgainstPlaneMaxY(Math::Polygon& output, const Math::Polygo
         const Math::Vertex& current  = polygon.m_vertices[i];
         const Math::Vertex& previous = polygon.m_vertices[(i + polygon.m_num_vertices - 1) % polygon.m_num_vertices];
 
-        bool current_inside = Math::checkVertexInsidePlaneMaxY(current);
-        bool previous_inside = Math::checkVertexInsidePlaneMaxY(previous);
+        bool current_inside = Math::checkVertexInsidePlaneMaxZ(current);
+        bool previous_inside = Math::checkVertexInsidePlaneMaxZ(previous);
 
         if( (current_inside == true) && (previous_inside == true) )
         {
@@ -78,11 +39,11 @@ void Math::clipPolygonAgainstPlaneMaxY(Math::Polygon& output, const Math::Polygo
         }
         else if( (current_inside == false) && (previous_inside == true) )
         {
-            output.addVertex( Math::lineIntersectionWithPlaneMaxY(previous, current) );
+            output.addVertex( Math::lineIntersectionWithPlaneMaxZ(previous, current) );
         }
         else if( (current_inside == true) && (previous_inside == false) )
         {
-            output.addVertex( Math::lineIntersectionWithPlaneMaxY(previous, current) );
+            output.addVertex( Math::lineIntersectionWithPlaneMaxZ(previous, current) );
             output.addVertex(current);
         }
     }

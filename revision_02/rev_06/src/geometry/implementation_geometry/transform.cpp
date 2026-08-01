@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -12,43 +13,19 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../tile_renderer.hpp"
+#include "../geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::drawPolygon
-(
-    const Geometry::Polygon* polygon,
-    const Material*          material,
-    bool                     draw_filled,
-    float                    color_mix
-)
+void Geometry::transformPolygon(Geometry::Polygon& output, const Geometry::Polygon& polygon, const Math::Mat4_f& matrix)
 {
-    if(draw_filled == true)
+    output.resize(polygon.m_num_vertices);
+
+    for(size_t i = 0; i < polygon.m_num_vertices; i++)
     {
-        for(size_t i = 1; i < polygon->m_num_vertices - 1; i++)
-        {
-            const Math::Vertex* v0 = &((polygon->m_vertices)[0]);
-            const Math::Vertex* v1 = &((polygon->m_vertices)[i]);
-            const Math::Vertex* v2 = &((polygon->m_vertices)[i + 1]);
-
-            fillTriangle(v0, v1, v2, material, color_mix);
-        }
+        Math::transformVertex(output.m_vertices[i], polygon.m_vertices[i], matrix);
     }
-    else
-    {
-        for(size_t i = 1; i < polygon->m_num_vertices - 1; i++)
-        {
-            const Math::Vertex* v0 = &((polygon->m_vertices)[0]);
-            const Math::Vertex* v1 = &((polygon->m_vertices)[i]);
-            const Math::Vertex* v2 = &((polygon->m_vertices)[i + 1]);
-
-            drawLine(v0, v1, material, color_mix);
-            drawLine(v0, v2, material, color_mix);
-            drawLine(v1, v2, material, color_mix);
-        }
-    }
-
 }
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -19,23 +19,23 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "vertex.hpp"
+#include "../math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-namespace Math
+namespace Geometry
 {
     struct Polygon
     {
         size_t m_num_vertices;
-        std::vector<Vertex> m_vertices;
+        std::vector<Math::Vertex> m_vertices;
 
         Polygon()
         {
             m_num_vertices = 0;
-            m_vertices = std::vector<Vertex>();
+            m_vertices = std::vector<Math::Vertex>();
         }
 
         inline void clear()
@@ -52,7 +52,7 @@ namespace Math
             }
         }
 
-        inline void addVertex(const Vertex& vertex)
+        inline void addVertex(const Math::Vertex& vertex)
         {
             if(m_num_vertices < m_vertices.size())
             {
