@@ -37,8 +37,8 @@ struct SubMesh
 struct Mesh
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    std::string m_mesh_name;
     int m_mesh_id;
+    std::string m_mesh_name;
 
     std::vector<Material*> m_materials;
     std::unordered_map<std::string, int> m_material_name_to_index;
@@ -92,8 +92,8 @@ struct Mesh
     // Scan for mtl files first and call loadMtlFile on each of them, then call loadObjFile.
     void loadMeshObjAndMtlFiles
     (
+        int                mesh_id,
         const std::string& mesh_name,
-        int mesh_id,
         const std::string& file_folder,
         const std::string& filename
     );

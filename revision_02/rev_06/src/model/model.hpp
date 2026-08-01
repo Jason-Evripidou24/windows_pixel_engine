@@ -39,6 +39,9 @@ struct PolygonBuffers
 struct Model
 {
     //---------------------------------------------------------------------------------------------------------------------//
+    int m_model_id;
+    std::string m_model_name;
+
     Mesh* m_mesh;
 
     Math::Vec3_f m_position;
@@ -59,7 +62,7 @@ struct Model
         m_rotate_axis = Math::Vec3_f();
     }
 
-    Model(Mesh* mesh)
+    Model(int model_id, const std::string& model_name, Mesh* mesh)
     {
         m_mesh = mesh;
         m_position = Math::Vec3_f();

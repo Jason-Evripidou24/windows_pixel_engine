@@ -38,12 +38,12 @@ namespace Math
             m_vertices = std::vector<Vertex>();
         }
 
-        void clear()
+        inline void clear()
         {
             m_num_vertices = 0;
         }
 
-        void resize(size_t size)
+        inline void resize(size_t size)
         {
             m_num_vertices = size;
             if(m_vertices.size() < size)
@@ -52,7 +52,7 @@ namespace Math
             }
         }
 
-        void addVertex(const Vertex& vertex)
+        inline void addVertex(const Vertex& vertex)
         {
             if(m_num_vertices < m_vertices.size())
             {

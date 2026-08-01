@@ -13,7 +13,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../math.hpp"
+#include "../../math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -53,39 +53,6 @@ Math::Vertex Math::lineIntersectionWithPlaneMinY(const Math::Vertex& start, cons
     Math::Vertex result;
     Math::interpolateVertex(result, start, end, t);
     return result;
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Math::clipPolygonAgainstPlaneMinY(std::vector<Math::Vertex>& output, const std::vector<Math::Vertex>& polygon)
-{
-    output.clear();
-
-    if(polygon.empty() == true) { return; }
-
-    for(size_t i = 0; i < polygon.size(); i++)
-    {
-        const Math::Vertex& current  = polygon[i];
-        const Math::Vertex& previous = polygon[(i + polygon.size() - 1) % polygon.size()];
-
-        bool current_inside = Math::checkVertexInsidePlaneMinY(current);
-        bool previous_inside = Math::checkVertexInsidePlaneMinY(previous);
-
-        if( (current_inside == true) && (previous_inside == true) )
-        {
-            output.push_back(current);
-        }
-        else if( (current_inside == false) && (previous_inside == true) )
-        {
-            output.push_back( Math::lineIntersectionWithPlaneMinY(previous, current) );
-        }
-        else if( (current_inside == true) && (previous_inside == false) )
-        {
-            output.push_back( Math::lineIntersectionWithPlaneMinY(previous, current) );
-            output.push_back(current);
-        }
-    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

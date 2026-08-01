@@ -156,25 +156,19 @@ void processInput(Window& window, float delta_time)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Mesh ground_mesh;
-    ground_mesh.loadMeshObjAndMtlFiles("ground_mesh", 0, "../assets/ground/", "obj.obj");
-    Model ground_model(&ground_mesh);
-    ground_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
-    ground_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
-    ground_model.m_rotate_rad = 0.0f;
-    ground_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
-
     std::random_device rd;
     std::mt19937 rng(rd());
     std::uniform_real_distribution<float> pos_dist(-19.8f, 19.8f);
     std::uniform_real_distribution<float> scale_dist(0.2f, 0.3f);
     std::uniform_real_distribution<float> rotation_dist(0.0f, 2.0f * 3.1415f);
     Mesh tree_mesh;
-    tree_mesh.loadMeshObjAndMtlFiles("tree_mesh", 1, "../assets/tree_001/", "obj.obj");
-    std::vector<Model> tree_models(10, Model(&tree_mesh));
+    tree_mesh.loadMeshObjAndMtlFiles(1, "tree_mesh", "../assets/tree_001/", "obj.obj");
+    std::vector<Model> tree_models(10);
 
     for (size_t i = 0; i < tree_models.size(); i++)
     {
+        tree_models[i] = Model(i, "tree_model", &tree_mesh);
+
         float scale = scale_dist(rng);
 
         tree_models[i].m_position = Math::Vec3_f(pos_dist(rng), 0.0f, pos_dist(rng));
@@ -184,33 +178,41 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         tree_models[i].m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
     }
 
+    Mesh ground_mesh;
+    ground_mesh.loadMeshObjAndMtlFiles(0, "ground_mesh", "../assets/ground/", "obj.obj");
+    Model ground_model(11, "ground_model", &ground_mesh);
+    ground_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
+    ground_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    ground_model.m_rotate_rad = 0.0f;
+    ground_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
     Mesh car_001_mesh;
-    car_001_mesh.loadMeshObjAndMtlFiles("car_001_mesh", 2, "../assets/car_001/", "obj.obj");
-    Model car_model(&car_001_mesh);
+    car_001_mesh.loadMeshObjAndMtlFiles(2, "car_001_mesh", "../assets/car_001/", "obj.obj");
+    Model car_model(12, "car_001_model", &car_001_mesh);
     car_model.m_position = Math::Vec3_f(-7.0f, 0.0f, 12.0f);
     car_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
     car_model.m_rotate_rad = 0.0f;
     car_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_001_mesh;
-    house_001_mesh.loadMeshObjAndMtlFiles("house_001_mesh", 3, "../assets/house_001/", "obj.obj");
-    Model house_001_model(&house_001_mesh);
+    house_001_mesh.loadMeshObjAndMtlFiles(3, "house_001_mesh", "../assets/house_001/", "obj.obj");
+    Model house_001_model(13, "house_001_model", &house_001_mesh);
     house_001_model.m_position = Math::Vec3_f(-30.0f, 0.0f, 30.0f);
     house_001_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
     house_001_model.m_rotate_rad = Math::convertDegreesToRadians(310.0f);
     house_001_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_002_mesh;
-    house_002_mesh.loadMeshObjAndMtlFiles("house_002_mesh", 4, "../assets/house_002/", "obj.obj");
-    Model house_002_model(&house_002_mesh);
+    house_002_mesh.loadMeshObjAndMtlFiles(4, "house_002_mesh", "../assets/house_002/", "obj.obj");
+    Model house_002_model(14, "house_002_model", &house_002_mesh);
     house_002_model.m_position = Math::Vec3_f(-30.0f, 0.0f, -30.0f);
     house_002_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
     house_002_model.m_rotate_rad = Math::convertDegreesToRadians(220.0f);
     house_002_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_003_mesh;
-    house_003_mesh.loadMeshObjAndMtlFiles("house_003_mesh", 5, "../assets/house_003/", "obj.obj");
-    Model house_003_model(&house_003_mesh);
+    house_003_mesh.loadMeshObjAndMtlFiles(5, "house_003_mesh", "../assets/house_003/", "obj.obj");
+    Model house_003_model(15, "house_003_model", &house_003_mesh);
     house_003_model.m_position = Math::Vec3_f(20.0f, 1.5f, 20.0f);
     house_003_model.m_scale = Math::Vec3_f(3.0f, 3.0f, 3.0f);
     house_003_model.m_rotate_rad = Math::convertDegreesToRadians(220.0f);
@@ -248,7 +250,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     };
     presets preset_00(1400, 900, 1, 10, 10, 800);
     presets preset_01(1360, 900, 2, 10, 10, 360);
-    presets& preset_to_use = preset_01;
+    presets& preset_to_use = preset_00;
 
     Window window;
     //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }

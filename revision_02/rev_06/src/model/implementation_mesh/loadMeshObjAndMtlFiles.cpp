@@ -30,8 +30,8 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Mesh::loadMeshObjAndMtlFiles
 (
+    int                mesh_id,
     const std::string& mesh_name,
-    int mesh_id,
     const std::string& file_folder,
     const std::string& filename
 )
