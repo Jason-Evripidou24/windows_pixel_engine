@@ -206,7 +206,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     car_002_mesh.loadMeshObjAndMtlFiles(2, "car_002_mesh", "../assets/car_002/", "model.obj");
     car_002_mesh.loadObjFileHitbox("../assets/car_002/", "model.obj");
     Model car_002_model(12, "car_001_model", &car_002_mesh);
-    car_002_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
+    car_002_model.m_position = Math::Vec3_f(30.0f, 0.0f, -30.0f);
     car_002_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
     car_002_model.m_rotate_rad = 0.0f;
     car_002_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
@@ -310,7 +310,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
         }
         renderer.drawModel(ground_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
-        renderer.drawModel(cube_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
         t_00.join();
         t_01.join();
         t_02.join();
@@ -334,11 +333,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             {
                 Geometry::Polygon& polygon = car_002_mesh.m_hitboxes[i].m_wireframe.m_polygons[j];
 
-                for(size_t k = 1; k < polygon.m_num_vertices - 1; k++)
+                Geometry::Polygon transformed_polygon;
+                transformed_polygon.resize(polygon.m_num_vertices);
+
+                Geometry::transformPolygon(transformed_polygon, polygon, car_002_model.calcModelMatrix());
+
+                for(size_t k = 1; k < transformed_polygon.m_num_vertices - 1; k++)
                 {
-                    const Math::Vec4_f& v0 = polygon.m_vertices[0].m_position;
-                    const Math::Vec4_f& v1 = polygon.m_vertices[k].m_position;
-                    const Math::Vec4_f& v2 = polygon.m_vertices[k + 1].m_position;
+                    const Math::Vec4_f& v0 = transformed_polygon.m_vertices[0].m_position;
+                    const Math::Vec4_f& v1 = transformed_polygon.m_vertices[k].m_position;
+                    const Math::Vec4_f& v2 = transformed_polygon.m_vertices[k + 1].m_position;
 
                     Math::Vec3_f v0_pos = Math::Vec3_f(v0.m_data[0], v0.m_data[1], v0.m_data[2]);
                     Math::Vec3_f v1_pos = Math::Vec3_f(v1.m_data[0], v1.m_data[1], v1.m_data[2]);
