@@ -194,13 +194,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     cube_model.m_rotate_rad = 0.0f;
     cube_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
-    Mesh car_001_mesh;
-    car_001_mesh.loadMeshObjAndMtlFiles(2, "car_001_mesh", "../assets/car_001/", "obj.obj");
-    Model car_model(12, "car_001_model", &car_001_mesh);
-    car_model.m_position = Math::Vec3_f(-7.0f, 0.0f, 12.0f);
-    car_model.m_scale = Math::Vec3_f(2.0f, 2.0f, 2.0f);
-    car_model.m_rotate_rad = 0.0f;
-    car_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+    Mesh backpack_mesh;
+    backpack_mesh.loadMeshObjAndMtlFiles(7, "backpack_mesh", "../assets/backpack/", "obj.obj");
+    Model backpack_model(17, "backpack_model", &backpack_mesh);
+    backpack_model.m_position = Math::Vec3_f(5.0f, 2.0f, 5.0f);
+    backpack_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    backpack_model.m_rotate_rad = 0.0f;
+    backpack_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
+    Mesh car_002_mesh;
+    car_002_mesh.loadMeshObjAndMtlFiles(2, "car_002_mesh", "../assets/car_002/", "model.obj");
+    car_002_mesh.loadObjFileHitbox("../assets/car_002/", "model.obj");
+    Model car_002_model(12, "car_001_model", &car_002_mesh);
+    car_002_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
+    car_002_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    car_002_model.m_rotate_rad = 0.0f;
+    car_002_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_001_mesh;
     house_001_mesh.loadMeshObjAndMtlFiles(3, "house_001_mesh", "../assets/house_001/", "obj.obj");
@@ -258,10 +267,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     };
     presets preset_00(1400, 900, 1, 10, 10, 800);
     presets preset_01(1360, 900, 2, 10, 10, 360);
-    presets& preset_to_use = preset_00;
+    presets& preset_to_use = preset_01;
 
     Window window;
-    //if(!window.create(L"Pixel Engine", 1080, 720, hInstance)) { return -1; }
     if(!window.create(L"Pixel Engine", preset_to_use.m_window_width, preset_to_use.m_window_height, hInstance)) { return -1; }
 
     Backbuffer backbuffer;
@@ -289,7 +297,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        std::thread t_00([&]() { renderer.drawModel(car_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
+        int x = backbuffer.toBackbufferCoordX(0);
+        int y = backbuffer.toBackbufferCoordY(0);
+        backbuffer.setPixel(x, y, 1.0f, 0xFF000000);
+
+        std::thread t_00([&]() { renderer.drawModel(car_002_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         std::thread t_01([&]() { renderer.drawModel(house_001_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         std::thread t_02([&]() { renderer.drawModel(house_002_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         std::thread t_03([&]() { renderer.drawModel(house_003_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
@@ -315,6 +327,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             static_cast<int>(controls_string.size()),
             0xFFFFFFFF
         );
+
+        for(size_t i = 0; i < car_002_mesh.m_hitboxes.size(); i++)
+        {
+            for(size_t j = 0; j < car_002_mesh.m_hitboxes[i].m_wireframe.m_num_polygons; j++)
+            {
+                Geometry::Polygon& polygon = car_002_mesh.m_hitboxes[i].m_wireframe.m_polygons[j];
+
+                for(size_t k = 1; k < polygon.m_num_vertices - 1; k++)
+                {
+                    const Math::Vec4_f& v0 = polygon.m_vertices[0].m_position;
+                    const Math::Vec4_f& v1 = polygon.m_vertices[k].m_position;
+                    const Math::Vec4_f& v2 = polygon.m_vertices[k + 1].m_position;
+
+                    Math::Vec3_f v0_pos = Math::Vec3_f(v0.m_data[0], v0.m_data[1], v0.m_data[2]);
+                    Math::Vec3_f v1_pos = Math::Vec3_f(v1.m_data[0], v1.m_data[1], v1.m_data[2]);
+                    Math::Vec3_f v2_pos = Math::Vec3_f(v2.m_data[0], v2.m_data[1], v2.m_data[2]);
+
+                    Math::Vec3_f line_start_pos = camera.m_position;
+                    Math::Vec3_f line_end_pos = camera.m_position + (camera.m_front * 50.0f);
+
+                    bool check = Geometry::checkLineSegmentIntersectsTriangle(line_start_pos, line_end_pos, v0_pos, v1_pos, v2_pos);
+                    if(check == true)
+                    {
+                        std::string intersection_success = std::string("INTERSECTION!!!!");
+                        backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
+                    }
+
+                }
+            }
+        }
 
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
