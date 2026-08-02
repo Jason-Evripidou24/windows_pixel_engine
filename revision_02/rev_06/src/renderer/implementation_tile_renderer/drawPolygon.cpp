@@ -20,10 +20,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::drawPolygon
 (
-    const Geometry::Polygon* polygon,
-    const Material*          material,
-    bool                     draw_filled,
-    float                    color_mix
+    std::shared_ptr<const Geometry::Polygon> polygon,
+    const Material*                          material,
+    bool                                     draw_filled,
+    float                                    color_mix
 )
 {
     if(draw_filled == true)

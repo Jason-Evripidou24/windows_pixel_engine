@@ -30,12 +30,6 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct PolygonBuffers
-{
-    std::vector<std::vector<Geometry::Polygon>> m_buffer0;
-    std::vector<std::vector<Geometry::Polygon>> m_buffer1;
-};
-
 struct Model
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -48,8 +42,6 @@ struct Model
     Math::Vec3_f m_scale;
     float m_rotate_rad;
     Math::Vec3_f m_rotate_axis;
-
-    PolygonBuffers m_polygon_buffers;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -72,29 +64,6 @@ struct Model
         m_scale = Math::Vec3_f();
         m_rotate_rad = 0.0f;
         m_rotate_axis = Math::Vec3_f();
-
-        //-----------------------------------------------------------------------------------------------------------------//
-        size_t num_sub_meshes = m_mesh->m_sub_meshes.size();
-
-        m_polygon_buffers.m_buffer0.resize(num_sub_meshes);
-        m_polygon_buffers.m_buffer1.resize(num_sub_meshes);
-
-        for(size_t i = 0; i < num_sub_meshes; i++)
-        {
-            size_t polygon_count = m_mesh->m_sub_meshes[i].m_wireframe.m_num_polygons;
-
-            m_polygon_buffers.m_buffer0[i].resize(polygon_count);
-            m_polygon_buffers.m_buffer1[i].resize(polygon_count);
-
-            for(size_t j = 0; j < polygon_count; j++)
-            {
-                size_t vertex_count = m_mesh->m_sub_meshes[i].m_wireframe.m_polygons[j].m_num_vertices;
-
-                m_polygon_buffers.m_buffer0[i][j].resize(vertex_count + 6);
-                m_polygon_buffers.m_buffer1[i][j].resize(vertex_count + 6);
-            }
-        }
-        //-----------------------------------------------------------------------------------------------------------------//
     }
     //---------------------------------------------------------------------------------------------------------------------//
 

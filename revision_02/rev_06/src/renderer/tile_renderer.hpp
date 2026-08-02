@@ -36,13 +36,13 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TileRendererJob
 {
-    const Geometry::Polygon* m_polygon;
-    const Material*          m_material;
-    bool                     m_draw_filled;
-    float                    m_color_mix;
-    std::atomic<int>*        m_extern_pending_jobs;
-    std::mutex*              m_extern_pending_jobs_mutex;
-    std::condition_variable* m_extern_pending_jobs_condition_variable;
+    std::shared_ptr<const Geometry::Polygon> m_polygon;
+    const Material*                          m_material;
+    bool                                     m_draw_filled;
+    float                                    m_color_mix;
+    std::atomic<int>*                        m_extern_pending_jobs;
+    std::mutex*                              m_extern_pending_jobs_mutex;
+    std::condition_variable*                 m_extern_pending_jobs_condition_variable;
 
     TileRendererJob()
     {
@@ -57,13 +57,13 @@ struct TileRendererJob
 
     TileRendererJob
     (
-        const Geometry::Polygon* polygon,
-        const Material*          material,
-        bool                     draw_filled,
-        float                    color_mix,
-        std::atomic<int>*        extern_pending_jobs,
-        std::mutex*              extern_pending_jobs_mutex,
-        std::condition_variable* extern_pending_jobs_condition_variable
+        std::shared_ptr<const Geometry::Polygon> polygon,
+        const Material*                          material,
+        bool                                     draw_filled,
+        float                                    color_mix,
+        std::atomic<int>*                        extern_pending_jobs,
+        std::mutex*                              extern_pending_jobs_mutex,
+        std::condition_variable*                 extern_pending_jobs_condition_variable
     )
     :
     m_polygon(polygon),
@@ -107,13 +107,13 @@ struct TileRenderer
     void workerFunction();
     void submitJob
     (
-        const Geometry::Polygon* polygon,
-        const Material*          material,
-        bool                     draw_filled,
-        float                    color_mix,
-        std::atomic<int>*        extern_pending_jobs,
-        std::mutex*              extern_pending_jobs_mutex,
-        std::condition_variable* extern_pending_jobs_condition_variable
+        std::shared_ptr<const Geometry::Polygon> polygon,
+        const Material*                          material,
+        bool                                     draw_filled,
+        float                                    color_mix,
+        std::atomic<int>*                        extern_pending_jobs,
+        std::mutex*                              extern_pending_jobs_mutex,
+        std::condition_variable*                 extern_pending_jobs_condition_variable
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -136,10 +136,10 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawPolygon
     (
-        const Geometry::Polygon* polygon,
-        const Material*          material,
-        bool                     draw_filled,
-        float                    color_mix
+        std::shared_ptr<const Geometry::Polygon> polygon,
+        const Material*                          material,
+        bool                                     draw_filled,
+        float                                    color_mix
     );
 
     void fillTriangle

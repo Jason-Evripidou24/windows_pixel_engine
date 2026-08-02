@@ -93,13 +93,13 @@ struct Renderer
 
     void sendPolygonToTiles
     (
-        const Geometry::Polygon* polygon,
-        const Material*          material,
-        bool                     draw_filled,
-        float                    color_mix,
-        std::atomic<int>*        pending_jobs,
-        std::mutex*              pending_jobs_mutex,
-        std::condition_variable* pending_jobs_condition_variable
+        std::shared_ptr<const Geometry::Polygon> polygon,
+        const Material*                          material,
+        bool                                     draw_filled,
+        float                                    color_mix,
+        std::atomic<int>*                        pending_jobs,
+        std::mutex*                              pending_jobs_mutex,
+        std::condition_variable*                 pending_jobs_condition_variable
     );
     //---------------------------------------------------------------------------------------------------------------------//
 };

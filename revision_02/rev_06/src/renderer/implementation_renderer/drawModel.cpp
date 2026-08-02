@@ -33,8 +33,6 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
     for(size_t i = 0; i < num_sub_meshes; i++)
     {
         SubMesh& model_sub_mesh = model.m_mesh->m_sub_meshes[i];
-        std::vector<Geometry::Polygon>& model_sub_mesh_buffer0 = model.m_polygon_buffers.m_buffer0[i];
-        std::vector<Geometry::Polygon>& model_sub_mesh_buffer1 = model.m_polygon_buffers.m_buffer1[i];
 
         Material* material = nullptr;
         int material_index = model_sub_mesh.m_material_index;
@@ -43,36 +41,35 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
         size_t num_polygons = model_sub_mesh.m_wireframe.m_num_polygons;
         for(size_t j = 0; j < num_polygons; j++)
         {
-            model_sub_mesh_buffer0[j].resize(model_sub_mesh.m_wireframe.m_polygons[j].m_num_vertices);
+            std::shared_ptr<Geometry::Polygon> buffer0 = std::make_shared<Geometry::Polygon>();
+            Geometry::Polygon buffer1;
 
-            Geometry::transformPolygon
-            (
-                model_sub_mesh_buffer0[j],
-                model_sub_mesh.m_wireframe.m_polygons[j],
-                proj_view_model_matrix
-            );
+            buffer0->resize(model_sub_mesh.m_wireframe.m_polygons[j].m_num_vertices);
+            buffer1.resize(model_sub_mesh.m_wireframe.m_polygons[j].m_num_vertices);
 
-            Geometry::clipPolygonAgainstPlaneMinX(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
-            Geometry::clipPolygonAgainstPlaneMaxX(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
-            Geometry::clipPolygonAgainstPlaneMinY(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
-            Geometry::clipPolygonAgainstPlaneMaxY(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
-            Geometry::clipPolygonAgainstPlaneMinZ(model_sub_mesh_buffer1[j], model_sub_mesh_buffer0[j]);
-            Geometry::clipPolygonAgainstPlaneMaxZ(model_sub_mesh_buffer0[j], model_sub_mesh_buffer1[j]);
+            Geometry::transformPolygon( (*buffer0), model_sub_mesh.m_wireframe.m_polygons[j], proj_view_model_matrix);
 
-            for(size_t k = 0; k < model_sub_mesh_buffer0[j].m_num_vertices; k++)
+            Geometry::clipPolygonAgainstPlaneMinX(buffer1, (*buffer0));
+            Geometry::clipPolygonAgainstPlaneMaxX((*buffer0), buffer1);
+            Geometry::clipPolygonAgainstPlaneMinY(buffer1, (*buffer0));
+            Geometry::clipPolygonAgainstPlaneMaxY((*buffer0), buffer1);
+            Geometry::clipPolygonAgainstPlaneMinZ(buffer1, (*buffer0));
+            Geometry::clipPolygonAgainstPlaneMaxZ((*buffer0), buffer1);
+
+            for(size_t k = 0; k < buffer0->m_num_vertices; k++)
             {
-                if(Utils::checkFloatEquals(model_sub_mesh_buffer0[j].m_vertices[k].m_position.m_data[3], 0.0f))
+                if(Utils::checkFloatEquals(buffer0->m_vertices[k].m_position.m_data[3], 0.0f))
                 {
-                    model_sub_mesh_buffer0[j].clear();
+                    buffer0->clear();
                     break;
                 }
-                model_sub_mesh_buffer0[j].m_vertices[k].perspectiveDivide();
+                buffer0->m_vertices[k].perspectiveDivide();
             }
-            if(model_sub_mesh_buffer0[j].m_num_vertices < 3) { continue; }
+            if(buffer0->m_num_vertices < 3) { continue; }
 
             this->sendPolygonToTiles
             (
-                &(model_sub_mesh_buffer0[j]),
+                buffer0,
                 material,
                 draw_filled,
                 color_mix,
