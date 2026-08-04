@@ -30,15 +30,10 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct SubMesh
+struct RenderMesh
 {
     Geometry::Wireframe m_wireframe;
     int m_material_index;
-};
-
-struct Hitbox
-{
-    Geometry::Wireframe m_wireframe;
 };
 
 struct Mesh
@@ -59,13 +54,13 @@ struct Mesh
     std::vector<Texture*> m_diffuse_textures;
     std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
 
-    std::vector<SubMesh> m_sub_meshes;
+    std::vector<RenderMesh> m_render_meshes;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Collision and Selection detection.
     //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<Hitbox> m_hitboxes;
+    Geometry::MultiWireframe m_hitbox;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -77,12 +72,12 @@ struct Mesh
         m_material_name_to_index.clear();
         m_diffuse_textures.clear();
         m_diffuse_texture_name_to_index.clear();
-        m_sub_meshes.clear();
-        m_hitboxes.clear();
+        m_render_meshes.clear();
+        m_hitbox.clear();
     }
     ~Mesh()
     {
-        m_sub_meshes.clear();
+        m_render_meshes.clear();
 
         for(Material* material : m_materials)
         {
@@ -119,11 +114,6 @@ struct Mesh
         const std::string& file_folder,
         const std::string& filename
     );
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Hitbox obj file will not have any mtl accompanying files.
-    void loadObjFileHitbox(const std::string& file_folder, const std::string& filename);
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

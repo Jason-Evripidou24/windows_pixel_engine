@@ -116,7 +116,7 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
         //-----------------------------------------------------------------------------------------------------------------//
         // Diffuse texture.
         //-----------------------------------------------------------------------------------------------------------------//
-        else if(prefix == "map_Kd")
+        else if( (prefix == "map_Kd") || (prefix == "map_kd") )
         {
             if(curr_material == nullptr) { continue; }
 

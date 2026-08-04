@@ -141,6 +141,18 @@ namespace Math
         //-----------------------------------------------------------------------------------------------------------------//
         // Single-Object Operations.
         //-----------------------------------------------------------------------------------------------------------------//
+        inline float length()
+        {
+            float length = 0.0f;
+            for(int i = 0; i < 2; i++)
+            {
+                length += (m_data[i] * m_data[i]);
+            }
+            length = sqrtf(length);
+
+            return length;
+        }
+
         inline void normalise()
         {
             float length = 0.0f;

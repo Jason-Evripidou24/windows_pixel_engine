@@ -83,6 +83,85 @@ namespace Geometry
         }
     };
 };
+
+namespace Geometry
+{
+    struct MultiWireframe
+    {
+        int m_multiwireframe_id;
+        std::string m_multiwireframe_name;
+
+        size_t m_num_wireframes;
+        std::vector<Geometry::Wireframe> m_wireframes;
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Constructors.
+        //-----------------------------------------------------------------------------------------------------------------//
+        MultiWireframe()
+        {
+            m_multiwireframe_id = -1;
+            m_multiwireframe_name.clear();
+            m_num_wireframes = 0;
+            m_wireframes = std::vector<Geometry::Wireframe>();
+        }
+        MultiWireframe(int multiwireframe_id, const std::string& multiwireframe_name)
+        {
+            m_multiwireframe_id = multiwireframe_id;
+            m_multiwireframe_name = multiwireframe_name;
+            m_num_wireframes = 0;
+            m_wireframes = std::vector<Geometry::Wireframe>();
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Copy constructors.
+        //-----------------------------------------------------------------------------------------------------------------//
+        MultiWireframe(const MultiWireframe& other)
+        {
+            m_multiwireframe_id = other.m_multiwireframe_id;
+            m_multiwireframe_name = other.m_multiwireframe_name;
+            m_num_wireframes = other.m_num_wireframes;
+            m_wireframes = other.m_wireframes;
+        }
+
+        MultiWireframe& operator=(const MultiWireframe& other)
+        {
+            m_multiwireframe_id = other.m_multiwireframe_id;
+            m_multiwireframe_name = other.m_multiwireframe_name;
+            m_num_wireframes = other.m_num_wireframes;
+            m_wireframes = other.m_wireframes;
+            return *this;
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        inline void clear()
+        {
+            m_num_wireframes = 0;
+        }
+
+        inline void resize(size_t size)
+        {
+            m_num_wireframes = size;
+            if(m_wireframes.size() < size)
+            {
+                m_wireframes.resize(size);
+            }
+        }
+
+        inline void addWireframe(const Geometry::Wireframe& wireframe)
+        {
+            if(m_num_wireframes < m_wireframes.size())
+            {
+                m_wireframes[m_num_wireframes] = wireframe;
+            }
+            else
+            {
+                m_wireframes.push_back(wireframe);
+            }
+            m_num_wireframes++;
+        }
+    };
+};
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 

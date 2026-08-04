@@ -29,25 +29,25 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
 
     const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
 
-    size_t num_sub_meshes = model.m_mesh->m_sub_meshes.size();
+    size_t num_sub_meshes = model.m_mesh->m_render_meshes.size();
     for(size_t i = 0; i < num_sub_meshes; i++)
     {
-        SubMesh& model_sub_mesh = model.m_mesh->m_sub_meshes[i];
+        RenderMesh& model_render_mesh = model.m_mesh->m_render_meshes[i];
 
         Material* material = nullptr;
-        int material_index = model_sub_mesh.m_material_index;
+        int material_index = model_render_mesh.m_material_index;
         if(material_index != -1) { material = model.m_mesh->m_materials[material_index]; }
 
-        size_t num_polygons = model_sub_mesh.m_wireframe.m_num_polygons;
+        size_t num_polygons = model_render_mesh.m_wireframe.m_num_polygons;
         for(size_t j = 0; j < num_polygons; j++)
         {
             std::shared_ptr<Geometry::Polygon> buffer0 = std::make_shared<Geometry::Polygon>();
             Geometry::Polygon buffer1;
 
-            buffer0->resize(model_sub_mesh.m_wireframe.m_polygons[j].m_num_vertices);
-            buffer1.resize(model_sub_mesh.m_wireframe.m_polygons[j].m_num_vertices);
+            buffer0->resize(model_render_mesh.m_wireframe.m_polygons[j].m_num_vertices);
+            buffer1.resize(model_render_mesh.m_wireframe.m_polygons[j].m_num_vertices);
 
-            Geometry::transformPolygon( (*buffer0), model_sub_mesh.m_wireframe.m_polygons[j], proj_view_model_matrix);
+            Geometry::transformPolygon( (*buffer0), model_render_mesh.m_wireframe.m_polygons[j], proj_view_model_matrix);
 
             Geometry::clipPolygonAgainstPlaneMinX(buffer1, (*buffer0));
             Geometry::clipPolygonAgainstPlaneMaxX((*buffer0), buffer1);
