@@ -275,7 +275,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     };
     presets preset_00(1400, 900, 1, 10, 10, 800);
     presets preset_01(1360, 900, 2, 10, 10, 360);
-    presets& preset_to_use = preset_00;
+    presets& preset_to_use = preset_01;
 
     Window window;
     if(!window.create(L"Pixel Engine", preset_to_use.m_window_width, preset_to_use.m_window_height, hInstance)) { return -1; }
@@ -342,55 +342,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             0xFFFFFFFF
         );
         
-        int num_intersections_with_car = 0;
-        float closest_car_vertex_to_cam = 100000.0f;
-        for(size_t i = 0; i < truck_001_mesh.m_hitbox.m_num_wireframes; i++)
+        Math::Vec3_f line_start_pos = camera.m_position;
+        Math::Vec3_f line_end_pos = camera.m_position + (camera.m_front * 10.0f);
+        Geometry::MultiWireframe hitbox_transformed;
+        Geometry::transformMultiWireframe(hitbox_transformed, truck_001_mesh.m_hitbox, truck_001_model.calcModelMatrix());
+        if(Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
         {
-            for(size_t j = 0; j < truck_001_mesh.m_hitbox.m_wireframes[i].m_num_polygons; j++)
-            {
-                Geometry::Polygon& polygon = truck_001_mesh.m_hitbox.m_wireframes[i].m_polygons[j];
-
-                Geometry::Polygon transformed_polygon;
-                transformed_polygon.resize(polygon.m_num_vertices);
-
-                Geometry::transformPolygon(transformed_polygon, polygon, car_002_model.calcModelMatrix());
-
-                for(size_t k = 1; k < transformed_polygon.m_num_vertices - 1; k++)
-                {
-                    const Math::Vec4_f& v0 = transformed_polygon.m_vertices[0].m_position;
-                    const Math::Vec4_f& v1 = transformed_polygon.m_vertices[k].m_position;
-                    const Math::Vec4_f& v2 = transformed_polygon.m_vertices[k + 1].m_position;
-
-                    Math::Vec3_f v0_pos = Math::Vec3_f(v0.m_data[0], v0.m_data[1], v0.m_data[2]);
-                    Math::Vec3_f v1_pos = Math::Vec3_f(v1.m_data[0], v1.m_data[1], v1.m_data[2]);
-                    Math::Vec3_f v2_pos = Math::Vec3_f(v2.m_data[0], v2.m_data[1], v2.m_data[2]);
-
-                    Math::Vec3_f line_start_pos = camera.m_position;
-                    Math::Vec3_f line_end_pos = camera.m_position + (camera.m_front * 50.0f);
-
-                    bool check = Geometry::checkLineSegmentIntersectsTriangle(line_start_pos, line_end_pos, v0_pos, v1_pos, v2_pos);
-                    if(check == true)
-                    {
-                        num_intersections_with_car++;
-                    }
-
-                    float distance_to_cam0 = (v0_pos - camera.m_position).length();
-                    float distance_to_cam1 = (v0_pos - camera.m_position).length();
-                    float distance_to_cam2 = (v0_pos - camera.m_position).length();
-                    if(distance_to_cam0 < closest_car_vertex_to_cam) { closest_car_vertex_to_cam = distance_to_cam0; }
-                    if(distance_to_cam1 < closest_car_vertex_to_cam) { closest_car_vertex_to_cam = distance_to_cam1; }
-                    if(distance_to_cam2 < closest_car_vertex_to_cam) { closest_car_vertex_to_cam = distance_to_cam2; }
-                }
-            }
+            std::string intersection_success = std::string("CAN SELECT TRUCK");
+            backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
         }
-        std::string intersection_success = std::string("INTERSECTIONS WITH CAR: ") + std::to_string(num_intersections_with_car);
-        backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
-        info_string = std::string("CLOSEST CAR VERTEX TO CAM: ") + Utils::floatToString(closest_car_vertex_to_cam, 4, 2);
-        backbuffer.setText(10, 40, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+        else
+        {
+            std::string intersection_failure = std::string("CAN NOT SELECT TRUCK");
+            backbuffer.setText(10, 30, intersection_failure.c_str(), static_cast<int>(intersection_failure.size()), 0xFFFFFFFF);
 
-        std::string camera_info_string = camera.toString(4, 2);
-        backbuffer.setText(10, 60, camera_info_string.c_str(), static_cast<int>(camera_info_string.size()), 0xFFFFFFFF);
-
+        }
+        
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
 

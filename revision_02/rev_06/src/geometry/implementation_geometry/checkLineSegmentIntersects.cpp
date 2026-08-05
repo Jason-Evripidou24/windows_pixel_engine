@@ -58,3 +58,48 @@ bool Geometry::checkLineSegmentIntersectsTriangle
     return true;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+bool Geometry::checkLineSegmentIntersectsMultiWireframe
+(
+    const Math::Vec3_f& line_start_pos,
+    const Math::Vec3_f& line_end_pos,
+    const Geometry::MultiWireframe& multi_wireframe
+)
+{
+    size_t num_wireframes = multi_wireframe.m_num_wireframes;
+
+    for(size_t i = 0; i < num_wireframes; i++)
+    {
+        const Geometry::Wireframe& wireframe = multi_wireframe.m_wireframes[i];
+        size_t num_polygons = wireframe.m_num_polygons;
+        
+        for(size_t j = 0; j < num_polygons; j++)
+        {
+            const Geometry::Polygon& polygon = wireframe.m_polygons[j];
+            size_t num_vertices = polygon.m_num_vertices;
+
+            for(size_t k = 1; k < num_vertices - 1; k++)
+            {
+                const Math::Vec4_f& v0 = polygon.m_vertices[0].m_position;
+                const Math::Vec4_f& v1 = polygon.m_vertices[k].m_position;
+                const Math::Vec4_f& v2 = polygon.m_vertices[k + 1].m_position;
+
+                bool check = Geometry::checkLineSegmentIntersectsTriangle
+                (
+                    line_start_pos,
+                    line_end_pos,
+                    Math::Vec3_f(v0.m_data[0], v0.m_data[1], v0.m_data[2]),
+                    Math::Vec3_f(v1.m_data[0], v1.m_data[1], v1.m_data[2]),
+                    Math::Vec3_f(v2.m_data[0], v2.m_data[1], v2.m_data[2])
+                );
+
+                if(check == true) { return true; }
+            }
+        }
+    }
+
+    return false;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

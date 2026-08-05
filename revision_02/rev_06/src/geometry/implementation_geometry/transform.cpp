@@ -29,3 +29,29 @@ void Geometry::transformPolygon(Geometry::Polygon& output, const Geometry::Polyg
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Geometry::transformWireframe(Geometry::Wireframe& output, const Geometry::Wireframe& wireframe, const Math::Mat4_f& matrix)
+{
+    output.resize(wireframe.m_num_polygons);
+
+    for(size_t i = 0; i < wireframe.m_num_polygons; i++)
+    {
+        Geometry::transformPolygon(output.m_polygons[i], wireframe.m_polygons[i], matrix);
+    }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Geometry::transformMultiWireframe(Geometry::MultiWireframe& output, const Geometry::MultiWireframe& multi_wireframe, const Math::Mat4_f& matrix)
+{
+    output.resize(multi_wireframe.m_num_wireframes);
+
+    for(size_t i = 0; i < multi_wireframe.m_num_wireframes; i++)
+    {
+        Geometry::transformWireframe(output.m_wireframes[i], multi_wireframe.m_wireframes[i], matrix);
+    }
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

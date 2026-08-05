@@ -42,6 +42,13 @@ namespace Geometry
         const Math::Vec3_f& v1_pos,
         const Math::Vec3_f& v2_pos
     );
+
+    bool checkLineSegmentIntersectsMultiWireframe
+    (
+        const Math::Vec3_f& line_start_pos,
+        const Math::Vec3_f& line_end_pos,
+        const Geometry::MultiWireframe& multi_wireframe
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -56,6 +63,8 @@ namespace Geometry
     //---------------------------------------------------------------------------------------------------------------------//
 
     void transformPolygon(Geometry::Polygon& output, const Geometry::Polygon& polygon, const Math::Mat4_f& matrix);
+    void transformWireframe(Geometry::Wireframe& output, const Geometry::Wireframe& wireframe, const Math::Mat4_f& matrix);
+    void transformMultiWireframe(Geometry::MultiWireframe& output, const Geometry::MultiWireframe& multi_wireframe, const Math::Mat4_f& matrix);
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
