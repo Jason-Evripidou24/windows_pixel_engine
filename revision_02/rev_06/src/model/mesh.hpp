@@ -21,8 +21,9 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "material.hpp"
-#include "texture.hpp"
+#include "../material/material.hpp"
+#include "../material/texture.hpp"
+#include "../material/multi_wireframe_and_material_names.hpp"
 
 #include "../geometry/geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -30,12 +31,6 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct RenderMesh
-{
-    Geometry::Wireframe m_wireframe;
-    int m_material_index;
-};
-
 struct Mesh
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -54,7 +49,7 @@ struct Mesh
     std::vector<Texture*> m_diffuse_textures;
     std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
 
-    std::vector<RenderMesh> m_render_meshes;
+    MultiWireframeAndMaterialNames m_render_multi_wireframe_and_material_names;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -72,13 +67,12 @@ struct Mesh
         m_material_name_to_index.clear();
         m_diffuse_textures.clear();
         m_diffuse_texture_name_to_index.clear();
-        m_render_meshes.clear();
+        m_render_multi_wireframe_and_material_names.m_multi_wireframe.clear();
+        m_render_multi_wireframe_and_material_names.m_wireframes_material_names.clear();
         m_hitbox.clear();
     }
     ~Mesh()
     {
-        m_render_meshes.clear();
-
         for(Material* material : m_materials)
         {
             if(material != nullptr)
@@ -102,9 +96,6 @@ struct Mesh
     //---------------------------------------------------------------------------------------------------------------------//
     // Load mtl file(s) first. Populate material and texture data.
     void loadMtlFile(const std::string& file_folder, const std::string& filename);
-
-    // Called after all mtl files have been loaded.
-    void loadObjFile(const std::string& file_folder, const std::string& filename);
 
     // Scan for mtl files first and call loadMtlFile on each of them, then call loadObjFile.
     void loadMeshObjAndMtlFiles

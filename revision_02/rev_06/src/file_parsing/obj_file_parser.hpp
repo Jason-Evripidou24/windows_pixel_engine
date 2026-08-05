@@ -25,6 +25,8 @@
 #include "../math/math.hpp"
 #include "../geometry/polygon.hpp"
 #include "../geometry/wireframe.hpp"
+
+#include "../material/multi_wireframe_and_material_names.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -50,16 +52,16 @@ struct ObjFileParser
 
     static Geometry::Polygon createPolygon
     (
-        const std::vector<ObjFileParser::ObjVertexInfo>& polygon_vertices_info,
+        const std::vector<ObjFileParser::ObjVertexInfo>&          polygon_vertices_info,
         const std::vector<std::pair<Math::Vec4_f, Math::Vec4_f>>& vertex_positions_and_colors,
-        const std::vector<Math::Vec2_f>& vertex_tex_coords,
-        const std::vector<Math::Vec3_f>& vertex_normals
+        const std::vector<Math::Vec2_f>&                          vertex_tex_coords,
+        const std::vector<Math::Vec3_f>&                          vertex_normals
     );
 
-    static Geometry::MultiWireframe loadMultiWireframe
+    static Geometry::MultiWireframe loadMultiWireframe(const std::string& file_folder, const std::string& filename);
+
+    static MultiWireframeAndMaterialNames loadMultiWireframeAndMaterialNames
     (
-        int multiwireframe_id,
-        const std::string& multiwireframe_name,
         const std::string& file_folder,
         const std::string& filename
     );

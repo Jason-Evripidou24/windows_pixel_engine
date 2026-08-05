@@ -215,19 +215,10 @@ Geometry::Polygon ObjFileParser::createPolygon
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Geometry::MultiWireframe ObjFileParser::loadMultiWireframe
-(
-    int multiwireframe_id,
-    const std::string& multiwireframe_name,
-    const std::string& file_folder,
-    const std::string& filename
-)
+Geometry::MultiWireframe ObjFileParser::loadMultiWireframe(const std::string& file_folder, const std::string& filename)
 {
     Geometry::MultiWireframe multi_wireframe;
     multi_wireframe.clear();
-
-    multi_wireframe.m_multiwireframe_id = multiwireframe_id;
-    multi_wireframe.m_multiwireframe_name = multiwireframe_name;
 
     //---------------------------------------------------------------------------------------------------------------------//
     std::vector<std::pair<Math::Vec4_f, Math::Vec4_f>> vertex_positions_and_colors;
@@ -322,5 +313,118 @@ Geometry::MultiWireframe ObjFileParser::loadMultiWireframe
     }
 
     return multi_wireframe;
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+MultiWireframeAndMaterialNames ObjFileParser::loadMultiWireframeAndMaterialNames
+(
+    const std::string& file_folder,
+    const std::string& filename
+)
+{
+    MultiWireframeAndMaterialNames multi_wireframe_and_material_names;
+    multi_wireframe_and_material_names.m_multi_wireframe.clear();
+    multi_wireframe_and_material_names.m_wireframes_material_names.clear();
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    std::vector<std::pair<Math::Vec4_f, Math::Vec4_f>> vertex_positions_and_colors;
+    std::vector<Math::Vec2_f> vertex_tex_coords;
+    std::vector<Math::Vec3_f> vertex_normals;
+
+    std::ifstream file(file_folder + filename);
+    if(!file.is_open()) { return multi_wireframe_and_material_names; }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    Geometry::Wireframe curr_wireframe;
+    curr_wireframe.clear();
+    std::string curr_wireframe_material_name = std::string("");
+
+    std::string line;
+    while(std::getline(file, line))
+    {
+        std::stringstream ss(line);
+
+        std::string prefix;
+        ss >> prefix;
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Comment.
+        //-----------------------------------------------------------------------------------------------------------------//
+        if(prefix == "#") { continue; }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Vertex position.
+        //-----------------------------------------------------------------------------------------------------------------//
+        if(prefix == "v")
+        {
+            vertex_positions_and_colors.push_back(ObjFileParser::parseVertexPositionAndColor(ss));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Vertex tex coord.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "vt")
+        {
+            vertex_tex_coords.push_back(ObjFileParser::parseVertexTexCoord(ss));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Vertex normal.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "vn")
+        {
+            vertex_normals.push_back(ObjFileParser::parseVertexNormal(ss));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // New material name to be used with the following triangles.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "usemtl")
+        {
+
+            if(curr_wireframe.m_num_polygons > 0)
+            {
+                multi_wireframe_and_material_names.m_multi_wireframe.addWireframe(curr_wireframe);
+                multi_wireframe_and_material_names.m_wireframes_material_names.push_back(curr_wireframe_material_name);
+            }
+
+            curr_wireframe.clear();
+            ss >> curr_wireframe_material_name;
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Triangle.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "f")
+        {
+            std::vector<ObjFileParser::ObjVertexInfo> face_indices = ObjFileParser::parsePolygonInfo(ss);
+
+            Geometry::Polygon new_polygon = ObjFileParser::createPolygon
+            (
+                face_indices,
+                vertex_positions_and_colors,
+                vertex_tex_coords,
+                vertex_normals
+            );
+
+            curr_wireframe.addPolygon(new_polygon);
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+    }
+
+    if(curr_wireframe.m_num_polygons > 0)
+    {
+        multi_wireframe_and_material_names.m_multi_wireframe.addWireframe(curr_wireframe);
+        multi_wireframe_and_material_names.m_wireframes_material_names.push_back(curr_wireframe_material_name);
+    }
+
+    return multi_wireframe_and_material_names;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

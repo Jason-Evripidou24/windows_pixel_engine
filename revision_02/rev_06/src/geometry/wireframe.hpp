@@ -88,9 +88,6 @@ namespace Geometry
 {
     struct MultiWireframe
     {
-        int m_multiwireframe_id;
-        std::string m_multiwireframe_name;
-
         size_t m_num_wireframes;
         std::vector<Geometry::Wireframe> m_wireframes;
 
@@ -99,15 +96,6 @@ namespace Geometry
         //-----------------------------------------------------------------------------------------------------------------//
         MultiWireframe()
         {
-            m_multiwireframe_id = -1;
-            m_multiwireframe_name.clear();
-            m_num_wireframes = 0;
-            m_wireframes = std::vector<Geometry::Wireframe>();
-        }
-        MultiWireframe(int multiwireframe_id, const std::string& multiwireframe_name)
-        {
-            m_multiwireframe_id = multiwireframe_id;
-            m_multiwireframe_name = multiwireframe_name;
             m_num_wireframes = 0;
             m_wireframes = std::vector<Geometry::Wireframe>();
         }
@@ -118,16 +106,12 @@ namespace Geometry
         //-----------------------------------------------------------------------------------------------------------------//
         MultiWireframe(const MultiWireframe& other)
         {
-            m_multiwireframe_id = other.m_multiwireframe_id;
-            m_multiwireframe_name = other.m_multiwireframe_name;
             m_num_wireframes = other.m_num_wireframes;
             m_wireframes = other.m_wireframes;
         }
 
         MultiWireframe& operator=(const MultiWireframe& other)
         {
-            m_multiwireframe_id = other.m_multiwireframe_id;
-            m_multiwireframe_name = other.m_multiwireframe_name;
             m_num_wireframes = other.m_num_wireframes;
             m_wireframes = other.m_wireframes;
             return *this;

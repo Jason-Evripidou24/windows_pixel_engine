@@ -162,6 +162,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     std::uniform_real_distribution<float> scale_dist(0.2f, 0.3f);
     std::uniform_real_distribution<float> rotation_dist(0.0f, 2.0f * 3.1415f);
     Mesh tree_mesh;
+    tree_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/tree_001/",
+        "obj.obj"
+    );
+    tree_mesh.m_hitbox = ObjFileParser::loadMultiWireframe("../assets/tree_001/", "obj.obj");
     tree_mesh.loadMeshObjAndMtlFiles(1, "tree_mesh", "../assets/tree_001/", "obj.obj");
     std::vector<Model> tree_models(10);
 
@@ -179,6 +185,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     }
 
     Mesh backpack_mesh;
+    backpack_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/backpack/",
+        "obj.obj"
+    );
     backpack_mesh.loadMeshObjAndMtlFiles(7, "backpack_mesh", "../assets/backpack/", "obj.obj");
     Model backpack_model(17, "backpack_model", &backpack_mesh);
     backpack_model.m_position = Math::Vec3_f(5.0f, 2.0f, 5.0f);
@@ -187,6 +198,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     backpack_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh cube_mesh;
+    cube_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/cube/",
+        "obj.obj"
+    );
     cube_mesh.loadMeshObjAndMtlFiles(6, "cube_mesh", "../assets/cube/", "obj.obj");
     Model cube_model(16, "cube_model", &cube_mesh);
     cube_model.m_position = Math::Vec3_f(0.0f, 2.0f, 0.0f);
@@ -195,8 +211,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     cube_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh car_002_mesh;
+    car_002_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/car_002/",
+        "model.obj"
+    );
     car_002_mesh.loadMeshObjAndMtlFiles(2, "car_002_mesh", "../assets/car_002/", "model.obj");
-    car_002_mesh.loadObjFileHitbox("../assets/car_002/", "model.obj");
     Model car_002_model(12, "car_001_model", &car_002_mesh);
     car_002_model.m_position = Math::Vec3_f(30.0f, 0.0f, -30.0f);
     car_002_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
@@ -204,6 +224,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     car_002_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh ground_mesh;
+    ground_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/ground/",
+        "obj.obj"
+    );
     ground_mesh.loadMeshObjAndMtlFiles(0, "ground_mesh", "../assets/ground/", "obj.obj");
     Model ground_model(11, "ground_model", &ground_mesh);
     ground_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
@@ -212,6 +237,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     ground_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_001_mesh;
+    house_001_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/house_001/",
+        "obj.obj"
+    );
     house_001_mesh.loadMeshObjAndMtlFiles(3, "house_001_mesh", "../assets/house_001/", "obj.obj");
     Model house_001_model(13, "house_001_model", &house_001_mesh);
     house_001_model.m_position = Math::Vec3_f(-30.0f, 0.0f, 30.0f);
@@ -220,6 +250,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     house_001_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_002_mesh;
+    house_002_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/house_002/",
+        "obj.obj"
+    );
     house_002_mesh.loadMeshObjAndMtlFiles(4, "house_002_mesh", "../assets/house_002/", "obj.obj");
     Model house_002_model(14, "house_002_model", &house_002_mesh);
     house_002_model.m_position = Math::Vec3_f(-30.0f, 0.0f, -30.0f);
@@ -228,6 +263,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     house_002_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh house_003_mesh;
+    house_003_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/house_003/",
+        "obj.obj"
+    );
     house_003_mesh.loadMeshObjAndMtlFiles(5, "house_003_mesh", "../assets/house_003/", "obj.obj");
     Model house_003_model(15, "house_003_model", &house_003_mesh);
     house_003_model.m_position = Math::Vec3_f(20.0f, 1.5f, 20.0f);
@@ -236,8 +276,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     house_003_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
 
     Mesh truck_001_mesh;
+    truck_001_mesh.m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames
+    (
+        "../assets/truck_001/",
+        "rig.obj"
+    );
     truck_001_mesh.loadMeshObjAndMtlFiles(2, "truck_001_mesh", "../assets/truck_001/", "rig.obj");
-    truck_001_mesh.m_hitbox = ObjFileParser::loadMultiWireframe(1, "rig_hitbox", "../assets/truck_001/", "rig.obj");
+    truck_001_mesh.m_hitbox = ObjFileParser::loadMultiWireframe("../assets/truck_001/", "rig.obj");
     Model truck_001_model(12, "car_001_model", &truck_001_mesh);
     truck_001_model.m_position = Math::Vec3_f(30.0f, 0.0f, -30.0f);
     truck_001_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
@@ -276,7 +321,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     };
     presets preset_00(1400, 900, 1, 10, 10, 800);
     presets preset_01(1360, 900, 2, 10, 10, 360);
-    presets& preset_to_use = preset_01;
+    presets& preset_to_use = preset_00;
 
     Window window;
     if(!window.create(L"Pixel Engine", preset_to_use.m_window_width, preset_to_use.m_window_height, hInstance)) { return -1; }
@@ -306,18 +351,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        int x = backbuffer.toBackbufferCoordX(0);
-        int y = backbuffer.toBackbufferCoordY(0);
-        backbuffer.setPixel(x, y, 1.0f, 0xFF000000);
+        int mis_screen_x = backbuffer.toBackbufferCoordX(0);
+        int mis_screen_y = backbuffer.toBackbufferCoordY(0);
+        for(int i = -5; i <= 5; i++)
+        {
+            for(int j = -5; j <= 5; j++)
+            {
+                backbuffer.setPixel(mis_screen_x + i, mis_screen_y + j, 1.0f, 0xFF000000);
+            }
+        }
+    
+        for(size_t i = 0; i < tree_models.size(); i++)
+        {
+            renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
+        }
 
         std::thread t_00([&]() { renderer.drawModel(truck_001_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         std::thread t_01([&]() { renderer.drawModel(house_001_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         std::thread t_02([&]() { renderer.drawModel(house_002_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
         std::thread t_03([&]() { renderer.drawModel(house_003_model, proj_view_matrix, draw_filled, vertex_material_color_mix); });
-        for(size_t i = 0; i < tree_models.size(); i++)
-        {
-            renderer.drawModel(tree_models[i], proj_view_matrix, draw_filled, vertex_material_color_mix);
-        }
         renderer.drawModel(ground_model, proj_view_matrix, draw_filled, vertex_material_color_mix);
         t_00.join();
         t_01.join();
