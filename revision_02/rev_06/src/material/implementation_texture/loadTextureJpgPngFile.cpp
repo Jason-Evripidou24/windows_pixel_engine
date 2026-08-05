@@ -37,7 +37,7 @@ void Texture::loadTextureJpgPngFile(const std::string& file_folder, const std::s
 
     m_width = width;
     m_height = height;
-    m_data = new uint32_t[width * height];
+    m_data = std::make_unique<uint32_t[]>(width * height);
 
     for(int i = 0; i < (width * height); i++)
     {

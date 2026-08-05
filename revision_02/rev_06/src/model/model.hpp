@@ -69,6 +69,33 @@ struct Model
 
     //---------------------------------------------------------------------------------------------------------------------//
     Math::Mat4_f calcModelMatrix() const;
+
+    inline void moveModel(const float x_axis, const float y_axis, const float z_axis, const float offset)
+    {
+        Math::Vec3_f move(x_axis, y_axis, z_axis);
+        move = move * offset;
+        m_position = m_position + move;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline std::string toString()
+    {
+        std::string output = std::string("");
+        output += std::string("MODEL ID  : ") + std::to_string(m_model_id) + std::string("\n");
+        output += std::string("MODEL NAME: ") + m_model_name + std::string("\n");
+        
+        if(m_mesh == nullptr)
+        {
+            output += std::string("MODEL HAS NO MESH!");
+        }
+        else
+        {
+            output += std::string("MODEL MESH DETAILS:") + std::string("\n") + m_mesh->toString();
+        }
+
+        return output;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

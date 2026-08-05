@@ -32,7 +32,7 @@
 namespace Geometry
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // World Space collision detection.
+    // Collision detection (usually for world space but works fine as long as every object is in the same coordinate space).
     //---------------------------------------------------------------------------------------------------------------------//
     bool checkLineSegmentIntersectsTriangle
     (

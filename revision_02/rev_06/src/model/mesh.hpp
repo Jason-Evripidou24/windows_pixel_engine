@@ -66,6 +66,14 @@ struct Mesh
         m_render_multi_wireframe_and_material_names.clear();
         m_hitbox.clear();
     }
+    Mesh(int mesh_id, const std::string& mesh_name)
+    {
+        m_mesh_id = mesh_id;
+        m_mesh_name = mesh_name;
+        m_material_library.clear();
+        m_render_multi_wireframe_and_material_names.clear();
+        m_hitbox.clear();
+    }
     ~Mesh()
     {
         m_mesh_id = -1;
@@ -88,6 +96,16 @@ struct Mesh
         m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames(folder, render_wireframe_file_name);
         m_material_library = MtlFileParser::loadMaterialLibrary(folder, material_library_file_name);
         m_hitbox = ObjFileParser::loadMultiWireframe(folder, hitbox_file_name);
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline std::string toString()
+    {
+        std::string output = std::string("");
+        output += std::string("MESH ID  : ") + std::to_string(m_mesh_id) + std::string("\n");
+        output += std::string("MESH NAME: ") + m_mesh_name;
+        return output;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 };

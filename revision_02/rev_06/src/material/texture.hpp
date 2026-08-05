@@ -9,6 +9,7 @@
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include <cstdint>
+#include <memory>
 #include <string>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -27,7 +28,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct Texture
 {
-    uint32_t* m_data; // A-R-G-B
+    std::unique_ptr<uint32_t[]> m_data; // A-R-G-B
     int m_width;
     int m_height;
 
@@ -39,10 +40,6 @@ struct Texture
     }
     ~Texture()
     {
-        if(m_data != nullptr)
-        {
-            delete m_data;
-        }
     }
 
     void loadTextureJpgPngFile(const std::string& file_folder, const std::string& filename);
