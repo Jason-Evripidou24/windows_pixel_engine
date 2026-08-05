@@ -24,6 +24,10 @@
 #include "../material/material.hpp"
 #include "../material/texture.hpp"
 #include "../material/multi_wireframe_and_material_names.hpp"
+#include "../material/material_library.hpp"
+
+#include "../file_parsing/obj_file_parser.hpp"
+#include "../file_parsing/mtl_file_parser.hpp"
 
 #include "../geometry/geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -43,12 +47,7 @@ struct Mesh
     //---------------------------------------------------------------------------------------------------------------------//
     // Drawing/Rendering information.
     //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<Material*> m_materials;
-    std::unordered_map<std::string, int> m_material_name_to_index;
-
-    std::vector<Texture*> m_diffuse_textures;
-    std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
-
+    MaterialLibrary m_material_library;
     MultiWireframeAndMaterialNames m_render_multi_wireframe_and_material_names;
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -63,48 +62,33 @@ struct Mesh
     {
         m_mesh_id = -1;
         m_mesh_name.clear();
-        m_materials.clear();
-        m_material_name_to_index.clear();
-        m_diffuse_textures.clear();
-        m_diffuse_texture_name_to_index.clear();
-        m_render_multi_wireframe_and_material_names.m_multi_wireframe.clear();
-        m_render_multi_wireframe_and_material_names.m_wireframes_material_names.clear();
+        m_material_library.clear();
+        m_render_multi_wireframe_and_material_names.clear();
         m_hitbox.clear();
     }
     ~Mesh()
     {
-        for(Material* material : m_materials)
-        {
-            if(material != nullptr)
-            {
-                delete material;
-            }
-        }
-        m_material_name_to_index.clear();
-
-        for(Texture* diffuse_texture : m_diffuse_textures)
-        {
-            if(diffuse_texture != nullptr)
-            {
-                delete diffuse_texture;
-            }
-        }
-        m_diffuse_texture_name_to_index.clear();
+        m_mesh_id = -1;
+        m_mesh_name.clear();
+        m_material_library.clear();
+        m_render_multi_wireframe_and_material_names.clear();
+        m_hitbox.clear();
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Load mtl file(s) first. Populate material and texture data.
-    void loadMtlFile(const std::string& file_folder, const std::string& filename);
-
-    // Scan for mtl files first and call loadMtlFile on each of them, then call loadObjFile.
-    void loadMeshObjAndMtlFiles
+    void loadMesh
     (
-        int                mesh_id,
-        const std::string& mesh_name,
-        const std::string& file_folder,
-        const std::string& filename
-    );
+        const std::string& folder,
+        const std::string& render_wireframe_file_name,
+        const std::string& material_library_file_name,
+        const std::string& hitbox_file_name
+    )
+    {
+        m_render_multi_wireframe_and_material_names = ObjFileParser::loadMultiWireframeAndMaterialNames(folder, render_wireframe_file_name);
+        m_material_library = MtlFileParser::loadMaterialLibrary(folder, material_library_file_name);
+        m_hitbox = ObjFileParser::loadMultiWireframe(folder, hitbox_file_name);
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

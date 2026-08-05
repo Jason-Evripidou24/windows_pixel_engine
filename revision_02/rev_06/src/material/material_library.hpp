@@ -1,10 +1,14 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef MATERIAL_LIBRARY_HPP
+#define MATERIAL_LIBRARY_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <fstream>
-#include <sstream>
-#include <string>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -17,64 +21,72 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../mesh.hpp"
-
-#include "../../math/vec2_f.hpp"
-#include "../../math/vec3_f.hpp"
-#include "../../math/vec4_f.hpp"
-#include "../../math/vertex.hpp"
+#include "material.hpp"
+#include "texture.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Mesh::loadMeshObjAndMtlFiles
-(
-    int                mesh_id,
-    const std::string& mesh_name,
-    const std::string& file_folder,
-    const std::string& filename
-)
+struct MaterialLibrary
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    m_mesh_name = mesh_name;
-    m_mesh_id = mesh_id;
+    std::vector<std::shared_ptr<Material>> m_materials;
+    std::unordered_map<std::string, int> m_material_name_to_index;
 
-    std::ifstream file(file_folder + filename);
-    if(!file.is_open()) { return; }
-    std::string line;
-    //---------------------------------------------------------------------------------------------------------------------//
+    std::vector<std::shared_ptr<Texture>> m_diffuse_textures;
+    std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Get all .mtl files.
-    //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<std::string> mtl_filenames;
-
-    std::string current_mtl_file_name = std::string("");
-
-    while(std::getline(file, line))
+    MaterialLibrary()
     {
-        std::stringstream ss(line);
-
-        std::string prefix;
-        ss >> prefix;
-
-        if(prefix == "mtllib")
-        {
-            ss >> current_mtl_file_name;
-            mtl_filenames.push_back(current_mtl_file_name);
-        }
+        m_materials.clear();
+        m_material_name_to_index.clear();
+        m_diffuse_textures.clear();
+        m_diffuse_texture_name_to_index.clear();
     }
-    file.close();
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Load mtl files.
-    //---------------------------------------------------------------------------------------------------------------------//
-    for(const std::string& mtl_filename : mtl_filenames)
+    ~MaterialLibrary()
     {
-        this->loadMtlFile(file_folder, mtl_filename);
+        m_materials.clear();
+        m_material_name_to_index.clear();
+        m_diffuse_textures.clear();
+        m_diffuse_texture_name_to_index.clear();
     }
     //---------------------------------------------------------------------------------------------------------------------//
-}
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Copy constructors.
+    //---------------------------------------------------------------------------------------------------------------------//
+    MaterialLibrary(const MaterialLibrary& other)
+    {
+        m_materials = other.m_materials;
+        m_material_name_to_index = other.m_material_name_to_index;
+        m_diffuse_textures = other.m_diffuse_textures;
+        m_diffuse_texture_name_to_index = other.m_diffuse_texture_name_to_index;
+    }
+
+    MaterialLibrary& operator=(const MaterialLibrary& other)
+    {
+        m_materials = other.m_materials;
+        m_material_name_to_index = other.m_material_name_to_index;
+        m_diffuse_textures = other.m_diffuse_textures;
+        m_diffuse_texture_name_to_index = other.m_diffuse_texture_name_to_index;
+        return *this;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void clear()
+    {
+        m_materials.clear();
+        m_material_name_to_index.clear();
+        m_diffuse_textures.clear();
+        m_diffuse_texture_name_to_index.clear();
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

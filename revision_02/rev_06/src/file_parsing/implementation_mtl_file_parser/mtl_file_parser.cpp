@@ -2,11 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -17,22 +12,17 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../mesh.hpp"
-
-#include "../../math/vec2_f.hpp"
-#include "../../math/vec3_f.hpp"
-#include "../../math/vec4_f.hpp"
-#include "../../math/vertex.hpp"
+#include "../mtl_file_parser.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-std::string parseName(std::stringstream& stream)
+std::string MtlFileParser::parseName(std::stringstream& line_string_stream)
 {
     std::string name;
 
-    if(!(stream >> name)) { return std::string(""); }
+    if( !(line_string_stream >> name) ) { return std::string(""); }
 
     return name;
 }
@@ -40,14 +30,14 @@ std::string parseName(std::stringstream& stream)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-Math::Vec3_f parseColor(std::stringstream& stream)
+Math::Vec3_f MtlFileParser::parseColor(std::stringstream& line_string_stream)
 {
     float r;
     float g;
     float b;
 
     // Invalid normal direction.
-    if(!(stream >> r >> g >> b)) { return Math::Vec3_f(0.0f, 0.0f, 0.0f); }
+    if( !(line_string_stream >> r >> g >> b) ) { return Math::Vec3_f(0.0f, 0.0f, 0.0f); }
 
     return Math::Vec3_f(r, g, b);
 }
@@ -55,14 +45,16 @@ Math::Vec3_f parseColor(std::stringstream& stream)
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filename)
+MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folder, const std::string& filename)
 {
+    MaterialLibrary material_library;
+
     //---------------------------------------------------------------------------------------------------------------------//
     std::ifstream file(file_folder + filename);
-    if(!file.is_open()) { return; }
+    if(!file.is_open()) { return material_library; }
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Material*   curr_material = nullptr;
+    std::shared_ptr<Material> curr_material = nullptr;
     std::string curr_material_name = std::string("DEFAULT");
 
     std::string line;
@@ -86,18 +78,22 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
         {
             if(curr_material != nullptr)
             {
-                if(m_material_name_to_index.find(curr_material_name) != m_material_name_to_index.end())
+                if
+                (
+                    material_library.m_material_name_to_index.find(curr_material_name) !=
+                    material_library.m_material_name_to_index.end()
+                )
                 {
-                    delete curr_material;
+                    // delete curr_material; No need with smart pointers.
                 }
                 else
                 {
-                    m_materials.push_back(curr_material);
-                    m_material_name_to_index[curr_material_name] = static_cast<int>(m_materials.size()) - 1;
+                    material_library.m_materials.push_back(curr_material);
+                    material_library.m_material_name_to_index[curr_material_name] = static_cast<int>(material_library.m_materials.size()) - 1;
                 }
             }
 
-            curr_material = new Material();
+            curr_material = std::make_shared<Material>();
             curr_material_name = parseName(ss);
         }
         //-----------------------------------------------------------------------------------------------------------------//
@@ -122,18 +118,22 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
 
             const std::string diffuse_texture_name = parseName(ss);
 
-            if(m_diffuse_texture_name_to_index.find(diffuse_texture_name) == m_diffuse_texture_name_to_index.end())
+            if
+            (
+                material_library.m_diffuse_texture_name_to_index.find(diffuse_texture_name) ==
+                material_library.m_diffuse_texture_name_to_index.end()
+            )
             {
-                Texture* new_texture = new Texture();
+                std::shared_ptr<Texture> new_texture = std::make_shared<Texture>();
                 new_texture->loadTextureJpgPngFile(file_folder, diffuse_texture_name);
 
-                m_diffuse_textures.push_back(new_texture);
-                m_diffuse_texture_name_to_index[diffuse_texture_name] = static_cast<int>(m_diffuse_textures.size()) - 1;
+                material_library.m_diffuse_textures.push_back(new_texture);
+                material_library.m_diffuse_texture_name_to_index[diffuse_texture_name] = static_cast<int>(material_library.m_diffuse_textures.size()) - 1;
             }
 
             if(curr_material != nullptr)
             {
-                curr_material->m_diffuse_texture = m_diffuse_textures[m_diffuse_texture_name_to_index[diffuse_texture_name]];
+                curr_material->m_diffuse_texture = material_library.m_diffuse_textures[material_library.m_diffuse_texture_name_to_index[diffuse_texture_name]];
             }
         }
         //-----------------------------------------------------------------------------------------------------------------//
@@ -141,15 +141,21 @@ void Mesh::loadMtlFile(const std::string& file_folder, const std::string& filena
 
     if(curr_material != nullptr)
     {
-        if(m_material_name_to_index.find(curr_material_name) != m_material_name_to_index.end())
+        if
+        (
+            material_library.m_material_name_to_index.find(curr_material_name) !=
+            material_library.m_material_name_to_index.end()
+        )
         {
-            delete curr_material;
+            // delete curr_material; No need with smart pointers.
         }
         else
         {
-            m_materials.push_back(curr_material);
-            m_material_name_to_index[curr_material_name] = static_cast<int>(m_materials.size()) - 1;
+            material_library.m_materials.push_back(curr_material);
+            material_library.m_material_name_to_index[curr_material_name] = static_cast<int>(material_library.m_materials.size()) - 1;
         }
     }
+
+    return material_library;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef MULTI_WIREFRAME_AND_MATERIAL_NAMES
-#define MULTI_WIREFRAME_AND_MATERIAL_NAMES
+#ifndef MTL_FILE_PARSER_HPP
+#define MTL_FILE_PARSER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,6 +8,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -20,22 +22,23 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../geometry/geometry.hpp"
+#include "../math/math.hpp"
+#include "../geometry/polygon.hpp"
+#include "../geometry/wireframe.hpp"
+
+#include "../material/material_library.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct MultiWireframeAndMaterialNames
+struct MtlFileParser
 {
-    Geometry::MultiWireframe m_multi_wireframe;
-    std::vector<std::string> m_wireframes_material_names;
+    static std::string parseName(std::stringstream& line_string_stream);
 
-    inline void clear()
-    {
-        m_multi_wireframe.clear();
-        m_wireframes_material_names.clear();
-    }
+    static Math::Vec3_f parseColor(std::stringstream& line_string_stream);
+
+    static MaterialLibrary loadMaterialLibrary(const std::string& file_folder, const std::string& filename);
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
