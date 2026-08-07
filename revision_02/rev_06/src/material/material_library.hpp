@@ -30,26 +30,19 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct MaterialLibrary
 {
-    std::vector<std::shared_ptr<Material>> m_materials;
-    std::unordered_map<std::string, int> m_material_name_to_index;
-
-    std::vector<std::shared_ptr<Texture>> m_diffuse_textures;
-    std::unordered_map<std::string, int> m_diffuse_texture_name_to_index;
+    std::unordered_map<std::string, std::shared_ptr<Material>> m_materials;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> m_diffuse_textures;
 
     //---------------------------------------------------------------------------------------------------------------------//
     MaterialLibrary()
     {
         m_materials.clear();
-        m_material_name_to_index.clear();
         m_diffuse_textures.clear();
-        m_diffuse_texture_name_to_index.clear();
     }
     ~MaterialLibrary()
     {
         m_materials.clear();
-        m_material_name_to_index.clear();
         m_diffuse_textures.clear();
-        m_diffuse_texture_name_to_index.clear();
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -59,17 +52,13 @@ struct MaterialLibrary
     MaterialLibrary(const MaterialLibrary& other)
     {
         m_materials = other.m_materials;
-        m_material_name_to_index = other.m_material_name_to_index;
         m_diffuse_textures = other.m_diffuse_textures;
-        m_diffuse_texture_name_to_index = other.m_diffuse_texture_name_to_index;
     }
 
     MaterialLibrary& operator=(const MaterialLibrary& other)
     {
         m_materials = other.m_materials;
-        m_material_name_to_index = other.m_material_name_to_index;
         m_diffuse_textures = other.m_diffuse_textures;
-        m_diffuse_texture_name_to_index = other.m_diffuse_texture_name_to_index;
         return *this;
     }
     //---------------------------------------------------------------------------------------------------------------------//
@@ -78,9 +67,7 @@ struct MaterialLibrary
     inline void clear()
     {
         m_materials.clear();
-        m_material_name_to_index.clear();
         m_diffuse_textures.clear();
-        m_diffuse_texture_name_to_index.clear();
     }
     //---------------------------------------------------------------------------------------------------------------------//
 };

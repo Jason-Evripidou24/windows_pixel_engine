@@ -135,9 +135,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     {
         timer.tick();
 
-        backbuffer.clear(0xFF87CEEB); // Sky blue
+        //backbuffer.clear(0xFF87CEEB); // Sky blue
         //backbuffer.clear(0xFFFF0000); // Red
-        //backbuffer.clear(0xFF000000); // Black
+        backbuffer.clear(0xFF000000); // Black
         //backbuffer.clear(0xFFFFFFFF); // White
 
         processInput(window, timer.deltaTime);
@@ -154,17 +154,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
                 backbuffer.setPixel(mis_screen_x + i, mis_screen_y + j, 1.0f, 0xFF000000);
             }
         }
-    
+        
         for(size_t i = 0; i < tree_models.size(); i++)
         {
             renderer.drawModel(tree_models[i], proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
         }
+        renderer.drawModel(ground_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
 
         std::thread t_00([&]() { renderer.drawModel(truck_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_01([&]() { renderer.drawModel(house_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_02([&]() { renderer.drawModel(house_002_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_03([&]() { renderer.drawModel(house_003_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        renderer.drawModel(ground_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        
         t_00.join();
         t_01.join();
         t_02.join();
@@ -185,11 +186,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Math::Vec3_f line_start_pos = g_camera.m_position;
         Math::Vec3_f line_end_pos = g_camera.m_position + (g_camera.m_front * 10.0f);
         Geometry::MultiWireframe hitbox_transformed;
+
         Geometry::transformMultiWireframe(hitbox_transformed, truck_001_model.m_mesh->m_hitbox, truck_001_model.calcModelMatrix());
         if(Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
         {
             std::string intersection_success = truck_001_model.toString();
             backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
+        }
+        Geometry::transformMultiWireframe(hitbox_transformed, ground_model.m_mesh->m_hitbox, ground_model.calcModelMatrix());
+        if(Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
+        {
+            std::string intersection_success = ground_model.toString();
+            backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
+        }
+        for(size_t i = 0; i < tree_models.size(); i++)
+        {
+            Geometry::transformMultiWireframe(hitbox_transformed, tree_models[i].m_mesh->m_hitbox, tree_models[i].calcModelMatrix());
+            if(Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
+            {
+                std::string intersection_success = tree_models[i].toString();
+                backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
+            }
         }
         
         backbuffer.present(window.m_dc, window.m_width, window.m_height);

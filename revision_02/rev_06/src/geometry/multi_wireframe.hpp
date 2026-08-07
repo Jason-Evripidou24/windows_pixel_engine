@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef WIREFRAME_HPP
-#define WIREFRAME_HPP
+#ifndef MULTI_WIREFRAME_HPP
+#define MULTI_WIREFRAME_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -19,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "polygon.hpp"
+#include "wireframe.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -27,59 +27,63 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 namespace Geometry
 {
-    struct Wireframe
+    struct MultiWireframe
     {
-        size_t m_num_polygons;
-        std::vector<Geometry::Polygon> m_polygons;
+        size_t m_num_wireframes;
+        std::vector<Geometry::Wireframe> m_wireframes;
 
-        Wireframe()
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Constructors.
+        //-----------------------------------------------------------------------------------------------------------------//
+        MultiWireframe()
         {
-            m_num_polygons = 0;
-            m_polygons = std::vector<Geometry::Polygon>();
+            m_num_wireframes = 0;
+            m_wireframes = std::vector<Geometry::Wireframe>();
         }
+        //-----------------------------------------------------------------------------------------------------------------//
 
         //-----------------------------------------------------------------------------------------------------------------//
         // Copy constructors.
         //-----------------------------------------------------------------------------------------------------------------//
-        Wireframe(const Wireframe& other)
+        MultiWireframe(const MultiWireframe& other)
         {
-            m_num_polygons = other.m_num_polygons;
-            m_polygons = other.m_polygons;
+            m_num_wireframes = other.m_num_wireframes;
+            m_wireframes = other.m_wireframes;
         }
 
-        Wireframe& operator=(const Wireframe& other)
+        MultiWireframe& operator=(const MultiWireframe& other)
         {
-            m_num_polygons = other.m_num_polygons;
-            m_polygons = other.m_polygons;
+            m_num_wireframes = other.m_num_wireframes;
+            m_wireframes = other.m_wireframes;
             return *this;
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
         inline void clear()
         {
-            m_num_polygons = 0;
+            m_num_wireframes = 0;
         }
 
         inline void resize(size_t size)
         {
-            m_num_polygons = size;
-            if(m_polygons.size() < size)
+            m_num_wireframes = size;
+            if(m_wireframes.size() < size)
             {
-                m_polygons.resize(size);
+                m_wireframes.resize(size);
             }
         }
 
-        inline void addPolygon(const Geometry::Polygon& polygon)
+        inline void addWireframe(const Geometry::Wireframe& wireframe)
         {
-            if(m_num_polygons < m_polygons.size())
+            if(m_num_wireframes < m_wireframes.size())
             {
-                m_polygons[m_num_polygons] = polygon;
+                m_wireframes[m_num_wireframes] = wireframe;
             }
             else
             {
-                m_polygons.push_back(polygon);
+                m_wireframes.push_back(wireframe);
             }
-            m_num_polygons++;
+            m_num_wireframes++;
         }
     };
 };

@@ -38,12 +38,11 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
         Material* material = nullptr;
         if
         (
-            model.m_mesh->m_material_library.m_material_name_to_index.find(render_wireframe_material_name) !=
-            model.m_mesh->m_material_library.m_material_name_to_index.end()
+            model.m_mesh->m_material_library.m_materials.find(render_wireframe_material_name) !=
+            model.m_mesh->m_material_library.m_materials.end()
         )
         {
-            int material_index = model.m_mesh->m_material_library.m_material_name_to_index[render_wireframe_material_name];
-            material = model.m_mesh->m_material_library.m_materials[material_index].get();
+            material = model.m_mesh->m_material_library.m_materials[render_wireframe_material_name].get();
         }
 
         size_t num_polygons = render_wireframe.m_num_polygons;

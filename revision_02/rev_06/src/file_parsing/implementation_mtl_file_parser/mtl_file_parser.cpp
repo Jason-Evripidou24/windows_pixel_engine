@@ -78,18 +78,9 @@ MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folde
         {
             if(curr_material != nullptr)
             {
-                if
-                (
-                    material_library.m_material_name_to_index.find(curr_material_name) !=
-                    material_library.m_material_name_to_index.end()
-                )
+                if( material_library.m_materials.find(curr_material_name) == material_library.m_materials.end() )
                 {
-                    // delete curr_material; No need with smart pointers.
-                }
-                else
-                {
-                    material_library.m_materials.push_back(curr_material);
-                    material_library.m_material_name_to_index[curr_material_name] = static_cast<int>(material_library.m_materials.size()) - 1;
+                    material_library.m_materials[curr_material_name] = curr_material;
                 }
             }
 
@@ -118,22 +109,21 @@ MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folde
 
             const std::string diffuse_texture_name = parseName(ss);
 
-            if
-            (
-                material_library.m_diffuse_texture_name_to_index.find(diffuse_texture_name) ==
-                material_library.m_diffuse_texture_name_to_index.end()
-            )
+            if( material_library.m_diffuse_textures.find(diffuse_texture_name) == material_library.m_diffuse_textures.end() )
             {
                 std::shared_ptr<Texture> new_texture = std::make_shared<Texture>();
                 new_texture->loadTextureJpgPngFile(file_folder, diffuse_texture_name);
 
-                material_library.m_diffuse_textures.push_back(new_texture);
-                material_library.m_diffuse_texture_name_to_index[diffuse_texture_name] = static_cast<int>(material_library.m_diffuse_textures.size()) - 1;
+                material_library.m_diffuse_textures[diffuse_texture_name] = new_texture;
             }
 
-            if(curr_material != nullptr)
+            if
+            (
+                (curr_material != nullptr) &&
+                (material_library.m_diffuse_textures.find(diffuse_texture_name) != material_library.m_diffuse_textures.end())
+            )
             {
-                curr_material->m_diffuse_texture = material_library.m_diffuse_textures[material_library.m_diffuse_texture_name_to_index[diffuse_texture_name]];
+                curr_material->m_diffuse_texture = material_library.m_diffuse_textures[diffuse_texture_name];
             }
         }
         //-----------------------------------------------------------------------------------------------------------------//
@@ -141,18 +131,9 @@ MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folde
 
     if(curr_material != nullptr)
     {
-        if
-        (
-            material_library.m_material_name_to_index.find(curr_material_name) !=
-            material_library.m_material_name_to_index.end()
-        )
+        if( material_library.m_materials.find(curr_material_name) == material_library.m_materials.end() )
         {
-            // delete curr_material; No need with smart pointers.
-        }
-        else
-        {
-            material_library.m_materials.push_back(curr_material);
-            material_library.m_material_name_to_index[curr_material_name] = static_cast<int>(material_library.m_materials.size()) - 1;
+            material_library.m_materials[curr_material_name] = curr_material;
         }
     }
 
