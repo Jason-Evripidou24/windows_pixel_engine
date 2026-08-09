@@ -83,6 +83,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         tree_models[i].m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
     }
 
+    Model backpack_model(-1, "backpack_model", &backpack_mesh);
+    backpack_model.m_position = Math::Vec3_f(0.0f, 5.0f, 0.0f);
+    backpack_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
+    backpack_model.m_rotate_rad = 0.0f;
+    backpack_model.m_rotate_axis = Math::Vec3_f(0.0f, 1.0f, 0.0f);
+
     Model ground_model(-1, "ground_model", &ground_mesh);
     ground_model.m_position = Math::Vec3_f(0.0f, 0.0f, 0.0f);
     ground_model.m_scale = Math::Vec3_f(1.0f, 1.0f, 1.0f);
@@ -128,6 +134,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Renderer renderer(&backbuffer, g_preset_to_use.m_tile_split); // Must divide backbuffer width and height perfectly.
 
     Math::Mat4_f projection_matrix = g_camera.calcProjectionMatrix((float)backbuffer.m_width / (float)backbuffer.m_height);
+    /*
+    // Ortho currently broken
+    Math::Mat4_f projection_matrix;
+    projection_matrix.orthographic
+    (
+     -10.0f,  // left
+      10.0f,  // right
+     -10.0f,  // bottom
+      10.0f,  // top
+      0.1f,   // near
+      1000.0f // far
+    );
+    */
     Math::Mat4_f view_matrix;
     Math::Mat4_f proj_view_matrix;
 
@@ -141,48 +160,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //backbuffer.clear(0xFFFFFFFF); // White
 
         processInput(window, timer.deltaTime);
-    
-        view_matrix = g_camera.calcViewMatrix();
-        proj_view_matrix = projection_matrix * view_matrix;
 
-        int mis_screen_x = backbuffer.toBackbufferCoordX(0);
-        int mis_screen_y = backbuffer.toBackbufferCoordY(0);
-        for(int i = -5; i <= 5; i++)
-        {
-            for(int j = -5; j <= 5; j++)
-            {
-                backbuffer.setPixel(mis_screen_x + i, mis_screen_y + j, 1.0f, 0xFF000000);
-            }
-        }
-        
-        for(size_t i = 0; i < tree_models.size(); i++)
-        {
-            renderer.drawModel(tree_models[i], proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
-        }
-        renderer.drawModel(ground_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
-
-        std::thread t_00([&]() { renderer.drawModel(truck_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_01([&]() { renderer.drawModel(house_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_02([&]() { renderer.drawModel(house_002_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_03([&]() { renderer.drawModel(house_003_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        
-        t_00.join();
-        t_01.join();
-        t_02.join();
-        t_03.join();
-
-        std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
-        backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
-
-        backbuffer.setText
-        (
-            g_preset_to_use.m_control_string_x,
-            g_preset_to_use.m_control_string_y,
-            g_controls_string.c_str(),
-            static_cast<int>(g_controls_string.size()),
-            0xFFFFFFFF
-        );
-        
         Math::Vec3_f line_start_pos = g_camera.m_position;
         Math::Vec3_f line_end_pos = g_camera.m_position + (g_camera.m_front * 10.0f);
         Geometry::MultiWireframe hitbox_transformed;
@@ -208,6 +186,49 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
                 backbuffer.setText(10, 30, intersection_success.c_str(), static_cast<int>(intersection_success.size()), 0xFFFFFFFF);
             }
         }
+    
+        view_matrix = g_camera.calcViewMatrix();
+        proj_view_matrix = projection_matrix * view_matrix;
+
+        int mis_screen_x = backbuffer.toBackbufferCoordX(0);
+        int mis_screen_y = backbuffer.toBackbufferCoordY(0);
+        for(int i = -5; i <= 5; i++)
+        {
+            for(int j = -5; j <= 5; j++)
+            {
+                backbuffer.setPixel(mis_screen_x + i, mis_screen_y + j, 1.0f, 0xFF000000);
+            }
+        }
+        
+        for(size_t i = 0; i < tree_models.size(); i++)
+        {
+            tree_models[i].renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        }
+        ground_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+
+        std::thread t_00([&]() { backpack_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_01([&]() { truck_001_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_02([&]() { house_001_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_03([&]() { house_002_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_04([&]() { house_003_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        
+        t_00.join();
+        t_01.join();
+        t_02.join();
+        t_03.join();
+        t_04.join();
+
+        std::string info_string = std::string("FPS: ") + std::to_string(timer.fps);
+        backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+
+        backbuffer.setText
+        (
+            g_preset_to_use.m_control_string_x,
+            g_preset_to_use.m_control_string_y,
+            g_controls_string.c_str(),
+            static_cast<int>(g_controls_string.size()),
+            0xFFFFFFFF
+        );
         
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }

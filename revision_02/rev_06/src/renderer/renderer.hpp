@@ -10,9 +10,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include <atomic>
 #include <condition_variable>
-#include <cstdint>
+#include <memory>
 #include <mutex>
-#include <thread>
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -27,9 +26,9 @@
 #include "tile_renderer.hpp"
 
 #include "../backbuffer/backbuffer.hpp"
-
+#include "../geometry/geometry.hpp"
+#include "../material/material.hpp"
 #include "../math/math.hpp"
-#include "../model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -89,8 +88,6 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Functions.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawModel(Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix);
-
     void sendPolygonToTiles
     (
         std::shared_ptr<const Geometry::Polygon> polygon,

@@ -36,9 +36,9 @@ void TileRenderer::submitJob
         //-----------------------------------------------------------------------------------------------------------------//
         std::unique_lock<std::mutex> extern_jobs_pending_lock(*extern_pending_jobs_mutex);
 
-        extern_pending_jobs->fetch_sub(1);
+        //extern_pending_jobs->fetch_sub(1);
 
-        if(extern_pending_jobs->load() == 0)
+        if(extern_pending_jobs->fetch_sub(1) == 1)
         {
             extern_pending_jobs_condition_variable->notify_all();
         }

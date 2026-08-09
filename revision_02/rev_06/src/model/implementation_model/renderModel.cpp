@@ -2,7 +2,12 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <atomic>
+#include <condition_variable>
 #include <cstdint>
+#include <mutex>
+#include <thread>
+#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,36 +18,37 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../model.hpp"
 
-#include "../../model/model.hpp"
+#include "../../math/mat4_f.hpp"
+#include "../../math/math.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix)
+void Model::renderModel(Renderer& renderer, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix)
 {
     std::atomic<int>        pending_jobs(0);
     std::mutex              pending_jobs_mutex;
     std::condition_variable pending_jobs_condition_variable;
 
-    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * model.calcModelMatrix();
+    const Math::Mat4_f proj_view_model_matrix = projection_view_matrix * this->calcModelMatrix();
 
-    size_t num_render_wireframes = model.m_mesh->m_render_multi_wireframe_and_material_names.m_multi_wireframe.m_num_wireframes;
+    size_t num_render_wireframes = m_mesh->m_render_multi_wireframe_and_material_names.m_multi_wireframe.m_num_wireframes;
     for(size_t i = 0; i < num_render_wireframes; i++)
     {
-        Geometry::Wireframe& render_wireframe = model.m_mesh->m_render_multi_wireframe_and_material_names.m_multi_wireframe.m_wireframes[i];
-        std::string& render_wireframe_material_name = model.m_mesh->m_render_multi_wireframe_and_material_names.m_wireframes_material_names[i];
+        Geometry::Wireframe& render_wireframe = m_mesh->m_render_multi_wireframe_and_material_names.m_multi_wireframe.m_wireframes[i];
+        std::string& render_wireframe_material_name = m_mesh->m_render_multi_wireframe_and_material_names.m_wireframes_material_names[i];
 
         Material* material = nullptr;
         if
         (
-            model.m_mesh->m_material_library.m_materials.find(render_wireframe_material_name) !=
-            model.m_mesh->m_material_library.m_materials.end()
+            m_mesh->m_material_library.m_materials.find(render_wireframe_material_name) !=
+            m_mesh->m_material_library.m_materials.end()
         )
         {
-            material = model.m_mesh->m_material_library.m_materials[render_wireframe_material_name].get();
+            material = m_mesh->m_material_library.m_materials[render_wireframe_material_name].get();
         }
 
         size_t num_polygons = render_wireframe.m_num_polygons;
@@ -74,7 +80,7 @@ void Renderer::drawModel(Model& model, const Math::Mat4_f& projection_view_matri
             }
             if(buffer0->m_num_vertices < 3) { continue; }
 
-            this->sendPolygonToTiles
+            renderer.sendPolygonToTiles
             (
                 buffer0,
                 material,

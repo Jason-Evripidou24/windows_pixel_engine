@@ -294,6 +294,46 @@ namespace Math
             m_data[15] = 0.0f;
         }
 
+        /*
+        // Ortho currently broken
+        inline void orthographic
+        (
+            const float left,
+            const float right,
+            const float bottom,
+            const float top,
+            const float near_plane,
+            const float far_plane
+        )
+        {
+            if( (right <= left) || (top <= bottom) || (far_plane <= near_plane) )
+            {
+                this->identity();
+                return;
+            }
+
+            m_data[0]  = 2.0f / (right - left);
+            m_data[1]  = 0.0f;
+            m_data[2]  = 0.0f;
+            m_data[3]  = -(right + left) / (right - left);
+
+            m_data[4]  = 0.0f;
+            m_data[5]  = 2.0f / (top - bottom);
+            m_data[6]  = 0.0f;
+            m_data[7]  = -(top + bottom) / (top - bottom);
+
+            m_data[8]  = 0.0f;
+            m_data[9]  = 0.0f;
+            m_data[10] = -2.0f / (far_plane - near_plane);
+            m_data[11] = -(far_plane + near_plane) / (far_plane - near_plane);
+
+            m_data[12] = 0.0f;
+            m_data[13] = 0.0f;
+            m_data[14] = 0.0f;
+            m_data[15] = 1.0f;
+        }
+        */
+
         inline void lookAt
         (
             float cam_pos_x, float cam_pos_y, float cam_pos_z,

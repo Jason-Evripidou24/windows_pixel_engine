@@ -37,7 +37,7 @@ void Backbuffer::clear(uint32_t color)
     for(int i = 0; i < count; i++)
     {
         m_color_buffer[i] = color;
-        m_depth_buffer[i] = -1.0001f;
+        m_depth_buffer[i] = -2.0f;
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
