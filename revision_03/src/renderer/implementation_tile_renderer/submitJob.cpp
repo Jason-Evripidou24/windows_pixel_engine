@@ -30,24 +30,6 @@ void TileRenderer::submitJob
 )
 {
     std::unique_lock<std::mutex> lock(m_jobs_mutex);
-    
-    if( (m_running.load() == false) || (polygon == nullptr) )
-    {
-        //-----------------------------------------------------------------------------------------------------------------//
-        std::unique_lock<std::mutex> extern_jobs_pending_lock(*extern_pending_jobs_mutex);
-
-        //extern_pending_jobs->fetch_sub(1);
-
-        if(extern_pending_jobs->fetch_sub(1) == 1)
-        {
-            extern_pending_jobs_condition_variable->notify_all();
-        }
-
-        extern_jobs_pending_lock.unlock();
-        //-----------------------------------------------------------------------------------------------------------------//
-
-        return;
-    }
 
     m_jobs.push
     (
@@ -64,6 +46,6 @@ void TileRenderer::submitJob
     );
 
     lock.unlock();
-    m_jobs_condition_variable.notify_all();
+    m_jobs_condition_variable.notify_one();
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

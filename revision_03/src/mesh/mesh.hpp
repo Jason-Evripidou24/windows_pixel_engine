@@ -105,8 +105,16 @@ struct Mesh
     inline std::string toString()
     {
         std::string output = std::string("");
-        output += std::string("MESH ID  : ") + std::to_string(m_mesh_id) + std::string("\n");
-        output += std::string("MESH NAME: ") + m_mesh_name;
+        output += std::string("MESH DETAILS:")                                                            + std::string("\n");
+        output += std::string("    ID                   : ") + std::to_string(m_mesh_id)                  + std::string("\n");
+        output += std::string("    NAME                 : ") + m_mesh_name                                + std::string("\n");
+        output += std::string("    NUM_RENDER_WIREFRAMES: ") + std::to_string(m_render_wireframes.size()) + std::string("\n");
+        for(size_t i = 0; i < m_render_wireframes.size(); i++)
+        {
+            output +=
+                std::string("        ") + std::string("RENDER_WIREFRAME ") + std::to_string(i) + std::string(" NUM_POLYGONS: ") +
+                std::string("        ") + std::to_string(m_render_wireframes[i].m_wireframe.m_num_polygons) + std::string("\n");
+        }
         return output;
     }
     //---------------------------------------------------------------------------------------------------------------------//

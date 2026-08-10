@@ -28,6 +28,7 @@
 #include "../backbuffer/backbuffer.hpp"
 #include "../material/material.hpp"
 #include "../math/geometry/math_geometry.hpp"
+#include "../model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -87,6 +88,14 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Functions.
     //---------------------------------------------------------------------------------------------------------------------//
+    void transformAndDrawLocalSpaceModel
+    (
+        const Model&              model,
+        const Math::Core::Mat4_f& projection_view_matrix,
+        bool                      draw_filled,
+        float                     color_mix
+    );
+
     void transformAndDrawLocalSpaceWireframe
     (
         const Math::Geometry::Wireframe& wireframe,

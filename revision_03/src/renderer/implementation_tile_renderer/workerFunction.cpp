@@ -57,7 +57,7 @@ void TileRenderer::workerFunction()
 
         if(tile_renderer_job.m_extern_pending_jobs->fetch_sub(1) == 1)
         {
-            (tile_renderer_job.m_extern_pending_jobs_condition_variable)->notify_all();
+            (tile_renderer_job.m_extern_pending_jobs_condition_variable)->notify_one();
         }
 
         extern_jobs_pending_lock.unlock();

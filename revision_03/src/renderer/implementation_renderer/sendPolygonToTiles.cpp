@@ -74,15 +74,15 @@ void Renderer::sendPolygonToTiles
     int tile_min_y = y_min / m_tile_height;
     int tile_max_y = y_max / m_tile_height;
 
-    int tile_renderers_required = (tile_max_x - tile_min_x + 1) * (tile_max_y - tile_min_y + 1);
+    //int tile_renderers_required = (tile_max_x - tile_min_x + 1) * (tile_max_y - tile_min_y + 1);
     //---------------------------------------------------------------------------------------------------------------------//
-
-    pending_jobs->fetch_add(tile_renderers_required);
 
     for(int tile_y = tile_min_y; tile_y <= tile_max_y; tile_y++)
     {
         for(int tile_x = tile_min_x; tile_x <= tile_max_x; tile_x++)
         {
+            pending_jobs->fetch_add(1);
+
             m_tile_renderers[tile_x + (tile_y * m_tiles_x)]->submitJob
             (
                 polygon,

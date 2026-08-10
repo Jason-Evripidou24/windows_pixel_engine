@@ -197,15 +197,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         
         for(size_t i = 0; i < tree_models.size(); i++)
         {
-            tree_models[i].renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+            renderer.transformAndDrawLocalSpaceModel(tree_models[i], proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
         }
-        ground_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        renderer.transformAndDrawLocalSpaceModel(ground_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
 
-        std::thread t_00([&]() { backpack_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_01([&]() { truck_001_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_02([&]() { house_001_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_03([&]() { house_002_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
-        std::thread t_04([&]() { house_003_model.renderModel(renderer, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_00([&]() { renderer.transformAndDrawLocalSpaceModel(backpack_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_01([&]() { renderer.transformAndDrawLocalSpaceModel(truck_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_02([&]() { renderer.transformAndDrawLocalSpaceModel(house_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_03([&]() { renderer.transformAndDrawLocalSpaceModel(house_002_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        std::thread t_04([&]() { renderer.transformAndDrawLocalSpaceModel(house_003_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         
         t_00.join();
         t_01.join();
@@ -224,6 +224,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             static_cast<int>(g_controls_string.size()),
             0xFFFFFFFF
         );
+
+        //info_string = house_003_mesh.toString();
+        //backbuffer.setText(10, 100, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
         
         backbuffer.present(window.m_dc, window.m_width, window.m_height);
     }
