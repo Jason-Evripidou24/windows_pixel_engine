@@ -2,12 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <atomic>
-#include <condition_variable>
-#include <cstdint>
-#include <mutex>
-#include <thread>
-#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -18,58 +12,41 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../model.hpp"
+#include "../renderer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Model::renderModel(Renderer& renderer, const Math::Core::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix)
+void Renderer::transformAndDrawLocalSpaceWireframe
+(
+    const Math::Geometry::Wireframe& wireframe,
+    const Math::Core::Mat4_f&        proj_view_model_matrix,
+    const Material*                  material,
+    bool                             draw_filled,
+    float                            color_mix,
+    std::atomic<int>*                pending_jobs,
+    std::mutex*                      pending_jobs_mutex,
+    std::condition_variable*         pending_jobs_condition_variable
+)
 {
-    std::atomic<int>        pending_jobs(0);
-    std::mutex              pending_jobs_mutex;
-    std::condition_variable pending_jobs_condition_variable;
+    size_t num_polygons = wireframe.m_num_polygons;
 
-    const Math::Core::Mat4_f proj_view_model_matrix = projection_view_matrix * this->calcModelMatrix();
-
-    size_t num_render_wireframes = m_mesh->m_render_wireframes.size();
-    
-    for(size_t i = 0; i < num_render_wireframes; i++)
+    for(size_t i = 0; i < num_polygons; i++)
     {
-        Math::Geometry::Wireframe& render_wireframe = m_mesh->m_render_wireframes[i].m_wireframe;
-        std::string& render_wireframe_material_name = m_mesh->m_render_wireframes[i].m_wireframe_material_name;
+        std::shared_ptr<Math::Geometry::Polygon> new_polygon = std::make_shared<Math::Geometry::Polygon>();
+        Math::Geometry::transformPolygon((*new_polygon), wireframe.m_polygons[i], proj_view_model_matrix);
 
-        Material* material = nullptr;
-        if
+        this->drawPolygon
         (
-            m_mesh->m_material_library.m_materials.find(render_wireframe_material_name) !=
-            m_mesh->m_material_library.m_materials.end()
-        )
-        {
-            material = m_mesh->m_material_library.m_materials[render_wireframe_material_name].get();
-        }
-
-        renderer.transformAndDrawLocalSpaceWireframe
-        (
-            render_wireframe,
-            proj_view_model_matrix,
+            new_polygon,
             material,
             draw_filled,
             color_mix,
-            &pending_jobs,
-            &pending_jobs_mutex,
-            &pending_jobs_condition_variable
+            pending_jobs,
+            pending_jobs_mutex,
+            pending_jobs_condition_variable
         );
     }
-
-    std::unique_lock lock(pending_jobs_mutex);
-    pending_jobs_condition_variable.wait
-    (
-        lock,
-        [&]
-        {
-            return pending_jobs.load() == 0;
-        }
-    );
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

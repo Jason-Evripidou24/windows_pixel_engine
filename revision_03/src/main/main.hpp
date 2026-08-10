@@ -32,9 +32,9 @@
 #include "../renderer/renderer.hpp"
 #include "../window/window.hpp"
 #include "../utils/utils.hpp"
+#include "../utils/timer/timer.hpp"
 #include "../mesh/mesh.hpp"
 #include "../model/model.hpp"
-#include "../timer/timer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

@@ -142,9 +142,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     {
         timer.tick();
 
-        //backbuffer.clear(0xFF87CEEB); // Sky blue
+        backbuffer.clear(0xFF87CEEB); // Sky blue
         //backbuffer.clear(0xFFFF0000); // Red
-        backbuffer.clear(0xFF000000); // Black
+        //backbuffer.clear(0xFF000000); // Black
         //backbuffer.clear(0xFFFFFFFF); // White
 
         processInput(window, timer.deltaTime);
@@ -184,13 +184,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         view_matrix = g_camera.calcViewMatrix();
         proj_view_matrix = projection_matrix * view_matrix;
 
-        int mis_screen_x = backbuffer.toBackbufferCoordX(0);
-        int mis_screen_y = backbuffer.toBackbufferCoordY(0);
-        for(int i = -5; i <= 5; i++)
+        int mid_screen_x = backbuffer.toBackbufferCoordX(0);
+        int mid_screen_y = backbuffer.toBackbufferCoordY(0);
+        int crosshair_size = 3;
+        for(int i = -crosshair_size; i <= crosshair_size; i++)
         {
-            for(int j = -5; j <= 5; j++)
+            for(int j = -crosshair_size; j <= crosshair_size; j++)
             {
-                backbuffer.setPixel(mis_screen_x + i, mis_screen_y + j, 1.0f, 0xFF000000);
+                backbuffer.setPixel(mid_screen_x + i, mid_screen_y + j, 1.0f, 0xFF000000);
             }
         }
         

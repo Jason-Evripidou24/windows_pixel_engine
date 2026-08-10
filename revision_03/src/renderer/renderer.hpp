@@ -87,6 +87,29 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Functions.
     //---------------------------------------------------------------------------------------------------------------------//
+    void transformAndDrawLocalSpaceWireframe
+    (
+        const Math::Geometry::Wireframe& wireframe,
+        const Math::Core::Mat4_f&        proj_view_model_matrix,
+        const Material*                  material,
+        bool                             draw_filled,
+        float                            color_mix,
+        std::atomic<int>*                pending_jobs,
+        std::mutex*                      pending_jobs_mutex,
+        std::condition_variable*         pending_jobs_condition_variable
+    );
+
+    void drawPolygon
+    (
+        std::shared_ptr<Math::Geometry::Polygon> polygon,
+        const Material*                          material,
+        bool                                     draw_filled,
+        float                                    color_mix,
+        std::atomic<int>*                        pending_jobs,
+        std::mutex*                              pending_jobs_mutex,
+        std::condition_variable*                 pending_jobs_condition_variable
+    );
+
     void sendPolygonToTiles
     (
         std::shared_ptr<const Math::Geometry::Polygon> polygon,
