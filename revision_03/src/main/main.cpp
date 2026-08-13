@@ -77,6 +77,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     backpack_model.m_rotate_rad = 0.0f;
     backpack_model.m_rotate_axis = Math::Core::Vec3_f(0.0f, 1.0f, 0.0f);
 
+    Model cube_model(-1, "cube_model", &cube_mesh);
+    cube_model.m_position = Math::Core::Vec3_f(0.0f, 5.0f, 0.0f);
+    cube_model.m_scale = Math::Core::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_model.m_rotate_rad = 0.0f;
+    cube_model.m_rotate_axis = Math::Core::Vec3_f(0.0f, 1.0f, 0.0f);
+
     Model ground_model(-1, "ground_model", &ground_mesh);
     ground_model.m_position = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
     ground_model.m_scale = Math::Core::Vec3_f(1.0f, 1.0f, 1.0f);
@@ -149,6 +155,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         processInput(window, timer.deltaTime);
 
+        cube_model.m_rotate_rad += timer.deltaTime * 1.0f;
+
         std::string intersection_success = std::string("");
 
         Math::Core::Vec3_f line_start_pos = g_camera.m_position;
@@ -200,14 +208,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             renderer.transformAndDrawLocalSpaceModel(tree_models[i], proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
         }
         renderer.transformAndDrawLocalSpaceModel(ground_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        renderer.transformAndDrawLocalSpaceModel(cube_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
 
-        std::thread t_00([&]() { renderer.transformAndDrawLocalSpaceModel(backpack_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
+        //std::thread t_00([&]() { renderer.transformAndDrawLocalSpaceModel(backpack_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_01([&]() { renderer.transformAndDrawLocalSpaceModel(truck_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_02([&]() { renderer.transformAndDrawLocalSpaceModel(house_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_03([&]() { renderer.transformAndDrawLocalSpaceModel(house_002_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_04([&]() { renderer.transformAndDrawLocalSpaceModel(house_003_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         
-        t_00.join();
+        //t_00.join();
         t_01.join();
         t_02.join();
         t_03.join();

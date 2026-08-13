@@ -26,7 +26,7 @@
 presets  g_preset00(1400, 900, 1, 10, 10, 800);
 presets  g_preset01(1360, 900, 2, 10, 10, 360);
 presets  g_preset02(1300, 700, 1, 10, 10, 600);
-presets& g_preset_to_use = g_preset00;
+presets& g_preset_to_use = g_preset01;
 
 // Camera and camera related variables.
 Camera g_camera

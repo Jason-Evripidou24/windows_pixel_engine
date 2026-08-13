@@ -34,7 +34,20 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 namespace Utils
 {
-    bool checkFloatEquals(const float a, const float b);
+    inline bool checkFloatEquals(const float a, const float b)
+    {
+        const float eps = 0.0001f;
+
+        float smaller_val = a;
+        if(b < smaller_val) { smaller_val = b; }
+
+        float larger_val = a;
+        if(b > larger_val) { larger_val = b; }
+
+        if( (larger_val - smaller_val) > eps) { return false; }
+        return true;
+    }
+
     std::string floatToString(float value, int min_string_width, int num_decimals);
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

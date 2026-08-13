@@ -119,12 +119,12 @@ namespace Math
             {
                 for(size_t i = 0; i < m_data_size; i++)
                 {
-                    if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == true)
+                    if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == false)
                     {
-                        return false;
+                        return true;
                     }
                 }
-                return true;
+                return false;
             }
             //-------------------------------------------------------------------------------------------------------------//
 

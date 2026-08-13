@@ -28,6 +28,7 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "mat4_f.hpp"
+#include "quaternion.hpp"
 #include "vec2_f.hpp"
 #include "vec3_f.hpp"
 #include "vec4_f.hpp"

@@ -112,12 +112,12 @@ namespace Math
             {
                 for(size_t i = 0; i < m_data_size; i++)
                 {
-                    if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == true)
+                    if(Utils::checkFloatEquals(m_data[i], other.m_data[i]) == false)
                     {
-                        return false;
+                        return true;
                     }
                 }
-                return true;
+                return false;
             }
             //-------------------------------------------------------------------------------------------------------------//
 
@@ -228,8 +228,8 @@ namespace Math
                 float y;
                 float z;
 
-                float length = axis_x + axis_y + axis_z;
-                length = sqrtf(length);
+                const float length_squared = (axis_x * axis_x) + (axis_y * axis_y) + (axis_z * axis_z);
+                const float length = sqrtf(length_squared);
 
                 if(length == 0.0f)
                 {

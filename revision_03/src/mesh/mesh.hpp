@@ -112,7 +112,7 @@ struct Mesh
         for(size_t i = 0; i < m_render_wireframes.size(); i++)
         {
             output +=
-                std::string("        ") + std::string("RENDER_WIREFRAME ") + std::to_string(i) + std::string(" NUM_POLYGONS: ") +
+                std::string("        ") + std::to_string(i) + std::string(" NUM_POLYGONS: ") +
                 std::string("        ") + std::to_string(m_render_wireframes[i].m_wireframe.m_num_polygons) + std::string("\n");
         }
         return output;
