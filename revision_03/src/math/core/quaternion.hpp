@@ -231,7 +231,8 @@ namespace Math
                 m_w *= inv_length;
             }
 
-            inline Quaternion fromEuler(float x_axis, float y_axis, float z_axis) const
+            // Untested
+            inline static Quaternion fromEuler(float x_axis, float y_axis, float z_axis)
             {
                 const float x = x_axis * 0.5f;
                 const float y = y_axis * 0.5f;
@@ -252,7 +253,7 @@ namespace Math
                 return result;
             }
 
-            inline Quaternion fromAxisAngle(float x_axis, float y_axis, float z_axis, float angle) const
+            inline static Quaternion fromAxisAngle(float x_axis, float y_axis, float z_axis, float angle)
             {
                 const float half_angle = angle * 0.5f;
                 const float s = sinf(half_angle);

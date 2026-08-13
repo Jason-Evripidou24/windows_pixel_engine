@@ -77,11 +77,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     backpack_model.m_rotate_rad = 0.0f;
     backpack_model.m_rotate_axis = Math::Core::Vec3_f(0.0f, 1.0f, 0.0f);
 
-    Model cube_model(-1, "cube_model", &cube_mesh);
-    cube_model.m_position = Math::Core::Vec3_f(0.0f, 5.0f, 0.0f);
-    cube_model.m_scale = Math::Core::Vec3_f(1.0f, 1.0f, 1.0f);
-    cube_model.m_rotate_rad = 0.0f;
-    cube_model.m_rotate_axis = Math::Core::Vec3_f(0.0f, 1.0f, 0.0f);
+    Model cube_model_001(-1, "cube_model", &cube_mesh);
+    cube_model_001.m_position = Math::Core::Vec3_f(-2.0f, 2.0f, 0.0f);
+    cube_model_001.m_scale = Math::Core::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_model_001.m_rotate_rad = 0.0f;
+    cube_model_001.m_rotate_axis = Math::Core::Vec3_f(-10.0f, 1.0f,5.0f);
+
+    Model cube_model_002(-1, "cube_model", &cube_mesh);
+    cube_model_002.m_position = Math::Core::Vec3_f(0.0f, 2.0f, 0.0f);
+    cube_model_002.m_scale = Math::Core::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_model_002.m_rotate_rad = 0.0f;
+    cube_model_002.m_rotate_axis = Math::Core::Vec3_f(3.0f, 6.0f, -12.0f);
+
+    Model cube_model_003(-1, "cube_model", &cube_mesh);
+    cube_model_003.m_position = Math::Core::Vec3_f(2.0f, 2.0f, 0.0f);
+    cube_model_003.m_scale = Math::Core::Vec3_f(1.0f, 1.0f, 1.0f);
+    cube_model_003.m_rotate_rad = 0.0f;
+    cube_model_003.m_rotate_axis = Math::Core::Vec3_f(-8.0f, -7.0f, 4.0f);
 
     Model ground_model(-1, "ground_model", &ground_mesh);
     ground_model.m_position = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
@@ -155,7 +167,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         processInput(window, timer.deltaTime);
 
-        cube_model.m_rotate_rad += timer.deltaTime * 1.0f;
+        cube_model_001.m_rotate_rad += timer.deltaTime * 1.0f;
+        cube_model_002.m_rotate_rad += timer.deltaTime * 1.0f;
+        cube_model_003.m_rotate_rad += timer.deltaTime * 1.0f;
 
         std::string intersection_success = std::string("");
 
@@ -172,6 +186,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         if(Math::Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
         {
             intersection_success += truck_001_model.toString() + std::string("\n");
+        }
+
+        Math::Geometry::transformMultiWireframe
+        (
+            hitbox_transformed,
+            cube_model_001.m_mesh->m_hitbox,
+            cube_model_001.calcModelMatrix()
+        );
+        if(Math::Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
+        {
+            intersection_success += cube_model_001.toString() + std::string("\n");
+        }
+        Math::Geometry::transformMultiWireframe
+        (
+            hitbox_transformed,
+            cube_model_002.m_mesh->m_hitbox,
+            cube_model_002.calcModelMatrix()
+        );
+        if(Math::Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
+        {
+            intersection_success += cube_model_002.toString() + std::string("\n");
+        }
+        Math::Geometry::transformMultiWireframe
+        (
+            hitbox_transformed,
+            cube_model_003.m_mesh->m_hitbox,
+            cube_model_003.calcModelMatrix()
+        );
+        if(Math::Geometry::checkLineSegmentIntersectsMultiWireframe(line_start_pos, line_end_pos, hitbox_transformed) == true)
+        {
+            intersection_success += cube_model_003.toString() + std::string("\n");
         }
 
         for(size_t tree_model = 0; tree_model < tree_models.size(); tree_model++)
@@ -208,7 +253,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             renderer.transformAndDrawLocalSpaceModel(tree_models[i], proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
         }
         renderer.transformAndDrawLocalSpaceModel(ground_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
-        renderer.transformAndDrawLocalSpaceModel(cube_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        renderer.transformAndDrawLocalSpaceModel(cube_model_001, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        renderer.transformAndDrawLocalSpaceModel(cube_model_002, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
+        renderer.transformAndDrawLocalSpaceModel(cube_model_003, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix);
 
         //std::thread t_00([&]() { renderer.transformAndDrawLocalSpaceModel(backpack_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });
         std::thread t_01([&]() { renderer.transformAndDrawLocalSpaceModel(truck_001_model, proj_view_matrix, g_draw_filled, g_vertex_material_color_mix); });

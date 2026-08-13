@@ -44,6 +44,7 @@ struct Camera
     // Euler angles (radians).
     float m_pitch_rads;         // Rotation around local X axis.
     float m_yaw_rads;           // Rotation around local Y axis.
+    Math::Core::Quaternion m_rotation;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -102,6 +103,17 @@ struct Camera
         return result;
     }
     //---------------------------------------------------------------------------------------------------------------------//
+
+    /*
+    inline Math::Core::Vec3_f rotateVector(const Math::Core::Vec3_f& vector) const
+    {
+        Math::Core::Quaternion vector_quaternion(vector.m_data[0], vector.m_data[1], vector.m_data[2], 0.0f);
+
+        Math::Core::Quaternion result = m_rotation * vector_quaternion * m_rotation.conjugate();
+
+        return Math::Core::Vec3_f(result.m_x, result.m_y, result.m_z);
+    }
+    */
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

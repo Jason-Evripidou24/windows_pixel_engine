@@ -19,6 +19,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "quaternion.hpp"
 #include "vec4_f.hpp"
 #include "../../utils/utils.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -223,61 +224,39 @@ namespace Math
 
             inline void rotation(const float axis_x, const float axis_y, const float axis_z, const float theta_rad)
             {
-                //---------------------------------------------------------------------------------------------------------//
-                float x;
-                float y;
-                float z;
+                Math::Core::Quaternion q = Math::Core::Quaternion::fromAxisAngle(axis_x, axis_y, axis_z, theta_rad);
 
-                const float length_squared = (axis_x * axis_x) + (axis_y * axis_y) + (axis_z * axis_z);
-                const float length = sqrtf(length_squared);
+                const float xx = q.m_x * q.m_x;
+                const float yy = q.m_y * q.m_y;
+                const float zz = q.m_z * q.m_z;
 
-                if(length == 0.0f)
-                {
-                    x = 0.0f;
-                    y = 0.0f;
-                    z = 0.0f;
-                }
-                else
-                {
-                    x = axis_x / length;
-                    y = axis_y / length;
-                    z = axis_z / length;
-                }   
+                const float xy = q.m_x * q.m_y;
+                const float xz = q.m_x * q.m_z;
+                const float yz = q.m_y * q.m_z;
 
-                if( (x == 0.0f) && (y == 0.0f) && (z == 0.0f) )
-                {
-                    this->identity();
-                    return;
-                }
+                const float wx = q.m_w * q.m_x;
+                const float wy = q.m_w * q.m_y;
+                const float wz = q.m_w * q.m_z;
 
-                float cos_theta = cosf(theta_rad);
-                float sin_theta = sinf(theta_rad);
-                float one_minus_cos_theta = 1.0f - cos_theta;
-                //---------------------------------------------------------------------------------------------------------//
-
-                //---------------------------------------------------------------------------------------------------------//
-                // Row-major rotation matrix
-
-                m_data[0]  = cos_theta + (x * x * one_minus_cos_theta);
-                m_data[1]  = (x * y * one_minus_cos_theta) - (z * sin_theta);
-                m_data[2]  = (x * z * one_minus_cos_theta) + (y * sin_theta);
+                m_data[0]  = 1.0f - 2.0f * (yy + zz);
+                m_data[1]  = 2.0f * (xy - wz);
+                m_data[2]  = 2.0f * (xz + wy);
                 m_data[3]  = 0.0f;
 
-                m_data[4]  = (y * x * one_minus_cos_theta) + (z * sin_theta);
-                m_data[5]  = cos_theta + (y * y * one_minus_cos_theta);
-                m_data[6]  = (y * z * one_minus_cos_theta) - (x * sin_theta);
+                m_data[4]  = 2.0f * (xy + wz);
+                m_data[5]  = 1.0f - 2.0f * (xx + zz);
+                m_data[6]  = 2.0f * (yz - wx);
                 m_data[7]  = 0.0f;
 
-                m_data[8]  = (z * x * one_minus_cos_theta) - (y * sin_theta);
-                m_data[9]  = (z * y * one_minus_cos_theta) + (x * sin_theta);
-                m_data[10] = cos_theta + (z * z * one_minus_cos_theta);
+                m_data[8]  = 2.0f * (xz - wy);
+                m_data[9]  = 2.0f * (yz + wx);
+                m_data[10] = 1.0f - 2.0f * (xx + yy);
                 m_data[11] = 0.0f;
 
                 m_data[12] = 0.0f;
                 m_data[13] = 0.0f;
                 m_data[14] = 0.0f;
                 m_data[15] = 1.0f;
-                //---------------------------------------------------------------------------------------------------------//
             }
 
             inline void scale(const float x, const float y, const float z)

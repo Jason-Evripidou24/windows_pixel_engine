@@ -26,6 +26,21 @@ void Camera::lookRight(const float offset)
     m_yaw_rads = std::fmod(m_yaw_rads, Math::Core::TWO_PI_f);
 
     this->updateVectors();
+
+    /*
+    const Math::Core::Quaternion rotation = Math::Core::Quaternion::fromAxisAngle
+    (
+        m_world_up.m_data[0],
+        m_world_up.m_data[1],
+        m_world_up.m_data[2],
+        offset
+    );
+
+    m_rotation = m_rotation * rotation;
+    m_rotation.normalise();
+
+    this->updateVectors();
+    */
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -37,5 +52,20 @@ void Camera::lookUp(const float offset)
     m_pitch_rads = std::clamp<float>(m_pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
 
     this->updateVectors();
+
+    /*
+    const Math::Core::Quaternion rotation = Math::Core::Quaternion::fromAxisAngle
+    (
+        m_right.m_data[0],
+        m_right.m_data[1],
+        m_right.m_data[2],
+        offset
+    );
+
+    m_rotation = m_rotation * rotation;
+    m_rotation.normalise();
+
+    this->updateVectors();
+    */
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

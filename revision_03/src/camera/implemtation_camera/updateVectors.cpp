@@ -35,4 +35,44 @@ void Camera::updateVectors()
     Math::Core::crossProduct(m_up, m_right, m_front);
     m_up.normalise();
 }
+
+/*
+void Camera::updateVectors()
+{
+    // Camera's default orientation:
+    //
+    // Forward = +Z
+    // Right   = +X
+    // Up      = +Y
+
+    const Math::Core::Vec3_f default_front
+    (
+        0.0f,
+        0.0f,
+        1.0f
+    );
+
+    const Math::Core::Vec3_f default_right
+    (
+        1.0f,
+        0.0f,
+        0.0f
+    );
+
+    const Math::Core::Vec3_f default_up
+    (
+        0.0f,
+        1.0f,
+        0.0f
+    );
+
+    m_front = this->rotateVector(default_front);
+    m_right = this->rotateVector(default_right);
+    m_up    = this->rotateVector(default_up);
+
+    m_front.normalise();
+    m_right.normalise();
+    m_up.normalise();
+}
+*/
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
