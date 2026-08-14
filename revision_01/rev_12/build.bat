@@ -6,8 +6,7 @@ REM Compiler setup (MSVC)
 REM ================================
 call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
 set "COMPILER=cl"
-set "CFLAGS=/nologo /EHsc /std:c++17 /W4 /O2 /GL /Gy /Oi /fp:fast /arch:AVX2"
-set "LDFLAGS=/LTCG /OPT:REF /OPT:ICF"
+set "CFLAGS=/nologo /EHsc /std:c++17 /W4"
 
 REM ================================
 REM Directories
@@ -68,7 +67,7 @@ for /r %OBJ_DIR% %%f in (*.obj) do (
     set "OBJS=!OBJS! "%%f""
 )
 
-%COMPILER% !OBJS! /Fe:%OUT_EXE% %LDFLAGS% user32.lib gdi32.lib
+%COMPILER% %CFLAGS% !OBJS! /Fe:%OUT_EXE% user32.lib gdi32.lib
 
 if errorlevel 1 (
     echo Link failed!

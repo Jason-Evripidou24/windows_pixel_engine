@@ -18,23 +18,20 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawTriangle
-(
-    Backbuffer& target,
-    float       v0_x,
-    float       v0_y,
-    float       v0_z,
-    uint32_t    v0_color,
-    float       v1_x,
-    float       v1_y,
-    float       v1_z,
-    uint32_t    v1_color,
-    float       v2_x,
-    float       v2_y,
-    float       v2_z,
-    uint32_t    v2_color
-)
+/*
+-   Triangle has been transformed to clip space and undergone perspective divide but no clipping against x,y,z planes.
+*/
+void Renderer::drawTriangle(const Math::Triangle& triangle, const Material* material, bool draw_filled, float color_mix)
 {
-    
+    if(draw_filled == true)
+    {
+        this->fillTriangle(triangle, material, color_mix);
+    }
+    else
+    {
+        this->drawLine(triangle.m_v0, triangle.m_v1, material, color_mix);
+        this->drawLine(triangle.m_v0, triangle.m_v2, material, color_mix);
+        this->drawLine(triangle.m_v1, triangle.m_v2, material, color_mix);
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

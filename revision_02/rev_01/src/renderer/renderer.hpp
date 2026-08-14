@@ -8,12 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <atomic>
-#include <condition_variable>
 #include <cstdint>
-#include <mutex>
-#include <thread>
-#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -25,10 +20,6 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../backbuffer/backbuffer.hpp"
-
-#include "../math/math.hpp"
-#include "../model/model.hpp"
-#include "../model/material_triangle.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -50,31 +41,37 @@
     6.  Screen Space
     |   Rasterization, Depth Test, Framebuffer
 
--   All Draw methods assume that triangles, vertices, ... have been transformed to clip space. i.e. They have undergone
-    transformation from loacl to clip space and perspective divide.
--   Draw methods of the renderer will clip triangles to be within -1 and 1 in the x,y,z view frustum.
+
+-   draw... functions are responsible for rendering triangles that are in clip space.
 */
 struct Renderer
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    Backbuffer* m_backbuffer;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(Backbuffer* backbuffer);
-    ~Renderer();
+    Renderer() = default;
+    ~Renderer() = default;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Functions.
+    // Draw functions. Triangles here are in clip space.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawModel(const Model& model, const Math::Mat4_f& projection_view_matrix, bool draw_filled, float color_mix);
-    void drawTriangle(const Math::Triangle& triangle, const Material* material, bool draw_filled, float color_mix);
-    void fillTriangle(const Math::Triangle& triangle, const Material* material, float color_mix);
-    void drawLine(const Math::Vertex& v_0, const Math::Vertex& v_1, const Material* material, float color_mix);
-    void drawPixel(const Math::Vertex& vertex, const Material* material, float color_mix);
+    void drawTriangle
+    (
+        Backbuffer& target,
+        float       v0_x,
+        float       v0_y,
+        float       v0_z,
+        uint32_t    v0_color,
+        float       v1_x,
+        float       v1_y,
+        float       v1_z,
+        uint32_t    v1_color,
+        float       v2_x,
+        float       v2_y,
+        float       v2_z,
+        uint32_t    v2_color
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

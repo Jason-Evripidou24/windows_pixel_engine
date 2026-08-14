@@ -19,10 +19,11 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-bool Window::create(const wchar_t* title, int width, int height, HINSTANCE h_instance)
+bool Window::create(const wchar_t* title, int width, int height, int pixel_size, HINSTANCE h_instance)
 {
     m_width = width;
     m_height = height;
+    m_pixel_size = pixel_size;
 
     WNDCLASS wc = {};
     wc.lpfnWndProc   = WindowProc;
@@ -59,6 +60,8 @@ bool Window::create(const wchar_t* title, int width, int height, HINSTANCE h_ins
     m_dc = GetDC(m_hwnd);
 
     m_running = true;
+
+    m_backbuffer.resize(m_width / m_pixel_size, m_height / m_pixel_size);
 
     return true;
 }
