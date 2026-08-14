@@ -13,42 +13,13 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../renderer.hpp"
+
+#include "../../math/core/math_core.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-uint32_t mixColor(uint32_t color_a, float alpha, uint32_t color_b, float beta, uint32_t color_c, float gamma)
-{
-    float a0 = static_cast<float>((color_a >> 0) & 0xFF);
-    float a1 = static_cast<float>((color_a >> 8) & 0xFF);
-    float a2 = static_cast<float>((color_a >> 16) & 0xFF);
-    float a3 = static_cast<float>((color_a >> 24) & 0xFF);
-
-    float b0 = static_cast<float>((color_b >> 0) & 0xFF);
-    float b1 = static_cast<float>((color_b >> 8) & 0xFF);
-    float b2 = static_cast<float>((color_b >> 16) & 0xFF);
-    float b3 = static_cast<float>((color_b >> 24) & 0xFF);
-
-    float c0 = static_cast<float>((color_c >> 0) & 0xFF);
-    float c1 = static_cast<float>((color_c >> 8) & 0xFF);
-    float c2 = static_cast<float>((color_c >> 16) & 0xFF);
-    float c3 = static_cast<float>((color_c >> 24) & 0xFF);
-
-    uint8_t mix0 = static_cast<uint8_t>( (a0 * alpha) + (b0 * beta) + (c0 * gamma) );
-    uint8_t mix1 = static_cast<uint8_t>( (a1 * alpha) + (b1 * beta) + (c1 * gamma) );
-    uint8_t mix2 = static_cast<uint8_t>( (a2 * alpha) + (b2 * beta) + (c2 * gamma) );
-    uint8_t mix3 = static_cast<uint8_t>( (a3 * alpha) + (b3 * beta) + (c3 * gamma) );
-
-    uint32_t result =
-        (static_cast<uint32_t>(mix0) << 0)  |
-        (static_cast<uint32_t>(mix1) << 8)  |
-        (static_cast<uint32_t>(mix2) << 16) |
-        (static_cast<uint32_t>(mix3) << 24);
-
-    return result;
-}
-
 void Renderer::drawTriangle
 (
     Backbuffer& backbuffer_target,
@@ -128,9 +99,6 @@ void Renderer::drawTriangle
             //-------------------------------------------------------------------------------------------------------------//
 
             //-------------------------------------------------------------------------------------------------------------//
-            float ax_minus_px = (float)(v0_x_screen - x);
-            float py_minus_ay = (float)(y - v0_y_screen);
-
             float w2_denominator = (by_minus_ay * cx_minus_ax) - (bx_minus_ax * cy_minus_ay);
             if(w2_denominator == 0.0f) { continue; }
 
@@ -144,7 +112,7 @@ void Renderer::drawTriangle
             //-------------------------------------------------------------------------------------------------------------//
 
             float z = (w0 * v0_z) + (w1 * v1_z) + (w2 * v2_z);
-            uint32_t color = mixColor(v0_color, w0, v1_color, w1, v2_color, w2);
+            uint32_t color = Math::Core::mixUint32(v0_color, w0, v1_color, w1, v2_color, w2);
             backbuffer_target.setPixel(x, y, z, color);
         }
     }
