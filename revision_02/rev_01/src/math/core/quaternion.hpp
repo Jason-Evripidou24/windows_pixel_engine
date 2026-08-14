@@ -27,6 +27,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "mat4_f.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -230,28 +231,6 @@ namespace Math
                 m_w *= inv_length;
             }
 
-            // Untested
-            inline static Quaternion fromEuler(float x_axis, float y_axis, float z_axis)
-            {
-                const float x = x_axis * 0.5f;
-                const float y = y_axis * 0.5f;
-                const float z = z_axis * 0.5f;
-
-                const float cx = cosf(x);
-                const float sx = sinf(x);
-                const float cy = cosf(y);
-                const float sy = sinf(y);
-                const float cz = cosf(z);
-                const float sz = sinf(z);
-
-                Quaternion result;
-                result.m_x = (sx * cy * cz) - (cx * sy * sz);
-                result.m_y = (cx * sy * cz) + (sx * cy * sz);
-                result.m_z = (cx * cy * sz) - (sx * sy * cz);
-                result.m_w = (cx * cy * cz) + (sx * sy * sz);
-                return result;
-            }
-
             inline static Quaternion fromAxisAngle(float x_axis, float y_axis, float z_axis, float angle)
             {
                 const float half_angle = angle * 0.5f;
@@ -267,6 +246,45 @@ namespace Math
                 const float inv_len = 1.0f / sqrtf(length_squared);
 
                 return Quaternion(x_axis * s * inv_len, y_axis * s * inv_len, z_axis * s * inv_len, c);
+            }
+
+            inline Math::Core::Mat4_f toRotationMatrix() const
+            {
+                Mat4_f result;
+
+                const float xx = m_x * m_x;
+                const float yy = m_y * m_y;
+                const float zz = m_z * m_z;
+
+                const float xy = m_x * m_y;
+                const float xz = m_x * m_z;
+                const float yz = m_y * m_z;
+
+                const float wx = m_w * m_x;
+                const float wy = m_w * m_y;
+                const float wz = m_w * m_z;
+
+                result.m_data[0]  = 1.0f - (2.0f * yy) - (2.0f * zz);
+                result.m_data[1]  = (2.0f * xy) - (2.0f * wz);
+                result.m_data[2]  = (2.0f * xz) + (2.0f * wy);
+                result.m_data[3]  = 0.0f;
+
+                result.m_data[4]  = (2.0f * xy) + (2.0f * wz);
+                result.m_data[5]  = 1.0f - (2.0f * xx) - (2.0f * zz);
+                result.m_data[6]  = (2.0f * yz) - (2.0f * wx);
+                result.m_data[7]  = 0.0f;
+
+                result.m_data[8]  = (2.0f * xz) - (2.0f * wy);
+                result.m_data[9]  = (2.0f * yz) + (2.0f * wx);
+                result.m_data[10] = 1.0f - (2.0f * xx) - (2.0f * yy);
+                result.m_data[11] = 0.0f;
+
+                result.m_data[12] = 0.0f;
+                result.m_data[13] = 0.0f;
+                result.m_data[14] = 0.0f;
+                result.m_data[15] = 1.0f;
+
+                return result;
             }
         };
     };

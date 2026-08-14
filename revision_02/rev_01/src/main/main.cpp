@@ -71,11 +71,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         rotate_angle += timer.deltaTime * 1.0f;
         Math::Core::Quaternion rotate = Math::Core::Quaternion::fromAxisAngle(0.0f, 0.0f, 1.0f, rotate_angle);
-        rotate.normalise();
-        Math::Core::rotateVec4(top_left_transformed, rotate, top_left);
-        Math::Core::rotateVec4(top_right_transformed, rotate, top_right);
-        Math::Core::rotateVec4(bot_left_transformed, rotate, bot_left);
-        Math::Core::rotateVec4(bot_right_transformed, rotate, bot_right);
+
+        top_left_transformed = rotate.toRotationMatrix() * top_left;
+        top_right_transformed = rotate.toRotationMatrix() * top_right;
+        bot_left_transformed = rotate.toRotationMatrix() * bot_left;
+        bot_right_transformed = rotate.toRotationMatrix() * bot_right;
 
         renderer.drawTriangle
         (
