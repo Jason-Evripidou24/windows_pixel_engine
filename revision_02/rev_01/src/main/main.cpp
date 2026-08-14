@@ -1,4 +1,5 @@
 #include "../window/window.hpp"
+#include "../renderer/renderer.hpp"
 
 static bool g_prev_1_key = false;
 static bool g_prev_2_key = false;
@@ -42,16 +43,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Window window;
     if(!window.create(L"Pixel Engine", 600, 600, 1, hInstance)) { return EXIT_FAILURE; }
 
+    Renderer renderer;
+
     while(window.processMessages())
     {
         processInput(window);
 
         window.m_backbuffer.clear(0xFF87CEEB); // Sky blue
 
-        window.m_backbuffer.setPixel(0, 0, 0.0f, 0xFF000000);
-        window.m_backbuffer.setPixel(0, 1, 0.0f, 0xFFFF0000);
-        window.m_backbuffer.setPixel(1, 0, 0.0f, 0xFF00FF00);
-        window.m_backbuffer.setPixel(1, 1, 0.0f, 0xFF0000FF);
+        renderer.drawTriangle
+        (
+             window.m_backbuffer,
+             0.0f,  0.5f, 0.0f, 0xFF000000,
+            -0.5f, -0.5f, 0.0f, 0xFF000000,
+             0.5f, -0.5f, 0.0f, 0xFF000000
+        );
 
         window.presentBackbuffer();
     }
