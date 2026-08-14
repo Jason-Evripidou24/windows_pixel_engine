@@ -54,9 +54,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.drawTriangle
         (
              window.m_backbuffer,
-             0.0f,  0.5f, 0.0f, 0xFF000000,
-            -0.5f, -0.5f, 0.0f, 0xFF000000,
-             0.5f, -0.5f, 0.0f, 0xFF000000
+             0.0f,  0.5f, 0.0f, 0xFFFF0000,
+            -0.5f, -0.5f, 0.0f, 0xFF00FF00,
+             0.5f, -0.5f, 0.0f, 0xFF0000FF
         );
 
         window.presentBackbuffer();

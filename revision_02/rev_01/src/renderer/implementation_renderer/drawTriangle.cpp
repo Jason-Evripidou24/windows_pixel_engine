@@ -18,6 +18,37 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+uint32_t mixColor(uint32_t color_a, float alpha, uint32_t color_b, float beta, uint32_t color_c, float gamma)
+{
+    float a0 = static_cast<float>((color_a >> 0) & 0xFF);
+    float a1 = static_cast<float>((color_a >> 8) & 0xFF);
+    float a2 = static_cast<float>((color_a >> 16) & 0xFF);
+    float a3 = static_cast<float>((color_a >> 24) & 0xFF);
+
+    float b0 = static_cast<float>((color_b >> 0) & 0xFF);
+    float b1 = static_cast<float>((color_b >> 8) & 0xFF);
+    float b2 = static_cast<float>((color_b >> 16) & 0xFF);
+    float b3 = static_cast<float>((color_b >> 24) & 0xFF);
+
+    float c0 = static_cast<float>((color_c >> 0) & 0xFF);
+    float c1 = static_cast<float>((color_c >> 8) & 0xFF);
+    float c2 = static_cast<float>((color_c >> 16) & 0xFF);
+    float c3 = static_cast<float>((color_c >> 24) & 0xFF);
+
+    uint8_t mix0 = static_cast<uint8_t>( (a0 * alpha) + (b0 * beta) + (c0 * gamma) );
+    uint8_t mix1 = static_cast<uint8_t>( (a1 * alpha) + (b1 * beta) + (c1 * gamma) );
+    uint8_t mix2 = static_cast<uint8_t>( (a2 * alpha) + (b2 * beta) + (c2 * gamma) );
+    uint8_t mix3 = static_cast<uint8_t>( (a3 * alpha) + (b3 * beta) + (c3 * gamma) );
+
+    uint32_t result =
+        (static_cast<uint32_t>(mix0) << 0)  |
+        (static_cast<uint32_t>(mix1) << 8)  |
+        (static_cast<uint32_t>(mix2) << 16) |
+        (static_cast<uint32_t>(mix3) << 24);
+
+    return result;
+}
+
 void Renderer::drawTriangle
 (
     Backbuffer& backbuffer_target,
@@ -73,50 +104,20 @@ void Renderer::drawTriangle
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Triangle edges.
-    //---------------------------------------------------------------------------------------------------------------------//
-    struct Vec3f
-    {
-        float m_data[3];
-        Vec3f(float x, float y, float z) { m_data[0] = x; m_data[1] = y; m_data[2] = z; }
-    };
-    struct Vec2f
-    {
-        float m_data[2];
-        Vec2f(float x, float y) { m_data[0] = x; m_data[1] = y; }
-    };
-
-    auto dotProduct = [](const Vec2f& a, const Vec2f& b)
-    {
-        return (a.m_data[0] * b.m_data[0]) + (a.m_data[1] * b.m_data[1]);
-    };
-
-    // Point = (x, y) + w1(edge0to1) + w2(edge0to2)
-    // PointX = x + w1(v1_x_screen - v0_x_screen) + w2(v1_y_screen - v0_y_screen)
-    // PointY = y + w1(v2_x_screen - v0_x_screen) + w2(v2_y_screen - v0_y_screen)
-
-    Vec2f edge0to1(v1_x_screen - v0_x_screen, v1_y_screen - v0_y_screen);
-    Vec2f edge0to2(v2_x_screen - v0_x_screen, v2_y_screen - v0_y_screen);
-
-
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
     // Draw pixels within bounding box.
     //---------------------------------------------------------------------------------------------------------------------//
+    float bx_minus_ax = (float)(v1_x_screen - v0_x_screen);
+    float by_minus_ay = (float)(v1_y_screen - v0_y_screen);
+
+    float cx_minus_ax = (float)(v2_x_screen - v0_x_screen);
+    float cy_minus_ay = (float)(v2_y_screen - v0_y_screen);
+
     for(int y = min_y; y <= max_y; y++)
     {
         for(int x = min_x; x <= max_x; x++)
         {
             //-------------------------------------------------------------------------------------------------------------//
             float ay_minus_py = (float)(v0_y_screen - y);
-
-            float bx_minus_ax = (float)(v1_x_screen - v0_x_screen);
-            float by_minus_ay = (float)(v1_y_screen - v0_y_screen);
-
-            float cx_minus_ax = (float)(v2_x_screen - v0_x_screen);
-            float cy_minus_ay = (float)(v2_y_screen - v0_y_screen);
-
             float px_minus_ax = (float)(x - v0_x_screen);
 
             float w1_denominator = (bx_minus_ax * cy_minus_ay) - (by_minus_ay * cx_minus_ax);
@@ -128,7 +129,6 @@ void Renderer::drawTriangle
 
             //-------------------------------------------------------------------------------------------------------------//
             float ax_minus_px = (float)(v0_x_screen - x);
-
             float py_minus_ay = (float)(y - v0_y_screen);
 
             float w2_denominator = (by_minus_ay * cx_minus_ax) - (bx_minus_ax * cy_minus_ay);
@@ -138,9 +138,14 @@ void Renderer::drawTriangle
             if(w2 < 0.0f) { continue; }
             //-------------------------------------------------------------------------------------------------------------//
 
-            if((w1 + w2) > 1.0f) { continue; }
+            //-------------------------------------------------------------------------------------------------------------//
+            float w0 = 1.0f - w1 - w2;
+            if(w0 < 0.0f) { continue; }
+            //-------------------------------------------------------------------------------------------------------------//
 
-            backbuffer_target.setPixel(x, y, 0.0f, 0xFF000000);
+            float z = (w0 * v0_z) + (w1 * v1_z) + (w2 * v2_z);
+            uint32_t color = mixColor(v0_color, w0, v1_color, w1, v2_color, w2);
+            backbuffer_target.setPixel(x, y, z, color);
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//
