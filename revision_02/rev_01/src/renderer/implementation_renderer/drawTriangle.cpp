@@ -119,3 +119,103 @@ void Renderer::drawTriangle
     //---------------------------------------------------------------------------------------------------------------------//
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+void Renderer::drawTriangle
+(
+    Backbuffer&            target,
+    Math::Geometry::Vertex v0    ,
+    Math::Geometry::Vertex v1    ,
+    Math::Geometry::Vertex v2
+)
+{
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Screen coordinates.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int v0_x_screen = target.toBackbufferCoordX(v0.m_position.m_data[0]);
+    int v0_y_screen = target.toBackbufferCoordY(v0.m_position.m_data[1]);
+
+    int v1_x_screen = target.toBackbufferCoordX(v1.m_position.m_data[0]);
+    int v1_y_screen = target.toBackbufferCoordY(v1.m_position.m_data[1]);
+
+    int v2_x_screen = target.toBackbufferCoordX(v2.m_position.m_data[0]);
+    int v2_y_screen = target.toBackbufferCoordY(v2.m_position.m_data[1]);
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Bounding box.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int min_x = v0_x_screen;
+    if(v1_x_screen < min_x) { min_x = v1_x_screen; }
+    if(v2_x_screen < min_x) { min_x = v2_x_screen; }
+    if(min_x < 0) { min_x = 0; }
+
+    int max_x = v0_x_screen;
+    if(v1_x_screen > max_x) { max_x = v1_x_screen; }
+    if(v2_x_screen > max_x) { max_x = v2_x_screen; }
+    if(max_x >= target.m_width) { max_x = target.m_width - 1; }
+
+    int min_y = v0_y_screen;
+    if(v1_y_screen < min_y) { min_y = v1_y_screen; }
+    if(v2_y_screen < min_y) { min_y = v2_y_screen; }
+    if(min_y < 0) { min_y = 0; }
+
+    int max_y = v0_y_screen;
+    if(v1_y_screen > max_y) { max_y = v1_y_screen; }
+    if(v2_y_screen > max_y) { max_y = v2_y_screen; }
+    if(max_y >= target.m_height) { max_y = target.m_height - 1; }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Draw pixels within bounding box.
+    //---------------------------------------------------------------------------------------------------------------------//
+    float bx_minus_ax = (float)(v1_x_screen - v0_x_screen);
+    float by_minus_ay = (float)(v1_y_screen - v0_y_screen);
+
+    float cx_minus_ax = (float)(v2_x_screen - v0_x_screen);
+    float cy_minus_ay = (float)(v2_y_screen - v0_y_screen);
+
+    for(int y = min_y; y <= max_y; y++)
+    {
+        for(int x = min_x; x <= max_x; x++)
+        {
+            //-------------------------------------------------------------------------------------------------------------//
+            float ay_minus_py = (float)(v0_y_screen - y);
+            float px_minus_ax = (float)(x - v0_x_screen);
+
+            float w1_denominator = (bx_minus_ax * cy_minus_ay) - (by_minus_ay * cx_minus_ax);
+            if(w1_denominator == 0.0f) { continue; }
+
+            float w1 = ( (cx_minus_ax * ay_minus_py) + (cy_minus_ay * px_minus_ax) ) / w1_denominator;
+            if(w1 < 0.0f) { continue; }
+            //-------------------------------------------------------------------------------------------------------------//
+
+            //-------------------------------------------------------------------------------------------------------------//
+            float w2_denominator = (by_minus_ay * cx_minus_ax) - (bx_minus_ax * cy_minus_ay);
+            if(w2_denominator == 0.0f) { continue; }
+
+            float w2 = ( (ay_minus_py * bx_minus_ax) + (px_minus_ax * by_minus_ay) ) / w2_denominator;
+            if(w2 < 0.0f) { continue; }
+            //-------------------------------------------------------------------------------------------------------------//
+
+            //-------------------------------------------------------------------------------------------------------------//
+            float w0 = 1.0f - w1 - w2;
+            if(w0 < 0.0f) { continue; }
+            //-------------------------------------------------------------------------------------------------------------//
+
+            float z = (w0 * v0.m_position.m_data[2]) + (w1 * v1.m_position.m_data[2]) + (w2 * v2.m_position.m_data[2]);
+
+            uint32_t color = Math::Core::mixUint32
+            (
+                Math::Core::convertVec4fToColor(v0.m_color), w0,
+                Math::Core::convertVec4fToColor(v1.m_color), w1,
+                Math::Core::convertVec4fToColor(v2.m_color), w2
+            );
+
+            target.setPixel(x, y, z, color);
+        }
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
