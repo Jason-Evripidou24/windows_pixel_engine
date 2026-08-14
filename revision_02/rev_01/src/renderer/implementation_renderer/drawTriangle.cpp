@@ -22,32 +22,32 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawTriangle
 (
-    Backbuffer& backbuffer_target,
-    float       v0_x,
-    float       v0_y,
-    float       v0_z,
+    Backbuffer& target  ,
+    float       v0_x    ,
+    float       v0_y    ,
+    float       v0_z    ,
     uint32_t    v0_color,
-    float       v1_x,
-    float       v1_y,
-    float       v1_z,
+    float       v1_x    ,
+    float       v1_y    ,
+    float       v1_z    ,
     uint32_t    v1_color,
-    float       v2_x,
-    float       v2_y,
-    float       v2_z,
+    float       v2_x    ,
+    float       v2_y    ,
+    float       v2_z    ,
     uint32_t    v2_color
 )
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Screen coordinates.
     //---------------------------------------------------------------------------------------------------------------------//
-    int v0_x_screen = backbuffer_target.toBackbufferCoordX(v0_x);
-    int v0_y_screen = backbuffer_target.toBackbufferCoordY(v0_y);
+    int v0_x_screen = target.toBackbufferCoordX(v0_x);
+    int v0_y_screen = target.toBackbufferCoordY(v0_y);
 
-    int v1_x_screen = backbuffer_target.toBackbufferCoordX(v1_x);
-    int v1_y_screen = backbuffer_target.toBackbufferCoordY(v1_y);
+    int v1_x_screen = target.toBackbufferCoordX(v1_x);
+    int v1_y_screen = target.toBackbufferCoordY(v1_y);
 
-    int v2_x_screen = backbuffer_target.toBackbufferCoordX(v2_x);
-    int v2_y_screen = backbuffer_target.toBackbufferCoordY(v2_y);
+    int v2_x_screen = target.toBackbufferCoordX(v2_x);
+    int v2_y_screen = target.toBackbufferCoordY(v2_y);
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -61,7 +61,7 @@ void Renderer::drawTriangle
     int max_x = v0_x_screen;
     if(v1_x_screen > max_x) { max_x = v1_x_screen; }
     if(v2_x_screen > max_x) { max_x = v2_x_screen; }
-    if(max_x >= backbuffer_target.m_width) { max_x = backbuffer_target.m_width - 1; }
+    if(max_x >= target.m_width) { max_x = target.m_width - 1; }
 
     int min_y = v0_y_screen;
     if(v1_y_screen < min_y) { min_y = v1_y_screen; }
@@ -71,7 +71,7 @@ void Renderer::drawTriangle
     int max_y = v0_y_screen;
     if(v1_y_screen > max_y) { max_y = v1_y_screen; }
     if(v2_y_screen > max_y) { max_y = v2_y_screen; }
-    if(max_y >= backbuffer_target.m_height) { max_y = backbuffer_target.m_height - 1; }
+    if(max_y >= target.m_height) { max_y = target.m_height - 1; }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -113,7 +113,7 @@ void Renderer::drawTriangle
 
             float z = (w0 * v0_z) + (w1 * v1_z) + (w2 * v2_z);
             uint32_t color = Math::Core::mixUint32(v0_color, w0, v1_color, w1, v2_color, w2);
-            backbuffer_target.setPixel(x, y, z, color);
+            target.setPixel(x, y, z, color);
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//

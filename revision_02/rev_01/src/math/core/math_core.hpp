@@ -29,6 +29,7 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "mat4_f.hpp"
+#include "quaternion.hpp"
 #include "vec2_f.hpp"
 #include "vec3_f.hpp"
 #include "vec4_f.hpp"
@@ -224,6 +225,26 @@ namespace Math
             uint32_t b = static_cast<uint32_t>(color.m_data[3] * 255.0f);
 
             return (a << 24) | (r << 16) | (g << 8) | (b << 0);
+        }
+
+        // quaternion must already be normalised.
+        inline void rotateVec4
+        (
+            Math::Core::Vec4_f& output,
+            const Math::Core::Quaternion& quaternion,
+            const Math::Core::Vec4_f& vec
+        )
+        {
+            // t = 2 cross(q.xyz, v)
+            const float tx = 2.0f * ( (quaternion.m_y * vec.m_data[2]) - (quaternion.m_z * vec.m_data[1]) );
+            const float ty = 2.0f * ( (quaternion.m_z * vec.m_data[0]) - (quaternion.m_x * vec.m_data[2]) );
+            const float tz = 2.0f * ( (quaternion.m_x * vec.m_data[1]) - (quaternion.m_y * vec.m_data[0]) );
+
+            // v + w t + cross(q.xyz, t)
+            output.m_data[0] = vec.m_data[0] + (quaternion.m_w * tx) + (quaternion.m_y * tz) - (quaternion.m_z * ty);
+            output.m_data[1] = vec.m_data[1] + (quaternion.m_w * ty) + (quaternion.m_z * tx) - (quaternion.m_x * tz);
+            output.m_data[2] = vec.m_data[2] + (quaternion.m_w * tz) + (quaternion.m_x * ty) - (quaternion.m_y * tx);
+            output.m_data[3] = vec.m_data[3];
         }
         //-----------------------------------------------------------------------------------------------------------------//
     };
