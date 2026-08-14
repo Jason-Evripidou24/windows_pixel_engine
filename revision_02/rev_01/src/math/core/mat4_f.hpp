@@ -223,6 +223,7 @@ namespace Math
                 m_data[12] = 0.0f;    m_data[13]  = 0.0f;    m_data[14] = 0.0f;    m_data[15] = 1.0f;
             }
 
+            // Rotation matrix constructed from euler angles.
             inline void rotation(const float axis_x, const float axis_y, const float axis_z, const float theta_rad)
             {
                 //---------------------------------------------------------------------------------------------------------//

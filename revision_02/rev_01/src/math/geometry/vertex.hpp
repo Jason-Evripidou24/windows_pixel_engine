@@ -33,10 +33,10 @@ namespace Math
         struct Vertex
         {
             //-------------------------------------------------------------------------------------------------------------//
-            Math::Core::Vec4_f m_position;
+            Math::Core::Vec4_f m_position  ;
             Math::Core::Vec2_f m_tex_coords;
-            Math::Core::Vec3_f m_normal;
-            Math::Core::Vec4_f m_color; // a-r-g-b
+            Math::Core::Vec3_f m_normal    ;
+            Math::Core::Vec4_f m_color     ; // a-r-g-b
             //-------------------------------------------------------------------------------------------------------------//
 
             //-------------------------------------------------------------------------------------------------------------//
@@ -52,16 +52,16 @@ namespace Math
 
             Vertex
             (
-                const Math::Core::Vec4_f& position,
+                const Math::Core::Vec4_f& position  ,
                 const Math::Core::Vec2_f& tex_coords,
-                const Math::Core::Vec3_f& normal,
+                const Math::Core::Vec3_f& normal    ,
                 const Math::Core::Vec4_f& color
             )
             {
-                m_position   = position;
+                m_position   = position  ;
                 m_tex_coords = tex_coords;
-                m_normal     = normal;
-                m_color      = color;
+                m_normal     = normal    ;
+                m_color      = color     ;
             }
             //-------------------------------------------------------------------------------------------------------------//
 
@@ -70,40 +70,40 @@ namespace Math
             //-------------------------------------------------------------------------------------------------------------//
             Vertex(const Vertex& other)
             {
-                m_position = other.m_position;
+                m_position = other.m_position    ;
                 m_tex_coords = other.m_tex_coords;
-                m_normal = other.m_normal;
-                m_color = other.m_color;
+                m_normal = other.m_normal        ;
+                m_color = other.m_color          ;
             }
 
             Vertex& operator=(const Vertex& other)
             {
                 if(this != &other)
                 {
-                    m_position = other.m_position;
+                    m_position = other.m_position    ;
                     m_tex_coords = other.m_tex_coords;
-                    m_normal = other.m_normal;
-                    m_color = other.m_color;
+                    m_normal = other.m_normal        ;
+                    m_color = other.m_color          ;
                 }
                 return *this;
             }
 
             Vertex(Vertex&& other) noexcept
             {
-                m_position   = std::move(other.m_position);
+                m_position   = std::move(other.m_position)  ;
                 m_tex_coords = std::move(other.m_tex_coords);
-                m_normal     = std::move(other.m_normal);
-                m_color      = std::move(other.m_color);
+                m_normal     = std::move(other.m_normal)    ;
+                m_color      = std::move(other.m_color)     ;
             }
 
             Vertex& operator=(Vertex&& other) noexcept
             {
                 if(this != &other)
                 {
-                    m_position   = std::move(other.m_position);
+                    m_position   = std::move(other.m_position)  ;
                     m_tex_coords = std::move(other.m_tex_coords);
-                    m_normal     = std::move(other.m_normal);
-                    m_color      = std::move(other.m_color);
+                    m_normal     = std::move(other.m_normal)    ;
+                    m_color      = std::move(other.m_color)     ;
                 }
                 return *this;
             }
@@ -129,7 +129,7 @@ namespace Math
                     m_position.m_data[0] = m_position.m_data[0] * inv_w;
                     m_position.m_data[1] = m_position.m_data[1] * inv_w;
                     m_position.m_data[2] = m_position.m_data[2] * inv_w;
-                    m_position.m_data[3] = m_position.m_data[3];
+                    m_position.m_data[3] = m_position.m_data[3]        ;
                 }
             }
             //-------------------------------------------------------------------------------------------------------------//

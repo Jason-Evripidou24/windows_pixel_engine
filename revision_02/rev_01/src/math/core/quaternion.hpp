@@ -248,6 +248,7 @@ namespace Math
                 return Quaternion(x_axis * s * inv_len, y_axis * s * inv_len, z_axis * s * inv_len, c);
             }
 
+            // Rotation matrix constructed from quaternion.
             inline Math::Core::Mat4_f toRotationMatrix() const
             {
                 Mat4_f result;

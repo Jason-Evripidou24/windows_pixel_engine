@@ -1,3 +1,4 @@
+#include "../camera/camera.hpp"
 #include "../math/core/math_core.hpp"
 #include "../window/window.hpp"
 #include "../renderer/renderer.hpp"
@@ -5,9 +6,25 @@
 
 static Math::Core::Quaternion rotation;
 
+Camera camera
+(
+    Math::Core::Vec3_f(0.0f, 0.0f, 5.0f),
+    Math::Core::convertDegreesToRadians(0.0f),
+    Math::Core::convertDegreesToRadians(180.0f),
+    Math::Core::convertDegreesToRadians(45.0f),
+    0.1f,
+    100.0f,
+    Math::Core::Vec3_f(0.0f, 1.0f, 0.0f)
+);
+float camera_move_speed = 5.0f;
+float camera_look_speed = 0.002f;
+
 static float rotate_angle_axis_x = 0.0f;
 static float rotate_angle_axis_y = 0.0f;
 static float rotate_angle_axis_z = 0.0f;
+
+static float mouse_pos_x = 0.0f;
+static float mouse_pos_y = 0.0f;
 
 static bool g_prev_1_key = false;
 static bool g_prev_2_key = false;
@@ -22,6 +39,7 @@ static bool g_prev_0_key = false;
 void processInput(Window& window, float delta_time)
 {
     //---------------------------------------------------------------------------------------------------------------------//
+    // Keyboard, rotating object.
     //---------------------------------------------------------------------------------------------------------------------//
     const float speed = 1.0f;
     bool curr_w_key = window.m_input.isKeyDown('W');
@@ -87,6 +105,24 @@ void processInput(Window& window, float delta_time)
     }
     g_prev_9_key = curr_9_key;
     //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Mouse.
+    //---------------------------------------------------------------------------------------------------------------------//
+    float curr_mouse_pos_x = (float)window.m_input.m_mouse_x;
+    float curr_mouse_pos_y = (float)window.m_input.m_mouse_y;
+
+    if(window.m_input.isMouseDown(0) == true)
+    {
+        float mouse_dx = mouse_pos_x - curr_mouse_pos_x;
+        float mouse_dy = mouse_pos_y - curr_mouse_pos_y;
+
+        camera.lookRight(mouse_dx * camera_look_speed);
+        camera.lookUp(mouse_dy * camera_look_speed);
+    }
+    mouse_pos_x = curr_mouse_pos_x;
+    mouse_pos_y = curr_mouse_pos_y;
+    //---------------------------------------------------------------------------------------------------------------------//
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
@@ -121,10 +157,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     bot_right.m_normal = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
     bot_right.m_color = Math::Core::Vec4_f(1.0f, 0.0f, 1.0f, 1.0f);
 
-    Math::Geometry::Vertex top_left_transformed;
-    Math::Geometry::Vertex top_right_transformed;
-    Math::Geometry::Vertex bot_left_transformed;
-    Math::Geometry::Vertex bot_right_transformed;
+    Math::Geometry::Polygon polygon;
+    polygon.addVertex(top_left);
+    polygon.addVertex(bot_left);
+    polygon.addVertex(bot_right);
+    polygon.addVertex(top_right);
+
+    Math::Geometry::Polygon polygon_transformed;
 
     Renderer renderer;
 
@@ -136,17 +175,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         window.m_backbuffer.clear(0xFF87CEEB); // Sky blue
 
         rotation.normalise();
-        Math::Core::Mat4_f rotate_matrix = rotation.toRotationMatrix();
-        Math::Geometry::transformVertex(top_left_transformed, top_left, rotate_matrix);
-        Math::Geometry::transformVertex(top_right_transformed, top_right, rotate_matrix);
-        Math::Geometry::transformVertex(bot_left_transformed, bot_left, rotate_matrix);
-        Math::Geometry::transformVertex(bot_right_transformed, bot_right, rotate_matrix);
+        Math::Core::Mat4_f proj_view_model_matrix =
+            camera.calcProjectionMatrix((float)window.m_backbuffer.m_width / (float)window.m_backbuffer.m_height) *
+            camera.calcViewMatrix() *
+            rotation.toRotationMatrix();
 
-        renderer.drawTriangle(window.m_backbuffer, top_left_transformed, bot_left_transformed, top_right_transformed);
-        renderer.drawTriangle(window.m_backbuffer, bot_left_transformed, bot_right_transformed, top_right_transformed);
+        Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
+        polygon_transformed.perspectiveDivide();
+        renderer.drawPolygon(window.m_backbuffer, polygon_transformed);
 
-        std::string info_string = top_left_transformed.toString(6, 2);
+        std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
+
+        info_string = camera.toString(6, 2);
+        window.m_backbuffer.setText(10, 400, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
+
 
         window.presentBackbuffer();
     }

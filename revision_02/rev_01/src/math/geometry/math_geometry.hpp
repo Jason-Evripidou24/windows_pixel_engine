@@ -32,6 +32,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Same Module.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "polygon.hpp"
 #include "vertex.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -54,6 +55,22 @@ namespace Math
         {
             output = vertex;
             output.m_position = matrix * vertex.m_position;
+        }
+
+        inline void transformPolygon
+        (
+            Math::Geometry::Polygon&       output,
+            const Math::Geometry::Polygon& polygon,
+            const Math::Core::Mat4_f&      matrix
+        )
+        {
+            size_t num_vertices = polygon.m_num_vertices;
+
+            output.resize(num_vertices);
+            for(size_t i = 0; i < num_vertices; i++)
+            {
+                Math::Geometry::transformVertex(output.m_vertices[i], polygon.m_vertices[i], matrix);
+            }
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
