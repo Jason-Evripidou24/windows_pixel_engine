@@ -182,15 +182,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
         polygon_transformed.perspectiveDivide();
-        //renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed);
-        renderer.drawClipSpacePolygonWireframe(window.m_backbuffer, polygon_transformed);
+        renderer.drawClipSpacePolygonFill(window.m_backbuffer, polygon_transformed);
+        //renderer.drawClipSpacePolygonWireframe(window.m_backbuffer, polygon_transformed);
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
-
-        info_string = camera.toString(6, 2);
-        window.m_backbuffer.setText(10, 400, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
-
 
         window.presentBackbuffer();
     }

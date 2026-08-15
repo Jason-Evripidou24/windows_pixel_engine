@@ -12,16 +12,16 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../../renderer.hpp"
 
-#include "../../math/core/math_core.hpp"
-#include "../../math/geometry/math_geometry.hpp"
+#include "../../../math/core/math_core.hpp"
+#include "../../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpaceTriangle
+void Renderer::drawClipSpaceTriangleFill
 (
     Backbuffer& target  ,
     float       v0_x    ,
@@ -123,7 +123,7 @@ void Renderer::drawClipSpaceTriangle
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpaceTriangle
+void Renderer::drawClipSpaceTriangleFill
 (
     Backbuffer&                   target,
     const Math::Geometry::Vertex& v0    ,

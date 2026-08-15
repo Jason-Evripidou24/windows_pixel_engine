@@ -12,15 +12,15 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../../renderer.hpp"
 
-#include "../../math/geometry/math_geometry.hpp"
+#include "../../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpacePolygon
+void Renderer::drawClipSpacePolygonFill
 (
     Backbuffer&                    target,
     const Math::Geometry::Polygon& polygon
@@ -34,7 +34,7 @@ void Renderer::drawClipSpacePolygon
     {
         const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
         const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawClipSpaceTriangle(target, v0, v1, v2);
+        this->drawClipSpaceTriangleFill(target, v0, v1, v2);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

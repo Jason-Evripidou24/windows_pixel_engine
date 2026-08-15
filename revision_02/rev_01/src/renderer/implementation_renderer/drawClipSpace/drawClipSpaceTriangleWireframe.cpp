@@ -12,30 +12,24 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../../renderer.hpp"
 
-#include "../../math/core/math_core.hpp"
-#include "../../math/geometry/math_geometry.hpp"
+#include "../../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpacePolygonWireframe
+void Renderer::drawClipSpaceTriangleWireframe
 (
-    Backbuffer&                    target,
-    const Math::Geometry::Polygon& polygon
+    Backbuffer&                   target,
+    const Math::Geometry::Vertex& v0    ,
+    const Math::Geometry::Vertex& v1    ,
+    const Math::Geometry::Vertex& v2
 )
 {
-    size_t num_vertices = polygon.m_num_vertices;
-    if(num_vertices < 3) { return; }
-
-    const Math::Geometry::Vertex& v0 = polygon.m_vertices[0];
-    for(size_t i = 1; i < num_vertices - 1; i++)
-    {
-        const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
-        const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawClipSpaceTriangleWireframe(target, v0, v1, v2);
-    }
+    this->drawClipSpaceLine(target, v0, v1);
+    this->drawClipSpaceLine(target, v1, v2);
+    this->drawClipSpaceLine(target, v2, v0);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -56,12 +56,6 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Transform
-    //---------------------------------------------------------------------------------------------------------------------//
-    void draw();
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
     // Vertices, Triangles and Polygons here are in clip space.
     //---------------------------------------------------------------------------------------------------------------------//
     void drawClipSpaceLine
@@ -71,7 +65,15 @@ struct Renderer
         const Math::Geometry::Vertex& v1
     );
 
-    void drawClipSpaceTriangle
+    void drawClipSpaceTriangleWireframe
+    (
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1    ,
+        const Math::Geometry::Vertex& v2
+    );
+
+    void drawClipSpaceTriangleFill
     (
         Backbuffer& target  ,
         float       v0_x    ,
@@ -88,15 +90,7 @@ struct Renderer
         uint32_t    v2_color
     );
 
-    void drawClipSpaceTriangleWireframe
-    (
-        Backbuffer&                   target,
-        const Math::Geometry::Vertex& v0    ,
-        const Math::Geometry::Vertex& v1    ,
-        const Math::Geometry::Vertex& v2
-    );
-
-    void drawClipSpaceTriangle
+    void drawClipSpaceTriangleFill
     (
         Backbuffer&                   target,
         const Math::Geometry::Vertex& v0    ,
@@ -110,11 +104,17 @@ struct Renderer
         const Math::Geometry::Polygon& polygon
     );
 
-    void drawClipSpacePolygon
+    void drawClipSpacePolygonFill
     (
         Backbuffer&                    target,
         const Math::Geometry::Polygon& polygon
     );
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Vertices here are in homogeneous space.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void draw();
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
