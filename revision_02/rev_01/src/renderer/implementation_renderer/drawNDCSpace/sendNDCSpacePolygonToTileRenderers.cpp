@@ -77,18 +77,11 @@ void Renderer::sendNDCSpacePolygonToTileRenderers
     //---------------------------------------------------------------------------------------------------------------------//
     // Submit polygon to overlapping tiles.
     //---------------------------------------------------------------------------------------------------------------------//
-    for(int tile_y = tile_y_min; tile_y <= tile_y_max; ++tile_y)
+    for(int tile_y = tile_y_min; tile_y <= tile_y_max; tile_y++)
     {
-        for(int tile_x = tile_x_min; tile_x <= tile_x_max; ++tile_x)
+        for(int tile_x = tile_x_min; tile_x <= tile_x_max; tile_x++)
         {
-            if(draw_filled == true)
-            {
-                m_tile_renderers[tile_y][tile_x]->drawNDCSpacePolygonFill(target, polygon);
-            }
-            else
-            {
-                m_tile_renderers[tile_y][tile_x]->drawNDCSpacePolygonWireframe(target, polygon);
-            }
+            m_tile_renderers[tile_y][tile_x]->drawNDCSpacePolygon(target, polygon, draw_filled);
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//

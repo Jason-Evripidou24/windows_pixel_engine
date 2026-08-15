@@ -78,6 +78,13 @@ struct TileRenderer
         Backbuffer&                    target ,
         const Math::Geometry::Polygon& polygon
     );
+
+    void drawNDCSpacePolygon
+    (
+        Backbuffer&                    target     ,
+        const Math::Geometry::Polygon& polygon    ,
+        const bool                     draw_filled
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
