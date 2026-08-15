@@ -21,7 +21,7 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpaceTriangleFill
+void Renderer::drawNDCSpaceTriangleFill
 (
     Backbuffer& target  ,
     float       v0_x    ,
@@ -123,7 +123,7 @@ void Renderer::drawClipSpaceTriangleFill
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpaceTriangleFill
+void Renderer::drawNDCSpaceTriangleFill
 (
     Backbuffer&                   target,
     const Math::Geometry::Vertex& v0    ,

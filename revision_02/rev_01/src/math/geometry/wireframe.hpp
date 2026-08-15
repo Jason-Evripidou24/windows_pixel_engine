@@ -83,14 +83,6 @@ namespace Math
             //-------------------------------------------------------------------------------------------------------------//
             // Single-Object Operations.
             //-------------------------------------------------------------------------------------------------------------//
-            inline void perspectiveDivide()
-            {
-                for(size_t i = 0; i < m_num_polygons; i++)
-                {
-                    m_polygons[i].perspectiveDivide();
-                }
-            }
-
             inline void clear()
             {
                 m_num_polygons = 0;

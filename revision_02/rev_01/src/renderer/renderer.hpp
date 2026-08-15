@@ -56,16 +56,16 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices, Triangles and Polygons here are in clip space.
+    // Vertices, Triangles and Polygons here are in Normalised Device Coordinates space.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawClipSpaceLine
+    void drawNDCSpaceLine
     (
         Backbuffer&                   target,
         const Math::Geometry::Vertex& v0    ,
         const Math::Geometry::Vertex& v1
     );
 
-    void drawClipSpaceTriangleWireframe
+    void drawNDCSpaceTriangleWireframe
     (
         Backbuffer&                   target,
         const Math::Geometry::Vertex& v0    ,
@@ -73,7 +73,7 @@ struct Renderer
         const Math::Geometry::Vertex& v2
     );
 
-    void drawClipSpaceTriangleFill
+    void drawNDCSpaceTriangleFill
     (
         Backbuffer& target  ,
         float       v0_x    ,
@@ -90,7 +90,7 @@ struct Renderer
         uint32_t    v2_color
     );
 
-    void drawClipSpaceTriangleFill
+    void drawNDCSpaceTriangleFill
     (
         Backbuffer&                   target,
         const Math::Geometry::Vertex& v0    ,
@@ -98,13 +98,13 @@ struct Renderer
         const Math::Geometry::Vertex& v2
     );
 
-    void drawClipSpacePolygonWireframe
+    void drawNDCSpacePolygonWireframe
     (
         Backbuffer&                    target,
         const Math::Geometry::Polygon& polygon
     );
 
-    void drawClipSpacePolygonFill
+    void drawNDCSpacePolygonFill
     (
         Backbuffer&                    target,
         const Math::Geometry::Polygon& polygon
@@ -112,9 +112,14 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in homogeneous space.
+    // Vertices here are in world space.
     //---------------------------------------------------------------------------------------------------------------------//
-    void draw();
+    void drawClipSpacePolygon
+    (
+        Backbuffer&                    target     ,
+        const Math::Geometry::Polygon& polygon    ,
+        const bool                     draw_filled
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

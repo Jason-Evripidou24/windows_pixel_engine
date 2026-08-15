@@ -8,12 +8,12 @@ static Math::Core::Quaternion rotation;
 
 Math::Camera camera
 (
-    Math::Core::Vec3_f(0.0f, 0.0f, 5.0f),
+    Math::Core::Vec3_f(0.0f, 0.0f, 2.0f),
     Math::Core::convertDegreesToRadians(0.0f),
     Math::Core::convertDegreesToRadians(180.0f),
     Math::Core::convertDegreesToRadians(45.0f),
     0.1f,
-    100.0f,
+    3.0f,
     Math::Core::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 float camera_move_speed = 5.0f;
@@ -36,50 +36,96 @@ static bool g_prev_7_key = false;
 static bool g_prev_8_key = false;
 static bool g_prev_9_key = false;
 static bool g_prev_0_key = false;
+static bool g_draw_filled = true;
 void processInput(Window& window, float delta_time)
 {
     //---------------------------------------------------------------------------------------------------------------------//
     // Keyboard, rotating object.
     //---------------------------------------------------------------------------------------------------------------------//
     const float speed = 1.0f;
-    bool curr_w_key = window.m_input.isKeyDown('W');
-    if(curr_w_key == true)
+    bool curr_numpad_8_key = window.m_input.isKeyDown(VK_NUMPAD8);
+    if(curr_numpad_8_key == true)
     {
         Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(1.0f, 0.0f, 0.0f, speed * delta_time);
         rotation = rotation * delta;
     }
-    bool curr_s_key = window.m_input.isKeyDown('S');
-    if(curr_s_key == true)
+    bool curr_numpad_5_key = window.m_input.isKeyDown(VK_NUMPAD5);
+    if(curr_numpad_5_key == true)
     {
         Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(1.0f, 0.0f, 0.0f, -speed * delta_time);
         rotation = rotation * delta;
     }
-
-    bool curr_a_key = window.m_input.isKeyDown('A');
-    if(curr_a_key == true)
+    bool curr_numpad_4_key = window.m_input.isKeyDown(VK_NUMPAD4);
+    if(curr_numpad_4_key == true)
     {
         Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 0.0f, 1.0f, speed * delta_time);
         rotation = rotation * delta;
     }
-    bool curr_d_key = window.m_input.isKeyDown('D');
-    if(curr_d_key == true)
+    bool curr_numpad_6_key = window.m_input.isKeyDown(VK_NUMPAD6);
+    if(curr_numpad_6_key == true)
     {
         Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 0.0f, 1.0f, -speed * delta_time);
         rotation = rotation * delta;
     }
-
-    bool curr_q_key = window.m_input.isKeyDown('Q');
-    if(curr_q_key == true)
+    bool curr_numpad_7_key = window.m_input.isKeyDown(VK_NUMPAD7);
+    if(curr_numpad_7_key == true)
     {
         Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, speed * delta_time);
         rotation = rotation * delta;
     }
-    bool curr_e_key = window.m_input.isKeyDown('E');
-    if(curr_e_key == true)
+    bool curr_numpad_9_key = window.m_input.isKeyDown(VK_NUMPAD9);
+    if(curr_numpad_9_key == true)
     {
         Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, -speed * delta_time);
         rotation = rotation * delta;
     }
+    //---------------------------------------------------------------------------------------------------------------------//
+    
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Keyboard, rotating object.
+    //---------------------------------------------------------------------------------------------------------------------//
+    //const float speed = 1.0f;
+    bool curr_w_key = window.m_input.isKeyDown('W');
+    if(curr_w_key == true)
+    {
+        camera.moveForward(speed * delta_time);
+    }
+    bool curr_s_key = window.m_input.isKeyDown('S');
+    if(curr_s_key == true)
+    {
+        camera.moveForward(-speed * delta_time);
+    }
+    bool curr_a_key = window.m_input.isKeyDown('A');
+    if(curr_a_key == true)
+    {
+        camera.moveRight(-speed * delta_time);
+    }
+    bool curr_d_key = window.m_input.isKeyDown('D');
+    if(curr_d_key == true)
+    {
+        camera.moveRight(speed * delta_time);
+    }
+    bool curr_q_key = window.m_input.isKeyDown('Q');
+    if(curr_q_key == true)
+    {
+        camera.moveUp(speed * delta_time);
+    }
+    bool curr_e_key = window.m_input.isKeyDown('E');
+    if(curr_e_key == true)
+    {
+        camera.moveUp(-speed * delta_time);
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Wireframe and Filled mode.
+    //---------------------------------------------------------------------------------------------------------------------//
+    bool curr_0_key = window.m_input.isKeyDown('0');
+    if( (curr_0_key == true) && (g_prev_0_key == false) )
+    {
+        g_draw_filled = !g_draw_filled;
+    }
+    g_prev_0_key = curr_0_key;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -181,9 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             rotation.toRotationMatrix();
 
         Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
-        polygon_transformed.perspectiveDivide();
-        renderer.drawClipSpacePolygonFill(window.m_backbuffer, polygon_transformed);
-        //renderer.drawClipSpacePolygonWireframe(window.m_backbuffer, polygon_transformed);
+        renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed, g_draw_filled);
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);

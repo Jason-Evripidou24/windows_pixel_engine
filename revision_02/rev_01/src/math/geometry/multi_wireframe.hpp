@@ -88,14 +88,6 @@ namespace Math
             //-------------------------------------------------------------------------------------------------------------//
             // Single-Object Operations.
             //-------------------------------------------------------------------------------------------------------------//
-            inline void perspectiveDivide()
-            {
-                for(size_t i = 0; i < m_num_wireframes; i++)
-                {
-                    m_wireframes[i].perspectiveDivide();
-                }
-            }
-
             inline void clear()
             {
                 m_num_wireframes = 0;

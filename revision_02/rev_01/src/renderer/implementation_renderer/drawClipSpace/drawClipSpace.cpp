@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -14,27 +15,54 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../../renderer.hpp"
 
+#include "../../../math/core/math_core.hpp"
 #include "../../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpacePolygonFill
+void Renderer::drawClipSpacePolygon
 (
-    Backbuffer&                    target,
-    const Math::Geometry::Polygon& polygon
+    Backbuffer&                    target     ,
+    const Math::Geometry::Polygon& polygon    ,
+    const bool                     draw_filled
 )
 {
-    size_t num_vertices = polygon.m_num_vertices;
-    if(num_vertices < 3) { return; }
+    Math::Geometry::Polygon polygon_clipped;
+    Math::Geometry::Polygon buffer = polygon;
 
-    const Math::Geometry::Vertex& v0 = polygon.m_vertices[0];
-    for(size_t i = 1; i < num_vertices - 1; i++)
+    Math::Geometry::clipPolygonAgainstPlaneMinXClipSpace(polygon_clipped, buffer);
+    std::swap(buffer, polygon_clipped);
+    Math::Geometry::clipPolygonAgainstPlaneMaxXClipSpace(polygon_clipped, buffer);
+    std::swap(buffer, polygon_clipped);
+    Math::Geometry::clipPolygonAgainstPlaneMinYClipSpace(polygon_clipped, buffer);
+    std::swap(buffer, polygon_clipped);
+    Math::Geometry::clipPolygonAgainstPlaneMaxYClipSpace(polygon_clipped, buffer);
+    std::swap(buffer, polygon_clipped);
+    Math::Geometry::clipPolygonAgainstPlaneMinZClipSpace(polygon_clipped, buffer);
+    std::swap(buffer, polygon_clipped);
+    Math::Geometry::clipPolygonAgainstPlaneMaxZClipSpace(polygon_clipped, buffer);
+
+    polygon_clipped.perspectiveDivide();
+
+    for(size_t i = 0; i < polygon_clipped.m_num_vertices; i++)
     {
-        const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
-        const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawClipSpaceTriangleFill(target, v0, v1, v2);
+        if( std::abs(polygon_clipped.m_vertices[i].m_position.m_data[3]) < 0.0001f )
+        {
+            polygon_clipped.clear();
+            break;
+        }
+    }
+    if(polygon_clipped.m_num_vertices < 3) { return; }
+
+    if(draw_filled == true)
+    {
+        this->drawNDCSpacePolygonFill(target, polygon_clipped);
+    }
+    else
+    {
+        this->drawNDCSpacePolygonWireframe(target, polygon_clipped);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

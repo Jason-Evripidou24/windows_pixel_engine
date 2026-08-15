@@ -21,7 +21,7 @@
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpaceLine
+void Renderer::drawNDCSpaceLine
 (
     Backbuffer&                   target,
     const Math::Geometry::Vertex& v0    ,
