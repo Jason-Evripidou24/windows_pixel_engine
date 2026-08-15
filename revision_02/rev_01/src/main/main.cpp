@@ -211,7 +211,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Math::Geometry::Polygon polygon_transformed;
 
-    Renderer renderer;
+    Renderer renderer(20);
 
     while(window.processMessages())
     {
@@ -232,7 +232,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed, g_draw_filled);
 
         std::string info_string = std::to_string(timer.fps);
-        window.m_backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
+        window.m_backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
 
         window.presentBackbuffer();
     }

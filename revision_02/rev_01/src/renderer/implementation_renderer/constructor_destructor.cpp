@@ -2,7 +2,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cmath>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,49 +12,24 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
-
-#include "../../../math/core/math_core.hpp"
-#include "../../../math/geometry/math_geometry.hpp"
+#include "../renderer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpacePolygon
-(
-    Backbuffer&                    target     ,
-    const Math::Geometry::Polygon& polygon    ,
-    const bool                     draw_filled
-)
+Renderer::Renderer(int tile_split)
 {
-    Math::Geometry::Polygon polygon_clipped;
-    Math::Geometry::Polygon buffer = polygon;
+    m_tile_split = tile_split;
 
-    Math::Geometry::clipPolygonAgainstPlaneMinXClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxXClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMinYClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxYClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMinZClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxZClipSpace(polygon_clipped, buffer);
-
-    polygon_clipped.perspectiveDivide();
-
-    for(size_t i = 0; i < polygon_clipped.m_num_vertices; i++)
+    m_tile_renderers.resize(tile_split);
+    for(int tile_y = 0; tile_y < tile_split; tile_y++)
     {
-        if( std::abs(polygon_clipped.m_vertices[i].m_position.m_data[3]) < 0.0001f )
+        m_tile_renderers[tile_y].resize(tile_split);
+        for(int tile_x = 0; tile_x < tile_split; tile_x++)
         {
-            polygon_clipped.clear();
-            break;
+            m_tile_renderers[tile_y][tile_x] = std::make_unique<TileRenderer>(tile_x, tile_y, tile_split);
         }
     }
-    if(polygon_clipped.m_num_vertices < 3) { return; }
-
-    this->sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, draw_filled);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

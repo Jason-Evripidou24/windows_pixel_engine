@@ -12,16 +12,13 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
-
-#include "../../../math/core/math_core.hpp"
-#include "../../../math/geometry/math_geometry.hpp"
+#include "../../tile_renderer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawNDCSpaceTriangleFill
+void TileRenderer::drawNDCSpaceTriangleFill
 (
     Backbuffer&                   target,
     const Math::Geometry::Vertex& v0    ,
@@ -64,6 +61,18 @@ void Renderer::drawNDCSpaceTriangleFill
     if(v1_y_screen > max_y) { max_y = v1_y_screen; }
     if(v2_y_screen > max_y) { max_y = v2_y_screen; }
     if(max_y >= target.m_height) { max_y = target.m_height - 1; }
+
+    int tile_min_x = (m_tile_x * target.m_width) / m_tile_split;
+    int tile_max_x = ((m_tile_x + 1) * target.m_width) / m_tile_split - 1;
+
+    int tile_min_y = (m_tile_y * target.m_height) / m_tile_split;
+    int tile_max_y = ((m_tile_y + 1) * target.m_height) / m_tile_split - 1;
+
+    if(min_x < tile_min_x) { min_x = tile_min_x; }
+    if(max_x > tile_max_x) { max_x = tile_max_x; }
+
+    if(min_y < tile_min_y) { min_y = tile_min_y; }
+    if(max_y > tile_max_y) { max_y = tile_max_y; }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -75,6 +84,12 @@ void Renderer::drawNDCSpaceTriangleFill
     float cx_minus_ax = (float)(v2_x_screen - v0_x_screen);
     float cy_minus_ay = (float)(v2_y_screen - v0_y_screen);
 
+    float w1_denominator = (bx_minus_ax * cy_minus_ay) - (by_minus_ay * cx_minus_ax);
+    if(w1_denominator == 0.0f) { return; }
+
+    float w2_denominator = (by_minus_ay * cx_minus_ax) - (bx_minus_ax * cy_minus_ay);
+    if(w2_denominator == 0.0f) { return; }
+
     for(int y = min_y; y <= max_y; y++)
     {
         for(int x = min_x; x <= max_x; x++)
@@ -83,17 +98,11 @@ void Renderer::drawNDCSpaceTriangleFill
             float ay_minus_py = (float)(v0_y_screen - y);
             float px_minus_ax = (float)(x - v0_x_screen);
 
-            float w1_denominator = (bx_minus_ax * cy_minus_ay) - (by_minus_ay * cx_minus_ax);
-            if(w1_denominator == 0.0f) { continue; }
-
             float w1 = ( (cx_minus_ax * ay_minus_py) + (cy_minus_ay * px_minus_ax) ) / w1_denominator;
             if(w1 < 0.0f) { continue; }
             //-------------------------------------------------------------------------------------------------------------//
 
             //-------------------------------------------------------------------------------------------------------------//
-            float w2_denominator = (by_minus_ay * cx_minus_ax) - (bx_minus_ax * cy_minus_ay);
-            if(w2_denominator == 0.0f) { continue; }
-
             float w2 = ( (ay_minus_py * bx_minus_ax) + (px_minus_ax * by_minus_ay) ) / w2_denominator;
             if(w2 < 0.0f) { continue; }
             //-------------------------------------------------------------------------------------------------------------//

@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef TILE_RENDERER_HPP
+#define TILE_RENDERER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,9 +8,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
-#include <memory>
-#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -21,75 +18,65 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer/tile_renderer.hpp"
-
-#include "../window/backbuffer/backbuffer.hpp"
-
-#include "../math/geometry/math_geometry.hpp"
+#include "../../window/backbuffer/backbuffer.hpp"
+#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Renderer pipeline:
-    1.  Local/Object Space (Vec3, Vec4 with 1.0f as the homogenious coordinate)
-    |   Model Matrix
-    2.  World Space (Vec4)
-    |   View Matrix
-    3.  View Space
-    |   Projection Matrix
-    4.  Clip Space (Vec4)
-    |   Homogeneous Clipping
-    |   Perspective Divide
-    5.  Normalized Device Coordinates (NDC)
-    |   Viewport Transform
-    6.  Screen Space
-    |   Rasterization, Depth Test, Framebuffer
-*/
-struct Renderer
+struct TileRenderer
 {
+    //---------------------------------------------------------------------------------------------------------------------//
+    // The bounding box (tile) in screen space that the TileRenderer object is responsible for drawing within.
+    int m_tile_x;
+    int m_tile_y;
     int m_tile_split;
-    std::vector<std::vector<std::unique_ptr<TileRenderer>>> m_tile_renderers;
+    //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and destructor.
+    // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(int tile_split);
-    ~Renderer() = default;
+    TileRenderer(int tile_x, int tile_y, int tile_split);
+    ~TileRenderer() = default;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Vertices, Triangles and Polygons here are in Normalised Device Coordinates space.
     //---------------------------------------------------------------------------------------------------------------------//
-    void sendNDCSpacePolygonToTileRenderers
+    void drawNDCSpaceLine
     (
-        Backbuffer&                    target     ,
-        const Math::Geometry::Polygon& polygon    ,
-        const bool                     draw_filled
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1
     );
-    //---------------------------------------------------------------------------------------------------------------------//
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in world space.
-    //---------------------------------------------------------------------------------------------------------------------//
-    void drawClipSpacePolygon
+    void drawNDCSpaceTriangleWireframe
     (
-        Backbuffer&                    target     ,
-        const Math::Geometry::Polygon& polygon    ,
-        const bool                     draw_filled
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1    ,
+        const Math::Geometry::Vertex& v2
     );
-    //---------------------------------------------------------------------------------------------------------------------//
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in local space.
-    //---------------------------------------------------------------------------------------------------------------------//
-    void drawLocalSpacePolygon
+    void drawNDCSpaceTriangleFill
     (
-        Backbuffer&                    target                ,
-        const Math::Geometry::Polygon& polygon               ,
-        const Math::Core::Mat4_f&      proj_view_model_matrix,
-        const bool                     draw_filled
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1    ,
+        const Math::Geometry::Vertex& v2
+    );
+
+    void drawNDCSpacePolygonWireframe
+    (
+        Backbuffer&                    target ,
+        const Math::Geometry::Polygon& polygon
+    );
+
+    void drawNDCSpacePolygonFill
+    (
+        Backbuffer&                    target ,
+        const Math::Geometry::Polygon& polygon
     );
     //---------------------------------------------------------------------------------------------------------------------//
 };

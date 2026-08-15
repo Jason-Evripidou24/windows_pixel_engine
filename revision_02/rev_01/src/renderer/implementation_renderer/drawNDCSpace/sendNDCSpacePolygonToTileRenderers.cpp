@@ -1,16 +1,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
-#include <memory>
-#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -21,81 +12,85 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer/tile_renderer.hpp"
+#include "../../renderer.hpp"
 
-#include "../window/backbuffer/backbuffer.hpp"
-
-#include "../math/geometry/math_geometry.hpp"
+#include "../../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Renderer pipeline:
-    1.  Local/Object Space (Vec3, Vec4 with 1.0f as the homogenious coordinate)
-    |   Model Matrix
-    2.  World Space (Vec4)
-    |   View Matrix
-    3.  View Space
-    |   Projection Matrix
-    4.  Clip Space (Vec4)
-    |   Homogeneous Clipping
-    |   Perspective Divide
-    5.  Normalized Device Coordinates (NDC)
-    |   Viewport Transform
-    6.  Screen Space
-    |   Rasterization, Depth Test, Framebuffer
-*/
-struct Renderer
+void Renderer::sendNDCSpacePolygonToTileRenderers
+(
+    Backbuffer&                    target     ,
+    const Math::Geometry::Polygon& polygon    ,
+    const bool                     draw_filled
+)
 {
-    int m_tile_split;
-    std::vector<std::vector<std::unique_ptr<TileRenderer>>> m_tile_renderers;
+    size_t num_vertices = polygon.m_num_vertices;
+    if(num_vertices < 3) { return; }
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and destructor.
+    // Polygon screen-space bounding box.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(int tile_split);
-    ~Renderer() = default;
-    //---------------------------------------------------------------------------------------------------------------------//
+    int min_x = target.toBackbufferCoordX(polygon.m_vertices[0].m_position.m_data[0]);
+    int max_x = min_x;
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices, Triangles and Polygons here are in Normalised Device Coordinates space.
-    //---------------------------------------------------------------------------------------------------------------------//
-    void sendNDCSpacePolygonToTileRenderers
-    (
-        Backbuffer&                    target     ,
-        const Math::Geometry::Polygon& polygon    ,
-        const bool                     draw_filled
-    );
-    //---------------------------------------------------------------------------------------------------------------------//
+    int min_y = target.toBackbufferCoordY(polygon.m_vertices[0].m_position.m_data[1]);
+    int max_y = min_y;
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in world space.
-    //---------------------------------------------------------------------------------------------------------------------//
-    void drawClipSpacePolygon
-    (
-        Backbuffer&                    target     ,
-        const Math::Geometry::Polygon& polygon    ,
-        const bool                     draw_filled
-    );
+    for(size_t i = 1; i < num_vertices; i++)
+    {
+        int x = target.toBackbufferCoordX(polygon.m_vertices[i].m_position.m_data[0]);
+        int y = target.toBackbufferCoordY(polygon.m_vertices[i].m_position.m_data[1]);
+
+        if(x < min_x) { min_x = x; }
+        if(x > max_x) { max_x = x; }
+
+        if(y < min_y) { min_y = y; }
+        if(y > max_y) { max_y = y; }
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in local space.
+    // Clamp bounding box to backbuffer.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawLocalSpacePolygon
-    (
-        Backbuffer&                    target                ,
-        const Math::Geometry::Polygon& polygon               ,
-        const Math::Core::Mat4_f&      proj_view_model_matrix,
-        const bool                     draw_filled
-    );
+    if(min_x < 0) { min_x = 0; }
+    if(max_x >= target.m_width) { max_x = target.m_width - 1; }
+
+    if(min_y < 0) { min_y = 0; }
+    if(max_y >= target.m_height) { max_y = target.m_height - 1; }
+
+    if(min_x > max_x || min_y > max_y) { return; }
     //---------------------------------------------------------------------------------------------------------------------//
-};
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Determine tile range.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int tile_x_min = (min_x * m_tile_split) / target.m_width;
+    int tile_x_max = (max_x * m_tile_split) / target.m_width;
 
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#endif
+    int tile_y_min = (min_y * m_tile_split) / target.m_height;
+    int tile_y_max = (max_y * m_tile_split) / target.m_height;
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Submit polygon to overlapping tiles.
+    //---------------------------------------------------------------------------------------------------------------------//
+    for(int tile_y = tile_y_min; tile_y <= tile_y_max; ++tile_y)
+    {
+        for(int tile_x = tile_x_min; tile_x <= tile_x_max; ++tile_x)
+        {
+            if(draw_filled == true)
+            {
+                m_tile_renderers[tile_y][tile_x]->drawNDCSpacePolygonFill(target, polygon);
+            }
+            else
+            {
+                m_tile_renderers[tile_y][tile_x]->drawNDCSpacePolygonWireframe(target, polygon);
+            }
+        }
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+}
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -12,24 +12,27 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
-
-#include "../../../math/geometry/math_geometry.hpp"
+#include "../../tile_renderer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawNDCSpaceTriangleWireframe
+void TileRenderer::drawNDCSpacePolygonFill
 (
-    Backbuffer&                   target,
-    const Math::Geometry::Vertex& v0    ,
-    const Math::Geometry::Vertex& v1    ,
-    const Math::Geometry::Vertex& v2
+    Backbuffer&                    target,
+    const Math::Geometry::Polygon& polygon
 )
 {
-    this->drawNDCSpaceLine(target, v0, v1);
-    this->drawNDCSpaceLine(target, v1, v2);
-    this->drawNDCSpaceLine(target, v2, v0);
+    size_t num_vertices = polygon.m_num_vertices;
+    if(num_vertices < 3) { return; }
+
+    const Math::Geometry::Vertex& v0 = polygon.m_vertices[0];
+    for(size_t i = 1; i < num_vertices - 1; i++)
+    {
+        const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
+        const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
+        this->drawNDCSpaceTriangleFill(target, v0, v1, v2);
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

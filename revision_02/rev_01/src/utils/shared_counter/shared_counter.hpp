@@ -1,8 +1,15 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef SHARED_COUNTER_HPP
+#define SHARED_COUNTER_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cmath>
+#include <mutex>
+#include <condition_variable>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,49 +20,46 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
-
-#include "../../../math/core/math_core.hpp"
-#include "../../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpacePolygon
-(
-    Backbuffer&                    target     ,
-    const Math::Geometry::Polygon& polygon    ,
-    const bool                     draw_filled
-)
+struct SharedCounter
 {
-    Math::Geometry::Polygon polygon_clipped;
-    Math::Geometry::Polygon buffer = polygon;
+    int m_data;
 
-    Math::Geometry::clipPolygonAgainstPlaneMinXClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxXClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMinYClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxYClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMinZClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxZClipSpace(polygon_clipped, buffer);
+    std::mutex m_mutex;
+    std::condition_variable m_condition_variable;
 
-    polygon_clipped.perspectiveDivide();
+    SharedCounter() { m_data = 0; }
+    SharedCounter(int data) { m_data = data; }
 
-    for(size_t i = 0; i < polygon_clipped.m_num_vertices; i++)
+    inline void increment()
     {
-        if( std::abs(polygon_clipped.m_vertices[i].m_position.m_data[3]) < 0.0001f )
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_data++;
+    }
+
+    inline void decrement()
+    {
+        bool should_notify = false;
+
         {
-            polygon_clipped.clear();
-            break;
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_data--;
+            if(m_data == 0) { should_notify = true; }
+        }
+
+        if(should_notify == true)
+        {
+            m_condition_variable.notify_all();
         }
     }
-    if(polygon_clipped.m_num_vertices < 3) { return; }
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
-    this->sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, draw_filled);
-}
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

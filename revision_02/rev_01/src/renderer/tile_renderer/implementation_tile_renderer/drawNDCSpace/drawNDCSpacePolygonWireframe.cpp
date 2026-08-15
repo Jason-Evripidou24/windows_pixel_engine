@@ -12,15 +12,13 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
-
-#include "../../../math/geometry/math_geometry.hpp"
+#include "../../tile_renderer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawNDCSpacePolygonFill
+void TileRenderer::drawNDCSpacePolygonWireframe
 (
     Backbuffer&                    target,
     const Math::Geometry::Polygon& polygon
@@ -34,7 +32,7 @@ void Renderer::drawNDCSpacePolygonFill
     {
         const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
         const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawNDCSpaceTriangleFill(target, v0, v1, v2);
+        this->drawNDCSpaceTriangleWireframe(target, v0, v1, v2);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
