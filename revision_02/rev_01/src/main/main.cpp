@@ -226,6 +226,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             camera.calcViewMatrix() *
             rotation.toRotationMatrix();
 
+        renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, proj_view_model_matrix, g_draw_filled);
+
         Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
         renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed, g_draw_filled);
 

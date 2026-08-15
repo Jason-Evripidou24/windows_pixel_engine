@@ -23,108 +23,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawNDCSpaceTriangleFill
 (
-    Backbuffer& target  ,
-    float       v0_x    ,
-    float       v0_y    ,
-    float       v0_z    ,
-    uint32_t    v0_color,
-    float       v1_x    ,
-    float       v1_y    ,
-    float       v1_z    ,
-    uint32_t    v1_color,
-    float       v2_x    ,
-    float       v2_y    ,
-    float       v2_z    ,
-    uint32_t    v2_color
-)
-{
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Screen coordinates.
-    //---------------------------------------------------------------------------------------------------------------------//
-    int v0_x_screen = target.toBackbufferCoordX(v0_x);
-    int v0_y_screen = target.toBackbufferCoordY(v0_y);
-
-    int v1_x_screen = target.toBackbufferCoordX(v1_x);
-    int v1_y_screen = target.toBackbufferCoordY(v1_y);
-
-    int v2_x_screen = target.toBackbufferCoordX(v2_x);
-    int v2_y_screen = target.toBackbufferCoordY(v2_y);
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Bounding box.
-    //---------------------------------------------------------------------------------------------------------------------//
-    int min_x = v0_x_screen;
-    if(v1_x_screen < min_x) { min_x = v1_x_screen; }
-    if(v2_x_screen < min_x) { min_x = v2_x_screen; }
-    if(min_x < 0) { min_x = 0; }
-
-    int max_x = v0_x_screen;
-    if(v1_x_screen > max_x) { max_x = v1_x_screen; }
-    if(v2_x_screen > max_x) { max_x = v2_x_screen; }
-    if(max_x >= target.m_width) { max_x = target.m_width - 1; }
-
-    int min_y = v0_y_screen;
-    if(v1_y_screen < min_y) { min_y = v1_y_screen; }
-    if(v2_y_screen < min_y) { min_y = v2_y_screen; }
-    if(min_y < 0) { min_y = 0; }
-
-    int max_y = v0_y_screen;
-    if(v1_y_screen > max_y) { max_y = v1_y_screen; }
-    if(v2_y_screen > max_y) { max_y = v2_y_screen; }
-    if(max_y >= target.m_height) { max_y = target.m_height - 1; }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Draw pixels within bounding box.
-    //---------------------------------------------------------------------------------------------------------------------//
-    float bx_minus_ax = (float)(v1_x_screen - v0_x_screen);
-    float by_minus_ay = (float)(v1_y_screen - v0_y_screen);
-
-    float cx_minus_ax = (float)(v2_x_screen - v0_x_screen);
-    float cy_minus_ay = (float)(v2_y_screen - v0_y_screen);
-
-    for(int y = min_y; y <= max_y; y++)
-    {
-        for(int x = min_x; x <= max_x; x++)
-        {
-            //-------------------------------------------------------------------------------------------------------------//
-            float ay_minus_py = (float)(v0_y_screen - y);
-            float px_minus_ax = (float)(x - v0_x_screen);
-
-            float w1_denominator = (bx_minus_ax * cy_minus_ay) - (by_minus_ay * cx_minus_ax);
-            if(w1_denominator == 0.0f) { continue; }
-
-            float w1 = ( (cx_minus_ax * ay_minus_py) + (cy_minus_ay * px_minus_ax) ) / w1_denominator;
-            if(w1 < 0.0f) { continue; }
-            //-------------------------------------------------------------------------------------------------------------//
-
-            //-------------------------------------------------------------------------------------------------------------//
-            float w2_denominator = (by_minus_ay * cx_minus_ax) - (bx_minus_ax * cy_minus_ay);
-            if(w2_denominator == 0.0f) { continue; }
-
-            float w2 = ( (ay_minus_py * bx_minus_ax) + (px_minus_ax * by_minus_ay) ) / w2_denominator;
-            if(w2 < 0.0f) { continue; }
-            //-------------------------------------------------------------------------------------------------------------//
-
-            //-------------------------------------------------------------------------------------------------------------//
-            float w0 = 1.0f - w1 - w2;
-            if(w0 < 0.0f) { continue; }
-            //-------------------------------------------------------------------------------------------------------------//
-
-            float z = (w0 * v0_z) + (w1 * v1_z) + (w2 * v2_z);
-            uint32_t color = Math::Core::mixUint32(v0_color, w0, v1_color, w1, v2_color, w2);
-            target.setPixel(x, y, z, color);
-        }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-}
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-
-
-// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawNDCSpaceTriangleFill
-(
     Backbuffer&                   target,
     const Math::Geometry::Vertex& v0    ,
     const Math::Geometry::Vertex& v1    ,
@@ -207,14 +105,25 @@ void Renderer::drawNDCSpaceTriangleFill
 
             float z = (w0 * v0.m_position.m_data[2]) + (w1 * v1.m_position.m_data[2]) + (w2 * v2.m_position.m_data[2]);
 
-            uint32_t color = Math::Core::mixUint32
-            (
-                Math::Core::convertVec4fToColor(v0.m_color), w0,
-                Math::Core::convertVec4fToColor(v1.m_color), w1,
-                Math::Core::convertVec4fToColor(v2.m_color), w2
-            );
+            //-------------------------------------------------------------------------------------------------------------//
+            // Perspective correction.
+            float a0 = w0 * (1.0f / v0.m_position.m_data[3]);
+            float a1 = w1 * (1.0f / v1.m_position.m_data[3]);
+            float a2 = w2 * (1.0f / v2.m_position.m_data[3]);
+            float denominator = a0 + a1 + a2;
+            if(denominator == 0.0f) { continue; }
 
-            target.setPixel(x, y, z, color);
+            a0 /= denominator;
+            a1 /= denominator;
+            a2 /= denominator;
+
+            // Perspective-correct color.
+            Math::Core::Vec4_f color = (v0.m_color * a0) + (v1.m_color * a1) + (v2.m_color * a2);
+
+            Math::Core::Vec2_f tex_coord = (v0.m_tex_coords * a0) + (v1.m_tex_coords * a1) + (v2.m_tex_coords * a2);
+            //-------------------------------------------------------------------------------------------------------------//
+
+            target.setPixel(x, y, z, Math::Core::convertVec4fToColor(color));
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//

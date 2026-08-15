@@ -75,23 +75,6 @@ struct Renderer
 
     void drawNDCSpaceTriangleFill
     (
-        Backbuffer& target  ,
-        float       v0_x    ,
-        float       v0_y    ,
-        float       v0_z    ,
-        uint32_t    v0_color,
-        float       v1_x    ,
-        float       v1_y    ,
-        float       v1_z    ,
-        uint32_t    v1_color,
-        float       v2_x    ,
-        float       v2_y    ,
-        float       v2_z    ,
-        uint32_t    v2_color
-    );
-
-    void drawNDCSpaceTriangleFill
-    (
         Backbuffer&                   target,
         const Math::Geometry::Vertex& v0    ,
         const Math::Geometry::Vertex& v1    ,
@@ -118,6 +101,18 @@ struct Renderer
     (
         Backbuffer&                    target     ,
         const Math::Geometry::Polygon& polygon    ,
+        const bool                     draw_filled
+    );
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Vertices here are in local space.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void drawLocalSpacePolygon
+    (
+        Backbuffer&                    target                ,
+        const Math::Geometry::Polygon& polygon               ,
+        const Math::Core::Mat4_f&      proj_view_model_matrix,
         const bool                     draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
