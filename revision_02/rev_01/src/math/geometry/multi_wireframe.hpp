@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef POLYGON_HPP
-#define POLYGON_HPP
+#ifndef MULTI_WIREFRAME_HPP
+#define MULTI_WIREFRAME_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -20,7 +20,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "vertex.hpp"
+#include "wireframe.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -30,52 +30,56 @@ namespace Math
 {
     namespace Geometry
     {
-        struct Polygon
+        struct MultiWireframe
         {
-            size_t m_num_vertices;
-            std::vector<Math::Geometry::Vertex> m_vertices;
-
-            Polygon()
-            {
-                m_num_vertices = 0;
-                m_vertices = std::vector<Math::Geometry::Vertex>();
-            }
+            size_t m_num_wireframes;
+            std::vector<Geometry::Wireframe> m_wireframes;
 
             //-------------------------------------------------------------------------------------------------------------//
-            // Copy and Move constructors.
+            // Constructors.
             //-------------------------------------------------------------------------------------------------------------//
-            Polygon(const Polygon& other)
+            MultiWireframe()
             {
-                m_num_vertices = other.m_num_vertices;
-                m_vertices = other.m_vertices;
+                m_num_wireframes = 0;
+                m_wireframes = std::vector<Geometry::Wireframe>();
+            }
+            //-------------------------------------------------------------------------------------------------------------//
+
+            //-------------------------------------------------------------------------------------------------------------//
+            // Copy constructors.
+            //-------------------------------------------------------------------------------------------------------------//
+            MultiWireframe(const MultiWireframe& other)
+            {
+                m_num_wireframes = other.m_num_wireframes;
+                m_wireframes = other.m_wireframes;
             }
 
-            Polygon& operator=(const Polygon& other)
+            MultiWireframe& operator=(const MultiWireframe& other)
             {
                 if(this != &other)
                 {
-                    m_num_vertices = other.m_num_vertices;
-                    m_vertices = other.m_vertices;
+                    m_num_wireframes = other.m_num_wireframes;
+                    m_wireframes = other.m_wireframes;
                 }
                 return *this;
             }
 
-            Polygon(Polygon&& other) noexcept
+            MultiWireframe(MultiWireframe&& other) noexcept
             {
-                m_num_vertices = other.m_num_vertices;
-                m_vertices = std::move(other.m_vertices);
+                m_num_wireframes = other.m_num_wireframes;
+                m_wireframes = std::move(other.m_wireframes);
                 
-                other.m_num_vertices = 0;
+                other.m_num_wireframes = 0;
             }
 
-            Polygon& operator=(Polygon&& other) noexcept
+            MultiWireframe& operator=(MultiWireframe&& other) noexcept
             {
                 if(this != &other)
                 {
-                    m_num_vertices = other.m_num_vertices;
-                    m_vertices = std::move(other.m_vertices);
+                    m_num_wireframes = other.m_num_wireframes;
+                    m_wireframes = std::move(other.m_wireframes);
 
-                    other.m_num_vertices = 0;
+                    other.m_num_wireframes = 0;
                 }
                 return *this;
             }
@@ -86,38 +90,38 @@ namespace Math
             //-------------------------------------------------------------------------------------------------------------//
             inline void perspectiveDivide()
             {
-                for(size_t i = 0; i < m_num_vertices; i++)
+                for(size_t i = 0; i < m_num_wireframes; i++)
                 {
-                    m_vertices[i].perspectiveDivide();
+                    m_wireframes[i].perspectiveDivide();
                 }
             }
 
             inline void clear()
             {
-                m_num_vertices = 0;
+                m_num_wireframes = 0;
             }
 
             inline void resize(size_t size)
             {
-                m_num_vertices = size;
-                if(m_vertices.size() < size)
+                m_num_wireframes = size;
+                if(m_wireframes.size() < size)
                 {
-                    m_vertices.resize(size);
+                    m_wireframes.resize(size);
                 }
             }
             //-------------------------------------------------------------------------------------------------------------//
 
-            inline void addVertex(const Math::Geometry::Vertex& vertex)
+            inline void addWireframe(const Geometry::Wireframe& wireframe)
             {
-                if(m_num_vertices < m_vertices.size())
+                if(m_num_wireframes < m_wireframes.size())
                 {
-                    m_vertices[m_num_vertices] = vertex;
+                    m_wireframes[m_num_wireframes] = wireframe;
                 }
                 else
                 {
-                    m_vertices.push_back(vertex);
+                    m_wireframes.push_back(wireframe);
                 }
-                m_num_vertices++;
+                m_num_wireframes++;
             }
         };
     };

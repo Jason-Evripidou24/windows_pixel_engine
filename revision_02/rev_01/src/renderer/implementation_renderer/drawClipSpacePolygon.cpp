@@ -14,16 +14,16 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../renderer.hpp"
 
-#include "../../math/core/math_core.hpp"
+#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawPolygon
+void Renderer::drawClipSpacePolygon
 (
-    Backbuffer&             target,
-    Math::Geometry::Polygon polygon
+    Backbuffer&                    target,
+    const Math::Geometry::Polygon& polygon
 )
 {
     size_t num_vertices = polygon.m_num_vertices;
@@ -34,7 +34,7 @@ void Renderer::drawPolygon
     {
         const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
         const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawTriangle(target, v0, v1, v2);
+        this->drawClipSpaceTriangle(target, v0, v1, v2);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

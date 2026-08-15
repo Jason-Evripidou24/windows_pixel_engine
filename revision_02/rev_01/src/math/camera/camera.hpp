@@ -21,169 +21,171 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../math/core/math_core.hpp"
-#include "../math/geometry/math_geometry.hpp"
+#include "../core/math_core.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct Camera
+namespace Math
 {
-    //---------------------------------------------------------------------------------------------------------------------//
-    const float m_CAMERA_MIN_PITCH_DEGREES_f = -89.0f;
-    const float m_CAMERA_MIN_PITCH_RADIANS_f = m_CAMERA_MIN_PITCH_DEGREES_f * Math::Core::RADIANS_PER_DEGREE_f;
-
-    const float m_CAMERA_MAX_PITCH_DEGREES_f = 89.0f;
-    const float m_CAMERA_MAX_PITCH_RADIANS_f = m_CAMERA_MAX_PITCH_DEGREES_f * Math::Core::RADIANS_PER_DEGREE_f;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Transform.
-    //---------------------------------------------------------------------------------------------------------------------//
-    Math::Core::Vec3_f m_position;    // Camera position.
-
-    // Euler angles (radians).
-    float m_pitch_rads;         // Rotation around local X axis.
-    float m_yaw_rads;           // Rotation around local Y axis.
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Projection parameters.
-    //---------------------------------------------------------------------------------------------------------------------//
-    float m_fov_rads;
-    float m_near_plane;
-    float m_far_plane;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Orientation vectors.
-    //---------------------------------------------------------------------------------------------------------------------//
-    Math::Core::Vec3_f m_world_up;    // World up direction.
-
-    Math::Core::Vec3_f m_front;       // Forward direction.
-    Math::Core::Vec3_f m_right;       // Right direction.
-    Math::Core::Vec3_f m_up;          // Camera up direction.
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    Camera
-    (
-        const Math::Core::Vec3_f& position,
-        const float pitch_rads,
-        const float yaw_rads,
-        const float fov_rads,
-        const float near_plane,
-        const float far_plane,
-        const Math::Core::Vec3_f& world_up
-    )
+    struct Camera
     {
-        m_position = position;
+        //-----------------------------------------------------------------------------------------------------------------//
+        const float m_CAMERA_MIN_PITCH_DEGREES_f = -89.0f;
+        const float m_CAMERA_MIN_PITCH_RADIANS_f = m_CAMERA_MIN_PITCH_DEGREES_f * Math::Core::RADIANS_PER_DEGREE_f;
 
-        m_pitch_rads = std::clamp<float>(pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
-        m_yaw_rads   = std::fmod(yaw_rads, Math::Core::TWO_PI_f);
+        const float m_CAMERA_MAX_PITCH_DEGREES_f = 89.0f;
+        const float m_CAMERA_MAX_PITCH_RADIANS_f = m_CAMERA_MAX_PITCH_DEGREES_f * Math::Core::RADIANS_PER_DEGREE_f;
+        //-----------------------------------------------------------------------------------------------------------------//
 
-        m_fov_rads   = fov_rads;
-        m_near_plane = near_plane;
-        m_far_plane  = far_plane;
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Transform.
+        //-----------------------------------------------------------------------------------------------------------------//
+        Math::Core::Vec3_f m_position;    // Camera position.
 
-        m_world_up = world_up;
-        m_world_up.normalise();
+        // Euler angles (radians).
+        float m_pitch_rads;         // Rotation around local X axis.
+        float m_yaw_rads;           // Rotation around local Y axis.
+        //-----------------------------------------------------------------------------------------------------------------//
 
-        this->updateVectors();
-    }
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Projection parameters.
+        //-----------------------------------------------------------------------------------------------------------------//
+        float m_fov_rads;
+        float m_near_plane;
+        float m_far_plane;
+        //-----------------------------------------------------------------------------------------------------------------//
 
-    inline void updateVectors()
-    {
-        m_front = Math::Core::Vec3_f
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Orientation vectors.
+        //-----------------------------------------------------------------------------------------------------------------//
+        Math::Core::Vec3_f m_world_up;    // World up direction.
+
+        Math::Core::Vec3_f m_front;       // Forward direction.
+        Math::Core::Vec3_f m_right;       // Right direction.
+        Math::Core::Vec3_f m_up;          // Camera up direction.
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        Camera
         (
-            cosf(m_pitch_rads) * sinf(m_yaw_rads),
-            sinf(m_pitch_rads),
-            cosf(m_pitch_rads) * cosf(m_yaw_rads)
-        );
-        m_front.normalise();
+            const Math::Core::Vec3_f& position,
+            const float pitch_rads,
+            const float yaw_rads,
+            const float fov_rads,
+            const float near_plane,
+            const float far_plane,
+            const Math::Core::Vec3_f& world_up
+        )
+        {
+            m_position = position;
 
-        Math::Core::crossProduct(m_right, m_front, m_world_up);
-        m_right.normalise();
+            m_pitch_rads = std::clamp<float>(pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
+            m_yaw_rads   = std::fmod(yaw_rads, Math::Core::TWO_PI_f);
 
-        Math::Core::crossProduct(m_up, m_right, m_front);
-        m_up.normalise();
-    }
+            m_fov_rads   = fov_rads;
+            m_near_plane = near_plane;
+            m_far_plane  = far_plane;
 
-    inline void moveForward(const float offset)
-    {
-        Math::Core::Vec3_f forward = m_front;
-        forward.m_data[1] = 0.0f;
-        forward.normalise();
+            m_world_up = world_up;
+            m_world_up.normalise();
 
-        m_position = m_position + (forward * offset);
-    }
-    inline void moveRight(const float offset)
-    {
-        Math::Core::Vec3_f right = m_right;
-        right.m_data[1] = 0.0f;
-        right.normalise();
+            this->updateVectors();
+        }
 
-        m_position = m_position + (right * offset);
-    }
-    inline void moveUp(const float offset)
-    {
-        Math::Core::Vec3_f up = m_up;
-        up.m_data[0] = 0.0f;
-        up.m_data[2] = 0.0f;
-        up.normalise();
+        inline void updateVectors()
+        {
+            m_front = Math::Core::Vec3_f
+            (
+                cosf(m_pitch_rads) * sinf(m_yaw_rads),
+                sinf(m_pitch_rads),
+                cosf(m_pitch_rads) * cosf(m_yaw_rads)
+            );
+            m_front.normalise();
 
-        m_position = m_position + (up * offset);
-    }
+            Math::Core::crossProduct(m_right, m_front, m_world_up);
+            m_right.normalise();
 
-    inline void lookRight(const float offset)
-    {
-        m_yaw_rads += offset;
-        m_yaw_rads = std::fmod(m_yaw_rads, Math::Core::TWO_PI_f);
+            Math::Core::crossProduct(m_up, m_right, m_front);
+            m_up.normalise();
+        }
 
-        this->updateVectors();
-    }
-    inline void lookUp(const float offset)
-    {
-        m_pitch_rads += offset;
-        m_pitch_rads = std::clamp<float>(m_pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
+        inline void moveForward(const float offset)
+        {
+            Math::Core::Vec3_f forward = m_front;
+            forward.m_data[1] = 0.0f;
+            forward.normalise();
 
-        this->updateVectors();
-    }
+            m_position = m_position + (forward * offset);
+        }
+        inline void moveRight(const float offset)
+        {
+            Math::Core::Vec3_f right = m_right;
+            right.m_data[1] = 0.0f;
+            right.normalise();
 
-    inline Math::Core::Mat4_f calcViewMatrix() const
-    {
-        Math::Core::Mat4_f new_mat;
-        new_mat.lookAt
-        (
-            m_position.m_data[0], m_position.m_data[1], m_position.m_data[2],
-            m_front.m_data[0], m_front.m_data[1], m_front.m_data[2], 
-            m_right.m_data[0], m_right.m_data[1], m_right.m_data[2], 
-            m_up.m_data[0], m_up.m_data[1], m_up.m_data[2]
-        );
-        return new_mat;
-    }
-    inline Math::Core::Mat4_f calcProjectionMatrix(const float aspect_ratio) const
-    {
-        Math::Core::Mat4_f new_mat;
-        new_mat.perspective(m_fov_rads, aspect_ratio, m_near_plane, m_far_plane);
-        return new_mat;
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
+            m_position = m_position + (right * offset);
+        }
+        inline void moveUp(const float offset)
+        {
+            Math::Core::Vec3_f up = m_up;
+            up.m_data[0] = 0.0f;
+            up.m_data[2] = 0.0f;
+            up.normalise();
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline std::string toString(int min_num_width, int num_decimals)
-    {
-        std::string result =
-            std::string("CAM POSITION: ") + m_position.toStringRow(min_num_width, num_decimals) + std::string("\n") +
-            std::string("CAM WORLD UP: ") + m_world_up.toStringRow(min_num_width, num_decimals) + std::string("\n") +
-            std::string("CAM FRONT:    ") + m_front.toStringRow(min_num_width, num_decimals)    + std::string("\n") +
-            std::string("CAM RIGHT:    ") + m_right.toStringRow(min_num_width, num_decimals)    + std::string("\n") +
-            std::string("CAM UP:       ") + m_up.toStringRow(6, 2);
+            m_position = m_position + (up * offset);
+        }
 
-        return result;
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
+        inline void lookRight(const float offset)
+        {
+            m_yaw_rads += offset;
+            m_yaw_rads = std::fmod(m_yaw_rads, Math::Core::TWO_PI_f);
+
+            this->updateVectors();
+        }
+        inline void lookUp(const float offset)
+        {
+            m_pitch_rads += offset;
+            m_pitch_rads = std::clamp<float>(m_pitch_rads, m_CAMERA_MIN_PITCH_RADIANS_f, m_CAMERA_MAX_PITCH_RADIANS_f);
+
+            this->updateVectors();
+        }
+
+        inline Math::Core::Mat4_f calcViewMatrix() const
+        {
+            Math::Core::Mat4_f new_mat;
+            new_mat.lookAt
+            (
+                m_position.m_data[0], m_position.m_data[1], m_position.m_data[2],
+                m_front.m_data[0], m_front.m_data[1], m_front.m_data[2], 
+                m_right.m_data[0], m_right.m_data[1], m_right.m_data[2], 
+                m_up.m_data[0], m_up.m_data[1], m_up.m_data[2]
+            );
+            return new_mat;
+        }
+        inline Math::Core::Mat4_f calcProjectionMatrix(const float aspect_ratio) const
+        {
+            Math::Core::Mat4_f new_mat;
+            new_mat.perspective(m_fov_rads, aspect_ratio, m_near_plane, m_far_plane);
+            return new_mat;
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        inline std::string toString(int min_num_width, int num_decimals)
+        {
+            std::string result =
+                std::string("CAM POSITION: ") + m_position.toStringRow(min_num_width, num_decimals) + std::string("\n") +
+                std::string("CAM WORLD UP: ") + m_world_up.toStringRow(min_num_width, num_decimals) + std::string("\n") +
+                std::string("CAM FRONT:    ") + m_front.toStringRow(min_num_width, num_decimals)    + std::string("\n") +
+                std::string("CAM RIGHT:    ") + m_right.toStringRow(min_num_width, num_decimals)    + std::string("\n") +
+                std::string("CAM UP:       ") + m_up.toStringRow(6, 2);
+
+            return result;
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+    };
 };
 
 /*

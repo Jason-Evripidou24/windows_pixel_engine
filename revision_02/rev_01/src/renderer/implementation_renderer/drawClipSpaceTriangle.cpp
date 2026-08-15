@@ -15,12 +15,13 @@
 #include "../renderer.hpp"
 
 #include "../../math/core/math_core.hpp"
+#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawTriangle
+void Renderer::drawClipSpaceTriangle
 (
     Backbuffer& target  ,
     float       v0_x    ,
@@ -122,12 +123,12 @@ void Renderer::drawTriangle
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawTriangle
+void Renderer::drawClipSpaceTriangle
 (
-    Backbuffer&            target,
-    Math::Geometry::Vertex v0    ,
-    Math::Geometry::Vertex v1    ,
-    Math::Geometry::Vertex v2
+    Backbuffer&                   target,
+    const Math::Geometry::Vertex& v0    ,
+    const Math::Geometry::Vertex& v1    ,
+    const Math::Geometry::Vertex& v2
 )
 {
     //---------------------------------------------------------------------------------------------------------------------//

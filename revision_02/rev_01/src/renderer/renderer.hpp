@@ -56,9 +56,22 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Draw functions. Triangles here are in clip space.
+    // Transform
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawTriangle
+    void draw();
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Vertices, Triangles and Polygons here are in clip space.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void drawClipSpaceLine
+    (
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1
+    );
+
+    void drawClipSpaceTriangle
     (
         Backbuffer& target  ,
         float       v0_x    ,
@@ -75,18 +88,32 @@ struct Renderer
         uint32_t    v2_color
     );
 
-    void drawTriangle
+    void drawClipSpaceTriangleWireframe
     (
-        Backbuffer&            target,
-        Math::Geometry::Vertex v0    ,
-        Math::Geometry::Vertex v1    ,
-        Math::Geometry::Vertex v2
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1    ,
+        const Math::Geometry::Vertex& v2
     );
 
-    void drawPolygon
+    void drawClipSpaceTriangle
     (
-        Backbuffer&             target,
-        Math::Geometry::Polygon polygon
+        Backbuffer&                   target,
+        const Math::Geometry::Vertex& v0    ,
+        const Math::Geometry::Vertex& v1    ,
+        const Math::Geometry::Vertex& v2
+    );
+
+    void drawClipSpacePolygonWireframe
+    (
+        Backbuffer&                    target,
+        const Math::Geometry::Polygon& polygon
+    );
+
+    void drawClipSpacePolygon
+    (
+        Backbuffer&                    target,
+        const Math::Geometry::Polygon& polygon
     );
     //---------------------------------------------------------------------------------------------------------------------//
 };

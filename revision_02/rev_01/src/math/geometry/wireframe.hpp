@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef POLYGON_HPP
-#define POLYGON_HPP
+#ifndef WIREFRAME_HPP
+#define WIREFRAME_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <utility> // For std::move
 #include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -20,7 +19,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "vertex.hpp"
+#include "polygon.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -30,52 +29,52 @@ namespace Math
 {
     namespace Geometry
     {
-        struct Polygon
+        struct Wireframe
         {
-            size_t m_num_vertices;
-            std::vector<Math::Geometry::Vertex> m_vertices;
+            size_t m_num_polygons;
+            std::vector<Math::Geometry::Polygon> m_polygons;
 
-            Polygon()
+            Wireframe()
             {
-                m_num_vertices = 0;
-                m_vertices = std::vector<Math::Geometry::Vertex>();
+                m_num_polygons = 0;
+                m_polygons = std::vector<Math::Geometry::Polygon>();
             }
 
             //-------------------------------------------------------------------------------------------------------------//
-            // Copy and Move constructors.
+            // Copy constructors.
             //-------------------------------------------------------------------------------------------------------------//
-            Polygon(const Polygon& other)
+            Wireframe(const Wireframe& other)
             {
-                m_num_vertices = other.m_num_vertices;
-                m_vertices = other.m_vertices;
+                m_num_polygons = other.m_num_polygons;
+                m_polygons = other.m_polygons;
             }
 
-            Polygon& operator=(const Polygon& other)
+            Wireframe& operator=(const Wireframe& other)
             {
                 if(this != &other)
                 {
-                    m_num_vertices = other.m_num_vertices;
-                    m_vertices = other.m_vertices;
+                    m_num_polygons = other.m_num_polygons;
+                    m_polygons = other.m_polygons;
                 }
                 return *this;
             }
 
-            Polygon(Polygon&& other) noexcept
+            Wireframe(Wireframe&& other) noexcept
             {
-                m_num_vertices = other.m_num_vertices;
-                m_vertices = std::move(other.m_vertices);
-                
-                other.m_num_vertices = 0;
+                m_num_polygons = other.m_num_polygons;
+                m_polygons = std::move(other.m_polygons);
+
+                other.m_num_polygons = 0;
             }
 
-            Polygon& operator=(Polygon&& other) noexcept
+            Wireframe& operator=(Wireframe&& other) noexcept
             {
                 if(this != &other)
                 {
-                    m_num_vertices = other.m_num_vertices;
-                    m_vertices = std::move(other.m_vertices);
-
-                    other.m_num_vertices = 0;
+                    m_num_polygons = other.m_num_polygons;
+                    m_polygons = std::move(other.m_polygons);
+                    
+                    other.m_num_polygons = 0;
                 }
                 return *this;
             }
@@ -86,38 +85,38 @@ namespace Math
             //-------------------------------------------------------------------------------------------------------------//
             inline void perspectiveDivide()
             {
-                for(size_t i = 0; i < m_num_vertices; i++)
+                for(size_t i = 0; i < m_num_polygons; i++)
                 {
-                    m_vertices[i].perspectiveDivide();
+                    m_polygons[i].perspectiveDivide();
                 }
             }
 
             inline void clear()
             {
-                m_num_vertices = 0;
+                m_num_polygons = 0;
             }
 
             inline void resize(size_t size)
             {
-                m_num_vertices = size;
-                if(m_vertices.size() < size)
+                m_num_polygons = size;
+                if(m_polygons.size() < size)
                 {
-                    m_vertices.resize(size);
+                    m_polygons.resize(size);
                 }
             }
             //-------------------------------------------------------------------------------------------------------------//
 
-            inline void addVertex(const Math::Geometry::Vertex& vertex)
+            inline void addPolygon(const Math::Geometry::Polygon& polygon)
             {
-                if(m_num_vertices < m_vertices.size())
+                if(m_num_polygons < m_polygons.size())
                 {
-                    m_vertices[m_num_vertices] = vertex;
+                    m_polygons[m_num_polygons] = polygon;
                 }
                 else
                 {
-                    m_vertices.push_back(vertex);
+                    m_polygons.push_back(polygon);
                 }
-                m_num_vertices++;
+                m_num_polygons++;
             }
         };
     };

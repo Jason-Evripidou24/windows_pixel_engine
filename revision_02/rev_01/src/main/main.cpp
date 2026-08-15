@@ -1,12 +1,12 @@
-#include "../camera/camera.hpp"
 #include "../math/core/math_core.hpp"
+#include "../math/camera/camera.hpp"
 #include "../window/window.hpp"
 #include "../renderer/renderer.hpp"
 #include "../utils/timer/timer.hpp"
 
 static Math::Core::Quaternion rotation;
 
-Camera camera
+Math::Camera camera
 (
     Math::Core::Vec3_f(0.0f, 0.0f, 5.0f),
     Math::Core::convertDegreesToRadians(0.0f),
@@ -182,7 +182,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
         polygon_transformed.perspectiveDivide();
-        renderer.drawPolygon(window.m_backbuffer, polygon_transformed);
+        //renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed);
+        renderer.drawClipSpacePolygonWireframe(window.m_backbuffer, polygon_transformed);
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer.setText(10, 10, info_string.c_str(), info_string.size(), 0xFFFFFFFF);
