@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef SHARED_COUNTER_HPP
-#define SHARED_COUNTER_HPP
+#ifndef TILE_RENDERER_JOB_HPP
+#define TILE_RENDERER_JOB_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,8 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <mutex>
-#include <condition_variable>
+#include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -20,42 +19,25 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct SharedCounter
+struct TileRendererJob
 {
-    int m_data;
+    std::shared_ptr<const Math::Geometry::Polygon> m_polygon;
+    const bool                                     m_draw_filled;
 
-    std::mutex m_mutex;
-    std::condition_variable m_condition_variable;
-
-    SharedCounter() { m_data = 0; }
-    SharedCounter(int data) { m_data = data; }
-
-    inline void increment()
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_data++;
-    }
-
-    inline void decrement()
-    {
-        bool should_notify = false;
-
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_data--;
-            if(m_data == 0) { should_notify = true; }
-        }
-
-        if(should_notify == true)
-        {
-            m_condition_variable.notify_all();
-        }
-    }
+    TileRendererJob
+    (
+        std::shared_ptr<const Math::Geometry::Polygon> polygon    ,
+        const bool                                     draw_filled
+    )
+        : m_polygon(polygon)
+        , m_draw_filled(draw_filled)
+    {}
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
