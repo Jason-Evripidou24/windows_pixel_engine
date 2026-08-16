@@ -4,12 +4,11 @@
 #include "../renderer/renderer.hpp"
 #include "../utils/timer/timer.hpp"
 #include "../model/mesh/mesh.hpp"
-
-static Math::Core::Quaternion rotation;
+#include "../model/model.hpp"
 
 Math::Camera camera
 (
-    Math::Core::Vec3_f(0.0f, 0.0f, 2.0f),
+    Math::Core::Vec3_f(0.0f, 1.7f, 0.0f),
     Math::Core::convertDegreesToRadians(0.0f),
     Math::Core::convertDegreesToRadians(180.0f),
     Math::Core::convertDegreesToRadians(45.0f),
@@ -17,10 +16,6 @@ Math::Camera camera
     100.0f,
     Math::Core::Vec3_f(0.0f, 1.0f, 0.0f)
 );
-
-static float rotate_angle_axis_x = 0.0f;
-static float rotate_angle_axis_y = 0.0f;
-static float rotate_angle_axis_z = 0.0f;
 
 static float mouse_pos_x = 0.0f;
 static float mouse_pos_y = 0.0f;
@@ -37,53 +32,11 @@ static bool g_prev_9_key = false;
 static bool g_prev_0_key = false;
 static bool g_draw_filled = true;
 void processInput(Window& window, float delta_time)
-{
+{   
     //---------------------------------------------------------------------------------------------------------------------//
     // Keyboard, rotating object.
     //---------------------------------------------------------------------------------------------------------------------//
-    const float speed = 1.0f;
-    bool curr_numpad_8_key = window.m_input.isKeyDown(VK_NUMPAD8);
-    if(curr_numpad_8_key == true)
-    {
-        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(1.0f, 0.0f, 0.0f, speed * delta_time);
-        rotation = rotation * delta;
-    }
-    bool curr_numpad_5_key = window.m_input.isKeyDown(VK_NUMPAD5);
-    if(curr_numpad_5_key == true)
-    {
-        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(1.0f, 0.0f, 0.0f, -speed * delta_time);
-        rotation = rotation * delta;
-    }
-    bool curr_numpad_4_key = window.m_input.isKeyDown(VK_NUMPAD4);
-    if(curr_numpad_4_key == true)
-    {
-        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 0.0f, 1.0f, speed * delta_time);
-        rotation = rotation * delta;
-    }
-    bool curr_numpad_6_key = window.m_input.isKeyDown(VK_NUMPAD6);
-    if(curr_numpad_6_key == true)
-    {
-        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 0.0f, 1.0f, -speed * delta_time);
-        rotation = rotation * delta;
-    }
-    bool curr_numpad_7_key = window.m_input.isKeyDown(VK_NUMPAD7);
-    if(curr_numpad_7_key == true)
-    {
-        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, speed * delta_time);
-        rotation = rotation * delta;
-    }
-    bool curr_numpad_9_key = window.m_input.isKeyDown(VK_NUMPAD9);
-    if(curr_numpad_9_key == true)
-    {
-        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, -speed * delta_time);
-        rotation = rotation * delta;
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-    
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Keyboard, rotating object.
-    //---------------------------------------------------------------------------------------------------------------------//
-    const float camera_speed = 20.0f;
+    const float camera_speed = 5.0f;
     bool curr_w_key = window.m_input.isKeyDown('W');
     if(curr_w_key == true)
     {
@@ -175,13 +128,78 @@ void processInput(Window& window, float delta_time)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     Window window;
-    if(!window.create(L"Pixel Engine", 600, 600, 1, hInstance)) { return EXIT_FAILURE; }
+    if(!window.create(L"Pixel Engine", 1200, 800, 1, hInstance)) { return EXIT_FAILURE; }
 
     Timer timer;
     timer.init();
 
-    std::shared_ptr<Mesh> test_mesh = std::make_shared<Mesh>(0, "test_mesh");
-    test_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
+    //---------------------------------------------------------------------------------------------------------------------//
+    std::shared_ptr<Mesh> backpack_mesh = std::make_shared<Mesh>(0, "backpack_mesh");
+    backpack_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
+
+    std::shared_ptr<Mesh> cube_mesh = std::make_shared<Mesh>(1, "cube_mesh");
+    cube_mesh->loadMesh("../assets/cube/", "obj.obj", "mtl.mtl", "obj.obj");
+
+    std::shared_ptr<Mesh> ground_mesh = std::make_shared<Mesh>(2, "ground_mesh");
+    ground_mesh->loadMesh("../assets/ground/", "obj.obj", "mtl.mtl", "obj.obj");
+
+    std::shared_ptr<Mesh> house_001_mesh = std::make_shared<Mesh>(3, "house_001_mesh");
+    house_001_mesh->loadMesh("../assets/house_001/", "obj.obj", "mtl.mtl", "");
+
+    std::shared_ptr<Mesh> house_002_mesh = std::make_shared<Mesh>(4, "house_002_mesh");
+    house_002_mesh->loadMesh("../assets/house_002/", "obj.obj", "Bambo_House.mtl", "");
+
+    std::shared_ptr<Mesh> house_003_mesh = std::make_shared<Mesh>(5, "house_003_mesh");
+    house_003_mesh->loadMesh("../assets/house_003/", "obj.obj", "building_04.mtl", "");
+
+    std::shared_ptr<Mesh> tree_mesh = std::make_shared<Mesh>(6, "tree_mesh");
+    tree_mesh->loadMesh("../assets/tree_001/", "obj.obj", "Lowpoly_tree_sample.mtl", "obj.obj");
+
+    std::shared_ptr<Mesh> truck_001_mesh = std::make_shared<Mesh>(7, "truck_001_mesh");
+    truck_001_mesh->loadMesh("../assets/truck_001/", "rig.obj", "rig.mtl", "rig.obj");
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    Model ground_model
+    (
+        0,
+        "ground_model",
+        ground_mesh,
+        Math::Core::Vec3_f(0.0f, 0.0f, 0.0f),
+        Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, 0.0f),
+        Math::Core::Vec3_f(1.0f, 1.0f, 1.0f)
+    );
+
+    Model house_001_model
+    (
+        1,
+        "house_001_model",
+        house_001_mesh,
+        Math::Core::Vec3_f(-30.0f, 0.0f, 30.0f),
+        Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, Math::Core::convertDegreesToRadians(310.0f)),
+        Math::Core::Vec3_f(2.0f, 2.0f, 2.0f)
+    );
+
+    Model house_002_model
+    (
+        2,
+        "house_002_model",
+        house_002_mesh,
+        Math::Core::Vec3_f(-30.0f, 0.0f, -30.0f),
+        Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, Math::Core::convertDegreesToRadians(220.0f)),
+        Math::Core::Vec3_f(2.0f, 2.0f, 2.0f)
+    );
+
+    Model house_003_model
+    (
+        3,
+        "house_003_model",
+        house_003_mesh,
+        Math::Core::Vec3_f(20.0f, 1.5f, 20.0f),
+        Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, Math::Core::convertDegreesToRadians(220.0f)),
+        Math::Core::Vec3_f(3.0f, 3.0f, 3.0f)
+    );
+    //---------------------------------------------------------------------------------------------------------------------//
 
     Renderer renderer(20);
 
@@ -192,38 +210,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
         window.m_backbuffer->clear(0xFF87CEEB); // Sky blue
 
-        rotation.normalise();
-        Math::Core::Mat4_f proj_view_model_matrix =
-            camera.calcProjectionMatrix((float)window.m_backbuffer->m_width / (float)window.m_backbuffer->m_height) *
-            camera.calcViewMatrix() *
-            rotation.toRotationMatrix();
+        float aspect_ratio = static_cast<float>(window.m_backbuffer->m_width) / static_cast<float>(window.m_backbuffer->m_height);
+        Math::Core::Mat4_f proj_view_matrix = camera.calcProjectionMatrix(aspect_ratio) * camera.calcViewMatrix();
 
         //-----------------------------------------------------------------------------------------------------------------//
         // Render time.
         //-----------------------------------------------------------------------------------------------------------------//
         renderer.m_tile_renderers_total_jobs_counter.resetCount();
 
-        for(size_t i = 0; i < test_mesh->m_render_wireframes.size(); i++)
-        {
-            const MeshWireframe& mesh_wireframe = test_mesh->m_render_wireframes[i];
-            const std::string& material_name = mesh_wireframe.m_wireframe_material_name;
-
-            std::shared_ptr<Material> material = nullptr;
-            if(test_mesh->m_material_library.m_materials.find(material_name) != test_mesh->m_material_library.m_materials.end())
-            {
-                material = test_mesh->m_material_library.m_materials[material_name];
-            }
-            else
-            {
-                material = std::make_shared<Material>();
-            }
-
-            for(int j = 0; j < mesh_wireframe.m_wireframe.m_num_polygons; j++)
-            {
-                const Math::Geometry::Polygon& polygon = mesh_wireframe.m_wireframe.m_polygons[j];
-                renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, material, proj_view_model_matrix, g_draw_filled);
-            }
-        }
+        renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, proj_view_matrix, g_draw_filled);
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);

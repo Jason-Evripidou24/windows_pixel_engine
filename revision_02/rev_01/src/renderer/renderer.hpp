@@ -28,8 +28,10 @@
 
 #include "../math/geometry/math_geometry.hpp"
 
-#include "../model/model.hpp"
 #include "../model/material/material.hpp"
+#include "../model/material/material_library.hpp"
+#include "../model/mesh/mesh_wireframe.hpp"
+#include "../model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -91,13 +93,12 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     // Vertices here are in local space.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawLocalSpacePolygon
+    void drawLocalSpaceModel
     (
-        std::shared_ptr<Backbuffer>     target                ,
-        const Math::Geometry::Polygon&  polygon               ,
-        std::shared_ptr<const Material> material              ,
-        const Math::Core::Mat4_f&       proj_view_model_matrix,
-        const bool                      draw_filled
+        std::shared_ptr<Backbuffer> target                ,
+        const Model&                model                 ,
+        const Math::Core::Mat4_f&   proj_view_matrix,
+        const bool                  draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
 };
