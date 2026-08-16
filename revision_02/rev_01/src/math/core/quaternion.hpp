@@ -251,7 +251,7 @@ namespace Math
             // Rotation matrix constructed from quaternion.
             inline Math::Core::Mat4_f toRotationMatrix() const
             {
-                Mat4_f result;
+                Math::Core::Mat4_f result;
 
                 const float xx = m_x * m_x;
                 const float yy = m_y * m_y;

@@ -20,6 +20,8 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../mesh/mesh.hpp"
+
+#include "../math/core/math_core.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -36,20 +38,16 @@ struct Model
     //Math::Core::Vec3_f m_position;
     //Math::Core::Vec3_f m_scale;
 
-    float m_rotate_rad_x_axis;
-    float m_rotate_rad_y_axis;
-    float m_rotate_rad_z_axis;
+    Math::Core::Quaternion m_rotation;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     Model()
     {
         m_mesh = nullptr;
+        m_rotation = Math::Core::Quaternion();
         //m_position = Math::Core::Vec3_f();
         //m_scale = Math::Core::Vec3_f();
-        m_rotate_rad_x_axis = 0.0f;
-        m_rotate_rad_y_axis = 0.0f;
-        m_rotate_rad_z_axis = 0.0f;
     }
 
     Model(int model_id, const std::string& model_name, std::shared_ptr<Mesh> mesh)
@@ -58,20 +56,41 @@ struct Model
         m_model_name = model_name;
 
         m_mesh = mesh;
+        m_rotation = Math::Core::Quaternion();
         //m_position = Math::Core::Vec3_f();
         //m_scale = Math::Core::Vec3_f();
-        m_rotate_rad_x_axis = 0.0f;
-        m_rotate_rad_y_axis = 0.0f;
-        m_rotate_rad_z_axis = 0.0f;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    //Math::Core::Mat4_f calcModelMatrix() const;
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void rotateX(const float offset_rads)
+    {
+        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(1.0f, 0.0f, 0.0f, offset_rads);
+        m_rotation = m_rotation * delta;
+    }
+    inline void rotateY(const float offset_rads)
+    {
+        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, offset_rads);
+        m_rotation = m_rotation * delta;
+    }
+    inline void rotateZ(const float offset_rads)
+    {
+        Math::Core::Quaternion delta = Math::Core::Quaternion::fromAxisAngle(0.0f, 0.0f, 1.0f, offset_rads);
+        m_rotation = m_rotation * delta;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    inline std::string toString()
+    Math::Core::Mat4_f calcModelMatrix() const
+    {
+        Math::Core::Mat4_f model = m_rotation.toRotationMatrix();
+        return model;
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline std::string toString() const
     {
         std::string output = std::string("");
         output += std::string("MODEL ID  : ") + std::to_string(m_model_id) + std::string("\n");

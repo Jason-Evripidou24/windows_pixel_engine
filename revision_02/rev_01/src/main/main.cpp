@@ -3,6 +3,7 @@
 #include "../window/window.hpp"
 #include "../renderer/renderer.hpp"
 #include "../utils/timer/timer.hpp"
+#include "../model/mesh/mesh.hpp"
 
 static Math::Core::Quaternion rotation;
 
@@ -179,6 +180,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     Timer timer;
     timer.init();
 
+    std::shared_ptr<Mesh> test_mesh = std::make_shared<Mesh>(0, "test_mesh");
+    test_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
+
     Math::Geometry::Vertex top_left;
     top_left.m_position = Math::Core::Vec4_f(-0.5f, 0.5f, 0.0f, 1.0f);
     top_left.m_tex_coords = Math::Core::Vec2_f(0.0f, 0.0f);
@@ -231,6 +235,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         renderer.m_tile_renderers_total_jobs_counter.resetCount();
         renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, proj_view_model_matrix, g_draw_filled);
+
+        for(size_t i = 0; i < test_mesh->m_render_wireframes.size(); i++)
+        {
+            const MeshWireframe& mesh_wireframe = test_mesh->m_render_wireframes[i];
+            for(int j = 0; j < mesh_wireframe.m_wireframe.m_num_polygons; j++)
+            {
+                const Math::Geometry::Polygon& polygon = mesh_wireframe.m_wireframe.m_polygons[j];
+                renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, proj_view_model_matrix, g_draw_filled);
+            }
+        }
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);

@@ -21,7 +21,7 @@
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "mesh_wireframe.hpp"
-#include "../material_library.hpp"
+#include "../material/material_library.hpp"
 #include "../../utils/file_parser/mtl_file_parser.hpp"
 #include "../../utils/file_parser/obj_file_parser.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -94,7 +94,7 @@ struct Mesh
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    inline std::string toString()
+    inline std::string toString() const
     {
         std::string output = std::string("");
         output += std::string("MESH DETAILS:")                                                            + std::string("\n");
