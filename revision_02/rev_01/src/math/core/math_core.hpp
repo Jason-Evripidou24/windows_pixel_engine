@@ -207,7 +207,7 @@ namespace Math
             return degrees * Math::Core::RADIANS_PER_DEGREE_f;
         }
 
-        inline uint32_t convertVec4fToColor(const Math::Core::Vec3_f& color)
+        inline uint32_t convertVec3fToColor(const Math::Core::Vec3_f& color)
         {
             uint32_t a = 0xFF;
             uint32_t r = static_cast<uint32_t>(color.m_data[0] * 255.0f);
