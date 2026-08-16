@@ -226,15 +226,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             camera.calcViewMatrix() *
             rotation.toRotationMatrix();
 
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Render time.
+        //-----------------------------------------------------------------------------------------------------------------//
+        renderer.m_tile_renderers_total_jobs_counter.resetCount();
         renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, proj_view_model_matrix, g_draw_filled);
-
-        Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
-        renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed, g_draw_filled);
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
 
         renderer.m_tile_renderers_total_jobs_counter.waitUntilZero();
+        //-----------------------------------------------------------------------------------------------------------------//
+        
         window.presentBackbuffer();
     }
 

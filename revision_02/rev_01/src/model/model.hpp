@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef MESH_HPP
-#define MESH_HPP
+#ifndef MODEL_HPP
+#define MODEL_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,8 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <string>
-#include <vector>
+#include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -20,93 +19,73 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "mesh_wireframe.hpp"
-#include "../material_library.hpp"
-#include "../../utils/file_parser/mtl_file_parser.hpp"
-#include "../../utils/file_parser/obj_file_parser.hpp"
+#include "../mesh/mesh.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct Mesh
+struct Model
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Identifiers.
-    //---------------------------------------------------------------------------------------------------------------------//
-    int m_mesh_id;
-    std::string m_mesh_name;
+    int m_model_id;
+    std::string m_model_name;
+
+    std::shared_ptr<Mesh> m_mesh;
+
+    //Math::Core::Vec3_f m_position;
+    //Math::Core::Vec3_f m_scale;
+
+    float m_rotate_rad_x_axis;
+    float m_rotate_rad_y_axis;
+    float m_rotate_rad_z_axis;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Drawing/Rendering information.
-    //---------------------------------------------------------------------------------------------------------------------//
-    MaterialLibrary m_material_library;
-    std::vector<MeshWireframe> m_render_wireframes;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Collision and Selection detection.
-    //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<MeshWireframe> m_hitbox_wireframes;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    Mesh()
+    Model()
     {
-        m_mesh_id = -1;
-        m_mesh_name.clear();
-        m_material_library.clear();
-        m_render_wireframes.clear();
-        m_hitbox_wireframes.clear();
+        m_mesh = nullptr;
+        //m_position = Math::Core::Vec3_f();
+        //m_scale = Math::Core::Vec3_f();
+        m_rotate_rad_x_axis = 0.0f;
+        m_rotate_rad_y_axis = 0.0f;
+        m_rotate_rad_z_axis = 0.0f;
     }
-    Mesh(int mesh_id, const std::string& mesh_name)
+
+    Model(int model_id, const std::string& model_name, std::shared_ptr<Mesh> mesh)
     {
-        m_mesh_id = mesh_id;
-        m_mesh_name = mesh_name;
-        m_material_library.clear();
-        m_render_wireframes.clear();
-        m_hitbox_wireframes.clear();
-    }
-    ~Mesh()
-    {
-        m_mesh_id = -1;
-        m_mesh_name.clear();
-        m_material_library.clear();
-        m_render_wireframes.clear();
-        m_hitbox_wireframes.clear();
+        m_model_id = model_id;
+        m_model_name = model_name;
+
+        m_mesh = mesh;
+        //m_position = Math::Core::Vec3_f();
+        //m_scale = Math::Core::Vec3_f();
+        m_rotate_rad_x_axis = 0.0f;
+        m_rotate_rad_y_axis = 0.0f;
+        m_rotate_rad_z_axis = 0.0f;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    void loadMesh
-    (
-        const std::string& folder,
-        const std::string& render_wireframe_file_name,
-        const std::string& material_library_file_name,
-        const std::string& hitbox_file_name
-    )
-    {
-        m_render_wireframes = ObjFileParser::loadMeshWireframes(folder,  render_wireframe_file_name);
-        m_material_library  = MtlFileParser::loadMaterialLibrary(folder, material_library_file_name);
-        m_hitbox_wireframes = ObjFileParser::loadMeshWireframes(folder,  hitbox_file_name);
-    }
+    //Math::Core::Mat4_f calcModelMatrix() const;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     inline std::string toString()
     {
         std::string output = std::string("");
-        output += std::string("MESH DETAILS:")                                                            + std::string("\n");
-        output += std::string("    ID                   : ") + std::to_string(m_mesh_id)                  + std::string("\n");
-        output += std::string("    NAME                 : ") + m_mesh_name                                + std::string("\n");
-        output += std::string("    NUM_RENDER_WIREFRAMES: ") + std::to_string(m_render_wireframes.size()) + std::string("\n");
-        for(size_t i = 0; i < m_render_wireframes.size(); i++)
+        output += std::string("MODEL ID  : ") + std::to_string(m_model_id) + std::string("\n");
+        output += std::string("MODEL NAME: ") + m_model_name + std::string("\n");
+        
+        if(m_mesh == nullptr)
         {
-            output +=
-                std::string("        ") + std::to_string(i) + std::string(" NUM_POLYGONS: ") +
-                std::string("        ") + std::to_string(m_render_wireframes[i].m_wireframe.m_num_polygons) + std::string("\n");
+            output += std::string("MODEL HAS NO MESH!");
         }
+        else
+        {
+            output += std::string("MODEL MESH DETAILS:") + std::string("\n") + m_mesh->toString();
+        }
+
         return output;
     }
     //---------------------------------------------------------------------------------------------------------------------//
