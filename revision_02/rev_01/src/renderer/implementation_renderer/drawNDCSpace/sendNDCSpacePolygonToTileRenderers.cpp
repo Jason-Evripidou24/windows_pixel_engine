@@ -2,6 +2,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -22,7 +23,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::sendNDCSpacePolygonToTileRenderers
 (
-    Backbuffer&                    target     ,
+    std::shared_ptr<Backbuffer>    target     ,
     const Math::Geometry::Polygon& polygon    ,
     const bool                     draw_filled
 )
@@ -33,16 +34,16 @@ void Renderer::sendNDCSpacePolygonToTileRenderers
     //---------------------------------------------------------------------------------------------------------------------//
     // Polygon screen-space bounding box.
     //---------------------------------------------------------------------------------------------------------------------//
-    int min_x = target.toBackbufferCoordX(polygon.m_vertices[0].m_position.m_data[0]);
+    int min_x = target->toBackbufferCoordX(polygon.m_vertices[0].m_position.m_data[0]);
     int max_x = min_x;
 
-    int min_y = target.toBackbufferCoordY(polygon.m_vertices[0].m_position.m_data[1]);
+    int min_y = target->toBackbufferCoordY(polygon.m_vertices[0].m_position.m_data[1]);
     int max_y = min_y;
 
     for(size_t i = 1; i < num_vertices; i++)
     {
-        int x = target.toBackbufferCoordX(polygon.m_vertices[i].m_position.m_data[0]);
-        int y = target.toBackbufferCoordY(polygon.m_vertices[i].m_position.m_data[1]);
+        int x = target->toBackbufferCoordX(polygon.m_vertices[i].m_position.m_data[0]);
+        int y = target->toBackbufferCoordY(polygon.m_vertices[i].m_position.m_data[1]);
 
         if(x < min_x) { min_x = x; }
         if(x > max_x) { max_x = x; }
@@ -56,10 +57,10 @@ void Renderer::sendNDCSpacePolygonToTileRenderers
     // Clamp bounding box to backbuffer.
     //---------------------------------------------------------------------------------------------------------------------//
     if(min_x < 0) { min_x = 0; }
-    if(max_x >= target.m_width) { max_x = target.m_width - 1; }
+    if(max_x >= target->m_width) { max_x = target->m_width - 1; }
 
     if(min_y < 0) { min_y = 0; }
-    if(max_y >= target.m_height) { max_y = target.m_height - 1; }
+    if(max_y >= target->m_height) { max_y = target->m_height - 1; }
 
     if(min_x > max_x || min_y > max_y) { return; }
     //---------------------------------------------------------------------------------------------------------------------//
@@ -67,21 +68,24 @@ void Renderer::sendNDCSpacePolygonToTileRenderers
     //---------------------------------------------------------------------------------------------------------------------//
     // Determine tile range.
     //---------------------------------------------------------------------------------------------------------------------//
-    int tile_x_min = (min_x * m_tile_split) / target.m_width;
-    int tile_x_max = (max_x * m_tile_split) / target.m_width;
+    int tile_x_min = (min_x * m_tile_split) / target->m_width;
+    int tile_x_max = (max_x * m_tile_split) / target->m_width;
 
-    int tile_y_min = (min_y * m_tile_split) / target.m_height;
-    int tile_y_max = (max_y * m_tile_split) / target.m_height;
+    int tile_y_min = (min_y * m_tile_split) / target->m_height;
+    int tile_y_max = (max_y * m_tile_split) / target->m_height;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Submit polygon to overlapping tiles.
     //---------------------------------------------------------------------------------------------------------------------//
+    std::shared_ptr<const Math::Geometry::Polygon> polygon_shared_pointer = std::make_shared<const Math::Geometry::Polygon>(polygon);
     for(int tile_y = tile_y_min; tile_y <= tile_y_max; tile_y++)
     {
         for(int tile_x = tile_x_min; tile_x <= tile_x_max; tile_x++)
         {
-            m_tile_renderers[tile_y][tile_x]->drawNDCSpacePolygon(target, polygon, draw_filled);
+            m_tile_renderers_total_jobs_counter.increment();
+            TileRendererJob tile_renderer_job(target, polygon_shared_pointer, draw_filled);
+            m_tile_renderer_workers[tile_y][tile_x]->m_job_queue.insertTileRendererJob(tile_renderer_job);
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//

@@ -20,15 +20,23 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 Renderer::Renderer(int tile_split)
 {
+    m_tile_renderers_total_jobs_counter.resetCount();
     m_tile_split = tile_split;
 
-    m_tile_renderers.resize(tile_split);
+    m_tile_renderer_workers.resize(tile_split);
     for(int tile_y = 0; tile_y < tile_split; tile_y++)
     {
-        m_tile_renderers[tile_y].resize(tile_split);
+        m_tile_renderer_workers[tile_y].resize(tile_split);
         for(int tile_x = 0; tile_x < tile_split; tile_x++)
         {
-            m_tile_renderers[tile_y][tile_x] = std::make_unique<TileRenderer>(tile_x, tile_y, tile_split);
+            m_tile_renderer_workers[tile_y][tile_x] = std::make_unique<TileRendererWorker>
+            (
+                tile_x,
+                tile_y, 
+                tile_split,
+                m_tile_renderers_total_jobs_counter
+            );
+            m_tile_renderer_workers[tile_y][tile_x]->start();
         }
     }
 }

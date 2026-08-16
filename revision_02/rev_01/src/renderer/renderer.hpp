@@ -21,7 +21,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer/tile_renderer.hpp"
+#include "tile_renderers_total_jobs_counter.hpp"
+#include "tile_renderer/tile_renderer_worker.hpp"
 
 #include "../window/backbuffer/backbuffer.hpp"
 
@@ -49,8 +50,9 @@
 */
 struct Renderer
 {
+    TileRenderersTotalJobsCounter m_tile_renderers_total_jobs_counter;
     int m_tile_split;
-    std::vector<std::vector<std::unique_ptr<TileRenderer>>> m_tile_renderers;
+    std::vector<std::vector<std::unique_ptr<TileRendererWorker>>> m_tile_renderer_workers;
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and destructor.
@@ -64,7 +66,7 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void sendNDCSpacePolygonToTileRenderers
     (
-        Backbuffer&                    target     ,
+        std::shared_ptr<Backbuffer>    target     ,
         const Math::Geometry::Polygon& polygon    ,
         const bool                     draw_filled
     );
@@ -75,7 +77,7 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawClipSpacePolygon
     (
-        Backbuffer&                    target     ,
+        std::shared_ptr<Backbuffer>    target     ,
         const Math::Geometry::Polygon& polygon    ,
         const bool                     draw_filled
     );
@@ -86,7 +88,7 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawLocalSpacePolygon
     (
-        Backbuffer&                    target                ,
+        std::shared_ptr<Backbuffer>    target                ,
         const Math::Geometry::Polygon& polygon               ,
         const Math::Core::Mat4_f&      proj_view_model_matrix,
         const bool                     draw_filled

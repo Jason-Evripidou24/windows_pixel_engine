@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERERS_TOTAL_JOBS_COUNTER_HPP
-#define TILE_RENDERERS_TOTAL_JOBS_COUNTER_HPP
+#ifndef TILE_RENDERER_WORKER_HPP
+#define TILE_RENDERER_WORKER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,8 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <mutex>
-#include <condition_variable>
+#include <thread>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -20,72 +19,84 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "tile_renderer.hpp"
+#include "tile_renderer_job.hpp"
+#include "tile_renderer_job_queue.hpp"
+#include "../tile_renderers_total_jobs_counter.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRenderersTotalJobsCounter
+struct TileRendererWorker
 {
-    int m_count;
+    TileRenderersTotalJobsCounter& m_total_jobs_counter;
 
-    std::mutex m_mutex;
-    std::condition_variable m_condition_variable;
+    TileRenderer m_tile_renderer;
+    TileRendererJobQueue m_job_queue;
+
+    std::thread m_worker_thread;
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRenderersTotalJobsCounter() { m_count = 0; }
-    TileRenderersTotalJobsCounter(int count) { m_count = count; }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Increment and Decrement.
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void resetCount()
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_count = 0;
-    }
-    
-    inline void increment()
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_count++;
-    }
-
-    inline void decrement()
-    {
-        bool should_notify = false;
-
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            if(m_count >  0) { m_count--; }
-            if(m_count == 0) { should_notify = true; }
-        }
-
-        if(should_notify == true)
-        {
-            m_condition_variable.notify_all();
-        }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Wait until counter reaches zero.
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void waitUntilZero()
-    {
-        std::unique_lock<std::mutex> lock(m_mutex);
-
-        m_condition_variable.wait
+    TileRendererWorker
+    (
+        int tile_x,
+        int tile_y,
+        int tile_split,
+        TileRenderersTotalJobsCounter& total_jobs_counter
+    )
+    :   m_total_jobs_counter(total_jobs_counter)
+    ,   m_tile_renderer
         (
-            lock,
-            [this]()
-            {
-                return (m_count == 0);
-            }
-        );
+            tile_x,
+            tile_y,
+            tile_split
+        )
+    {
+    }
+
+    ~TileRendererWorker()
+    {
+        this->stop();
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void start()
+    {
+        if(m_worker_thread.joinable()) { return; }
+
+        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
+    }
+
+    inline void stop()
+    {
+        m_job_queue.shutdown();
+
+        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void workerFunction()
+    {
+        TileRendererJob tile_renderer_job(nullptr, nullptr, false);
+
+        while(true)
+        {
+            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
+
+            m_tile_renderer.drawNDCSpacePolygon
+            (
+                *(tile_renderer_job.m_target),
+                *(tile_renderer_job.m_polygon),
+                tile_renderer_job.m_draw_filled
+            );
+
+            m_total_jobs_counter.decrement();
+        }
     }
     //---------------------------------------------------------------------------------------------------------------------//
 };

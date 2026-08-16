@@ -61,7 +61,8 @@ bool Window::create(const wchar_t* title, int width, int height, int pixel_size,
 
     m_running = true;
 
-    m_backbuffer.resize(m_width / m_pixel_size, m_height / m_pixel_size);
+    m_backbuffer = std::make_shared<Backbuffer>();
+    m_backbuffer->resize(m_width / m_pixel_size, m_height / m_pixel_size);
 
     return true;
 }

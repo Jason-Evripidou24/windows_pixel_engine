@@ -30,7 +30,7 @@ void Window::resize(int width, int height)
     m_width  = width;
     m_height = height;
 
-    m_backbuffer.resize(m_width / m_pixel_size, m_height / m_pixel_size);
+    m_backbuffer->resize(m_width / m_pixel_size, m_height / m_pixel_size);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -44,6 +44,6 @@ void Window::resizePixel(int pixel_size)
 
     m_pixel_size = pixel_size;
 
-    m_backbuffer.resize(m_width / m_pixel_size, m_height / m_pixel_size);
+    m_backbuffer->resize(m_width / m_pixel_size, m_height / m_pixel_size);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

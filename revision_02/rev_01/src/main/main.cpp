@@ -13,7 +13,7 @@ Math::Camera camera
     Math::Core::convertDegreesToRadians(180.0f),
     Math::Core::convertDegreesToRadians(45.0f),
     0.1f,
-    3.0f,
+    100.0f,
     Math::Core::Vec3_f(0.0f, 1.0f, 0.0f)
 );
 float camera_move_speed = 5.0f;
@@ -218,11 +218,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         timer.tick();
         processInput(window, timer.deltaTime);
 
-        window.m_backbuffer.clear(0xFF87CEEB); // Sky blue
+        window.m_backbuffer->clear(0xFF87CEEB); // Sky blue
 
         rotation.normalise();
         Math::Core::Mat4_f proj_view_model_matrix =
-            camera.calcProjectionMatrix((float)window.m_backbuffer.m_width / (float)window.m_backbuffer.m_height) *
+            camera.calcProjectionMatrix((float)window.m_backbuffer->m_width / (float)window.m_backbuffer->m_height) *
             camera.calcViewMatrix() *
             rotation.toRotationMatrix();
 
@@ -232,8 +232,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.drawClipSpacePolygon(window.m_backbuffer, polygon_transformed, g_draw_filled);
 
         std::string info_string = std::to_string(timer.fps);
-        window.m_backbuffer.setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+        window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
 
+        renderer.m_tile_renderers_total_jobs_counter.waitUntilZero();
         window.presentBackbuffer();
     }
 

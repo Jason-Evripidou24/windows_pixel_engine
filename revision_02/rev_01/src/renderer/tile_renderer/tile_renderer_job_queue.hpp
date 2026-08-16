@@ -39,8 +39,9 @@ struct TileRendererJobQueue
     // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
     TileRendererJobQueue() = default;
+    ~TileRendererJobQueue() = default;
 
-    ~TileRendererJobQueue()
+    inline void shutdown()
     {
         {
             std::lock_guard<std::mutex> lock(m_mutex);
@@ -54,16 +55,21 @@ struct TileRendererJobQueue
     //---------------------------------------------------------------------------------------------------------------------//
     // Insert and Retrieve jobs.
     //---------------------------------------------------------------------------------------------------------------------//
-    void insertTileRendererJob(const TileRendererJob& tile_renderer_job)
+    inline bool insertTileRendererJob(const TileRendererJob& tile_renderer_job)
     {
         {
             std::lock_guard<std::mutex> lock(m_mutex);
+
+            if(m_shutdown) { return false; }
+
             m_queue.push(tile_renderer_job);
         }
+        
         m_condition_variable.notify_one();
+        return true;
     }
 
-    TileRendererJob getTileRendererJob()
+    inline bool getTileRendererJob(TileRendererJob& output)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
 
@@ -72,14 +78,16 @@ struct TileRendererJobQueue
             lock,
             [this]()
             {
-                return !m_queue.empty();
+                return m_shutdown || !m_queue.empty();
             }
         );
 
-        TileRendererJob tile_renderer_job = std::move(m_queue.front());
+        if(m_shutdown && m_queue.empty()) { return false; }
+
+        output = std::move(m_queue.front());
         m_queue.pop();
 
-        return tile_renderer_job;
+        return true;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 };

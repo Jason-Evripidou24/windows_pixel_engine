@@ -19,6 +19,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "../../window/backbuffer/backbuffer.hpp"
 #include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -27,15 +28,18 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TileRendererJob
 {
+    std::shared_ptr<Backbuffer>                    m_target;
     std::shared_ptr<const Math::Geometry::Polygon> m_polygon;
-    const bool                                     m_draw_filled;
+    bool                                           m_draw_filled;
 
     TileRendererJob
     (
+        std::shared_ptr<Backbuffer>                    target     ,
         std::shared_ptr<const Math::Geometry::Polygon> polygon    ,
-        const bool                                     draw_filled
+        bool                                           draw_filled
     )
-        : m_polygon(polygon)
+        : m_target(target)
+        , m_polygon(polygon)
         , m_draw_filled(draw_filled)
     {}
 };

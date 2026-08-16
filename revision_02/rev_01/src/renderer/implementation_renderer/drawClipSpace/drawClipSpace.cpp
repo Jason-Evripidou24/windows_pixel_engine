@@ -24,7 +24,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawClipSpacePolygon
 (
-    Backbuffer&                    target     ,
+    std::shared_ptr<Backbuffer>    target     ,
     const Math::Geometry::Polygon& polygon    ,
     const bool                     draw_filled
 )
