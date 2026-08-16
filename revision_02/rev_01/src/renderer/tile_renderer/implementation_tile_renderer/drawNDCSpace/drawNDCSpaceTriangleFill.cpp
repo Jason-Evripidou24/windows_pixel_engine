@@ -20,10 +20,11 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::drawNDCSpaceTriangleFill
 (
-    Backbuffer&                   target,
-    const Math::Geometry::Vertex& v0    ,
-    const Math::Geometry::Vertex& v1    ,
-    const Math::Geometry::Vertex& v2
+    Backbuffer&                   target  ,
+    const Math::Geometry::Vertex& v0      ,
+    const Math::Geometry::Vertex& v1      ,
+    const Math::Geometry::Vertex& v2      ,
+    const Material&               material
 )
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -130,9 +131,11 @@ void TileRenderer::drawNDCSpaceTriangleFill
             Math::Core::Vec4_f color = (v0.m_color * a0) + (v1.m_color * a1) + (v2.m_color * a2);
 
             Math::Core::Vec2_f tex_coord = (v0.m_tex_coords * a0) + (v1.m_tex_coords * a1) + (v2.m_tex_coords * a2);
+            uint32_t tex_color = material.calcMaterialColor(tex_coord.m_data[0], tex_coord.m_data[1]);
             //-------------------------------------------------------------------------------------------------------------//
 
-            target.setPixel(x, y, z, Math::Core::convertVec4fToColor(color));
+            //target.setPixel(x, y, z, Math::Core::convertVec4fToColor(color));
+            target.setPixel(x, y, z, tex_color);
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//

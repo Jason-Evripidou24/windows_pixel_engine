@@ -25,6 +25,7 @@ void Renderer::sendNDCSpacePolygonToTileRenderers
 (
     std::shared_ptr<Backbuffer>    target     ,
     const Math::Geometry::Polygon& polygon    ,
+    std::shared_ptr<Material>      material   ,
     const bool                     draw_filled
 )
 {
@@ -84,7 +85,7 @@ void Renderer::sendNDCSpacePolygonToTileRenderers
         for(int tile_x = tile_x_min; tile_x <= tile_x_max; tile_x++)
         {
             m_tile_renderers_total_jobs_counter.increment();
-            TileRendererJob tile_renderer_job(target, polygon_shared_pointer, draw_filled);
+            TileRendererJob tile_renderer_job(target, polygon_shared_pointer, material, draw_filled);
             m_tile_renderer_workers[tile_y][tile_x]->m_job_queue.insertTileRendererJob(tile_renderer_job);
         }
     }

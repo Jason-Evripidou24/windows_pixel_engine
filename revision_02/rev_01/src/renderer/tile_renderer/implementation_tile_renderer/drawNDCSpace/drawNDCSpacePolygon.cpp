@@ -22,16 +22,17 @@ void TileRenderer::drawNDCSpacePolygon
 (
     Backbuffer&                    target     ,
     const Math::Geometry::Polygon& polygon    ,
+    const Material&                material   ,
     const bool                     draw_filled
 )
 {
     if(draw_filled == true)
     {
-        this->drawNDCSpacePolygonFill(target, polygon);
+        this->drawNDCSpacePolygonFill(target, polygon, material);
     }
     else
     {
-        this->drawNDCSpacePolygonWireframe(target, polygon);
+        this->drawNDCSpacePolygonWireframe(target, polygon, material);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -40,8 +41,9 @@ void TileRenderer::drawNDCSpacePolygon
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::drawNDCSpacePolygonFill
 (
-    Backbuffer&                    target,
-    const Math::Geometry::Polygon& polygon
+    Backbuffer&                    target  ,
+    const Math::Geometry::Polygon& polygon ,
+    const Material&                material
 )
 {
     size_t num_vertices = polygon.m_num_vertices;
@@ -52,7 +54,7 @@ void TileRenderer::drawNDCSpacePolygonFill
     {
         const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
         const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawNDCSpaceTriangleFill(target, v0, v1, v2);
+        this->drawNDCSpaceTriangleFill(target, v0, v1, v2, material);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -61,8 +63,9 @@ void TileRenderer::drawNDCSpacePolygonFill
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::drawNDCSpacePolygonWireframe
 (
-    Backbuffer&                    target,
-    const Math::Geometry::Polygon& polygon
+    Backbuffer&                    target  ,
+    const Math::Geometry::Polygon& polygon ,
+    const Material&                material
 )
 {
     size_t num_vertices = polygon.m_num_vertices;
@@ -73,7 +76,7 @@ void TileRenderer::drawNDCSpacePolygonWireframe
     {
         const Math::Geometry::Vertex& v1 = polygon.m_vertices[i];
         const Math::Geometry::Vertex& v2 = polygon.m_vertices[i + 1];
-        this->drawNDCSpaceTriangleWireframe(target, v0, v1, v2);
+        this->drawNDCSpaceTriangleWireframe(target, v0, v1, v2, material);
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

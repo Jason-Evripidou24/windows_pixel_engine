@@ -233,16 +233,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Render time.
         //-----------------------------------------------------------------------------------------------------------------//
-        renderer.m_tile_renderers_total_jobs_counter.resetCount();
-        renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, proj_view_model_matrix, g_draw_filled);
-
         for(size_t i = 0; i < test_mesh->m_render_wireframes.size(); i++)
         {
             const MeshWireframe& mesh_wireframe = test_mesh->m_render_wireframes[i];
+            const std::string& material_name = mesh_wireframe.m_wireframe_material_name;
+
+            std::shared_ptr<Material> material = nullptr;
+            if(test_mesh->m_material_library.m_materials.find(material_name) != test_mesh->m_material_library.m_materials.end())
+            {
+                material = test_mesh->m_material_library.m_materials[material_name];
+            }
+            else
+            {
+                material = std::make_shared<Material>();
+            }
+
             for(int j = 0; j < mesh_wireframe.m_wireframe.m_num_polygons; j++)
             {
                 const Math::Geometry::Polygon& polygon = mesh_wireframe.m_wireframe.m_polygons[j];
-                renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, proj_view_model_matrix, g_draw_filled);
+                renderer.drawLocalSpacePolygon(window.m_backbuffer, polygon, material, proj_view_model_matrix, g_draw_filled);
             }
         }
 

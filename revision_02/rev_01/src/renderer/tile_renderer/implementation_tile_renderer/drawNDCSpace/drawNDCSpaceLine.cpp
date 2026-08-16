@@ -20,9 +20,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::drawNDCSpaceLine
 (
-    Backbuffer&                   target,
-    const Math::Geometry::Vertex& v0    ,
-    const Math::Geometry::Vertex& v1
+    Backbuffer&                   target  ,
+    const Math::Geometry::Vertex& v0      ,
+    const Math::Geometry::Vertex& v1      ,
+    const Material&               material
 )
 {
     //---------------------------------------------------------------------------------------------------------------------//
@@ -44,7 +45,9 @@ void TileRenderer::drawNDCSpaceLine
 
     if(steps == 0)
     {
-        target.setPixel(backbuffer_x0, backbuffer_y0, v0.m_position.m_data[2], Math::Core::convertVec4fToColor(v0.m_color));
+        uint32_t tex_color = material.calcMaterialColor(v0.m_tex_coords.m_data[0], v0.m_tex_coords.m_data[1]);
+        target.setPixel(backbuffer_x0, backbuffer_y0, v0.m_position.m_data[2], tex_color);
+        return;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -55,13 +58,15 @@ void TileRenderer::drawNDCSpaceLine
 
         Math::Geometry::Vertex vertex_interpolated;
         Math::Geometry::interpolateVertex(vertex_interpolated, v0, v1, t);
-        target.setPixel
-        (
-            target.toBackbufferCoordX(vertex_interpolated.m_position.m_data[0]),
-            target.toBackbufferCoordY(vertex_interpolated.m_position.m_data[1]),
-            vertex_interpolated.m_position.m_data[2],
-            Math::Core::convertVec4fToColor(vertex_interpolated.m_color)
-        );
+
+        int x = target.toBackbufferCoordX(vertex_interpolated.m_position.m_data[0]);
+        int y = target.toBackbufferCoordY(vertex_interpolated.m_position.m_data[1]);
+        float z = vertex_interpolated.m_position.m_data[2];
+
+        Math::Core::Vec2_f tex_coord = (v0.m_tex_coords * t) + (v1.m_tex_coords * (1.0f - t));
+        uint32_t tex_color = material.calcMaterialColor(tex_coord.m_data[0], tex_coord.m_data[1]);
+
+        target.setPixel(x, y, z, tex_color);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }

@@ -82,18 +82,27 @@ struct TileRendererWorker
     //---------------------------------------------------------------------------------------------------------------------//
     inline void workerFunction()
     {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, false);
+        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
 
         while(true)
         {
             if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
 
-            m_tile_renderer.drawNDCSpacePolygon
+            if
             (
-                *(tile_renderer_job.m_target),
-                *(tile_renderer_job.m_polygon),
-                tile_renderer_job.m_draw_filled
-            );
+                (tile_renderer_job.m_target != nullptr)   &&
+                (tile_renderer_job.m_polygon != nullptr)  &&
+                (tile_renderer_job.m_material != nullptr)
+            )
+            {
+                m_tile_renderer.drawNDCSpacePolygon
+                (
+                    *(tile_renderer_job.m_target),
+                    *(tile_renderer_job.m_polygon),
+                    *(tile_renderer_job.m_material),
+                    tile_renderer_job.m_draw_filled
+                );
+            }
 
             m_total_jobs_counter.decrement();
         }

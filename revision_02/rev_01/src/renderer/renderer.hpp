@@ -27,6 +27,8 @@
 #include "../window/backbuffer/backbuffer.hpp"
 
 #include "../math/geometry/math_geometry.hpp"
+
+#include "../model/material/material.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -68,6 +70,7 @@ struct Renderer
     (
         std::shared_ptr<Backbuffer>    target     ,
         const Math::Geometry::Polygon& polygon    ,
+        std::shared_ptr<Material>      material   ,
         const bool                     draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
@@ -79,6 +82,7 @@ struct Renderer
     (
         std::shared_ptr<Backbuffer>    target     ,
         const Math::Geometry::Polygon& polygon    ,
+        std::shared_ptr<Material>      material   ,
         const bool                     draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
@@ -90,6 +94,7 @@ struct Renderer
     (
         std::shared_ptr<Backbuffer>    target                ,
         const Math::Geometry::Polygon& polygon               ,
+        std::shared_ptr<Material>      material              ,
         const Math::Core::Mat4_f&      proj_view_model_matrix,
         const bool                     draw_filled
     );

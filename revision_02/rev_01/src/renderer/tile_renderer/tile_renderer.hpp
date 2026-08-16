@@ -20,6 +20,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../../window/backbuffer/backbuffer.hpp"
 #include "../../math/geometry/math_geometry.hpp"
+#include "../../model/material/material.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -46,43 +47,49 @@ struct TileRenderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawNDCSpaceLine
     (
-        Backbuffer&                   target,
-        const Math::Geometry::Vertex& v0    ,
-        const Math::Geometry::Vertex& v1
+        Backbuffer&                   target  ,
+        const Math::Geometry::Vertex& v0      ,
+        const Math::Geometry::Vertex& v1      ,
+        const Material&               material
     );
 
     void drawNDCSpaceTriangleWireframe
     (
-        Backbuffer&                   target,
-        const Math::Geometry::Vertex& v0    ,
-        const Math::Geometry::Vertex& v1    ,
-        const Math::Geometry::Vertex& v2
+        Backbuffer&                   target  ,
+        const Math::Geometry::Vertex& v0      ,
+        const Math::Geometry::Vertex& v1      ,
+        const Math::Geometry::Vertex& v2      ,
+        const Material&               material
     );
 
     void drawNDCSpaceTriangleFill
     (
-        Backbuffer&                   target,
-        const Math::Geometry::Vertex& v0    ,
-        const Math::Geometry::Vertex& v1    ,
-        const Math::Geometry::Vertex& v2
+        Backbuffer&                   target  ,
+        const Math::Geometry::Vertex& v0      ,
+        const Math::Geometry::Vertex& v1      ,
+        const Math::Geometry::Vertex& v2      ,
+        const Material&               material
     );
 
     void drawNDCSpacePolygonWireframe
     (
-        Backbuffer&                    target ,
-        const Math::Geometry::Polygon& polygon
+        Backbuffer&                    target  ,
+        const Math::Geometry::Polygon& polygon ,
+        const Material&                material
     );
 
     void drawNDCSpacePolygonFill
     (
-        Backbuffer&                    target ,
-        const Math::Geometry::Polygon& polygon
+        Backbuffer&                    target  ,
+        const Math::Geometry::Polygon& polygon ,
+        const Material&                material
     );
 
     void drawNDCSpacePolygon
     (
         Backbuffer&                    target     ,
         const Math::Geometry::Polygon& polygon    ,
+        const Material&                material   ,
         const bool                     draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//

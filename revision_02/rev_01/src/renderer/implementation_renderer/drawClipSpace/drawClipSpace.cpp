@@ -26,6 +26,7 @@ void Renderer::drawClipSpacePolygon
 (
     std::shared_ptr<Backbuffer>    target     ,
     const Math::Geometry::Polygon& polygon    ,
+    std::shared_ptr<Material>      material   ,
     const bool                     draw_filled
 )
 {
@@ -56,6 +57,6 @@ void Renderer::drawClipSpacePolygon
     }
     if(polygon_clipped.m_num_vertices < 3) { return; }
 
-    this->sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, draw_filled);
+    this->sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, material, draw_filled);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

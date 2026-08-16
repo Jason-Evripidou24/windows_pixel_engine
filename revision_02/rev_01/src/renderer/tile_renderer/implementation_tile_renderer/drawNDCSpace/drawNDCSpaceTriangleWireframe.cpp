@@ -20,14 +20,15 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TileRenderer::drawNDCSpaceTriangleWireframe
 (
-    Backbuffer&                   target,
-    const Math::Geometry::Vertex& v0    ,
-    const Math::Geometry::Vertex& v1    ,
-    const Math::Geometry::Vertex& v2
+    Backbuffer&                   target  ,
+    const Math::Geometry::Vertex& v0      ,
+    const Math::Geometry::Vertex& v1      ,
+    const Math::Geometry::Vertex& v2      ,
+    const Material&               material
 )
 {
-    this->drawNDCSpaceLine(target, v0, v1);
-    this->drawNDCSpaceLine(target, v1, v2);
-    this->drawNDCSpaceLine(target, v2, v0);
+    this->drawNDCSpaceLine(target, v0, v1, material);
+    this->drawNDCSpaceLine(target, v1, v2, material);
+    this->drawNDCSpaceLine(target, v2, v0, material);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

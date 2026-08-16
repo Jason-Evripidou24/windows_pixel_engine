@@ -27,6 +27,7 @@ void Renderer::drawLocalSpacePolygon
 (
     std::shared_ptr<Backbuffer>    target                ,
     const Math::Geometry::Polygon& polygon               ,
+    std::shared_ptr<Material>      material              ,
     const Math::Core::Mat4_f&      proj_view_model_matrix,
     const bool                     draw_filled
 )
@@ -34,6 +35,6 @@ void Renderer::drawLocalSpacePolygon
     Math::Geometry::Polygon polygon_transformed;
     Math::Geometry::transformPolygon(polygon_transformed, polygon, proj_view_model_matrix);
 
-    this->drawClipSpacePolygon(target, polygon_transformed, draw_filled);
+    this->drawClipSpacePolygon(target, polygon_transformed, material, draw_filled);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
