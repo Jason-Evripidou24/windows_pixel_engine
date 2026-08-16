@@ -216,7 +216,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Render time.
         //-----------------------------------------------------------------------------------------------------------------//
-        renderer.m_tile_renderers_total_jobs_counter.resetCount();
+        renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.resetCount();
 
         renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model, proj_view_matrix, g_draw_filled);
         renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled);
@@ -226,7 +226,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
 
-        renderer.m_tile_renderers_total_jobs_counter.waitUntilZero();
+        renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.waitUntilZero();
         //-----------------------------------------------------------------------------------------------------------------//
         
         window.presentBackbuffer();

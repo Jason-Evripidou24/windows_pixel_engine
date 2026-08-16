@@ -57,6 +57,6 @@ void Renderer::drawClipSpacePolygon
     }
     if(polygon_clipped.m_num_vertices < 3) { return; }
 
-    this->sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, material, draw_filled);
+    m_tile_renderer_system.sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, material, draw_filled);
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERER_WORKER_HPP
-#define TILE_RENDERER_WORKER_HPP
+#ifndef TILE_RENDERER_SYSTEM_HPP
+#define TILE_RENDERER_SYSTEM_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <thread>
+#include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,95 +19,58 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer.hpp"
-#include "tile_renderer_job.hpp"
-#include "tile_renderer_job_queue.hpp"
+#include "tile_renderer_worker.hpp"
 #include "tile_renderer_system_total_jobs_counter.hpp"
+
+#include "../../math/geometry/math_geometry.hpp"
+#include "../../model/material/material.hpp"
+#include "../../window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRendererWorker
+struct TileRendererSystem
 {
-    TileRendererSystemTotalJobsCounter& m_total_jobs_counter;
-
-    TileRenderer m_tile_renderer;
-    TileRendererJobQueue m_job_queue;
-
-    std::thread m_worker_thread;
+    TileRendererSystemTotalJobsCounter m_tile_renderer_system_total_jobs_counter;
+    int m_tile_split;
+    std::vector<std::vector<std::unique_ptr<TileRendererWorker>>> m_tile_renderer_workers;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and Destructor.
+    // Constructor and destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRendererWorker
-    (
-        int tile_x,
-        int tile_y,
-        int tile_split,
-        TileRendererSystemTotalJobsCounter& total_jobs_counter
-    )
-        :   m_total_jobs_counter(total_jobs_counter)
-        ,   m_tile_renderer
-            (
-                tile_x,
-                tile_y,
-                tile_split
-            )
+    TileRendererSystem(int tile_split)
     {
-    }
+        m_tile_renderer_system_total_jobs_counter.resetCount();
+        m_tile_split = tile_split;
 
-    ~TileRendererWorker()
-    {
-        this->stop();
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void start()
-    {
-        if(m_worker_thread.joinable()) { return; }
-
-        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
-    }
-
-    inline void stop()
-    {
-        m_job_queue.shutdown();
-
-        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void workerFunction()
-    {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
-
-        while(true)
+        m_tile_renderer_workers.resize(tile_split);
+        for(int tile_y = 0; tile_y < tile_split; tile_y++)
         {
-            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
-
-            if
-            (
-                (tile_renderer_job.m_target != nullptr)   &&
-                (tile_renderer_job.m_polygon != nullptr)  &&
-                (tile_renderer_job.m_material != nullptr)
-            )
+            m_tile_renderer_workers[tile_y].resize(tile_split);
+            for(int tile_x = 0; tile_x < tile_split; tile_x++)
             {
-                m_tile_renderer.drawNDCSpacePolygon
+                m_tile_renderer_workers[tile_y][tile_x] = std::make_unique<TileRendererWorker>
                 (
-                    *(tile_renderer_job.m_target),
-                    *(tile_renderer_job.m_polygon),
-                    *(tile_renderer_job.m_material),
-                    tile_renderer_job.m_draw_filled
+                    tile_x,
+                    tile_y, 
+                    tile_split,
+                    m_tile_renderer_system_total_jobs_counter
                 );
+                m_tile_renderer_workers[tile_y][tile_x]->start();
             }
-
-            m_total_jobs_counter.decrement();
         }
     }
+    ~TileRendererSystem() = default;
     //---------------------------------------------------------------------------------------------------------------------//
+
+    void sendNDCSpacePolygonToTileRenderers
+    (
+        std::shared_ptr<Backbuffer>     target      ,
+        const Math::Geometry::Polygon&  polygon     ,
+        std::shared_ptr<const Material> material    ,
+        const bool                      draw_filled
+    );
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

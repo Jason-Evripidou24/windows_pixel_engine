@@ -1,8 +1,15 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef TILE_RENDERER_SYSTEM_TOTAL_JOBS_COUNTER_HPP
+#define TILE_RENDERER_SYSTEM_TOTAL_JOBS_COUNTER_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <memory>
+#include <mutex>
+#include <condition_variable>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,82 +20,78 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
-#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::sendNDCSpacePolygonToTileRenderers
-(
-    std::shared_ptr<Backbuffer>     target     ,
-    const Math::Geometry::Polygon&  polygon    ,
-    std::shared_ptr<const Material> material   ,
-    const bool                      draw_filled
-)
+struct TileRendererSystemTotalJobsCounter
 {
-    size_t num_vertices = polygon.m_num_vertices;
-    if(num_vertices < 3) { return; }
+    int m_count;
+
+    std::mutex m_mutex;
+    std::condition_variable m_condition_variable;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Polygon screen-space bounding box.
+    // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    int min_x = target->toBackbufferCoordX(polygon.m_vertices[0].m_position.m_data[0]);
-    int max_x = min_x;
+    TileRendererSystemTotalJobsCounter() { m_count = 0; }
+    TileRendererSystemTotalJobsCounter(int count) { m_count = count; }
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    int min_y = target->toBackbufferCoordY(polygon.m_vertices[0].m_position.m_data[1]);
-    int max_y = min_y;
-
-    for(size_t i = 1; i < num_vertices; i++)
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Increment and Decrement.
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void resetCount()
     {
-        int x = target->toBackbufferCoordX(polygon.m_vertices[i].m_position.m_data[0]);
-        int y = target->toBackbufferCoordY(polygon.m_vertices[i].m_position.m_data[1]);
-
-        if(x < min_x) { min_x = x; }
-        if(x > max_x) { max_x = x; }
-
-        if(y < min_y) { min_y = y; }
-        if(y > max_y) { max_y = y; }
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_count = 0;
     }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Clamp bounding box to backbuffer.
-    //---------------------------------------------------------------------------------------------------------------------//
-    if(min_x < 0) { min_x = 0; }
-    if(max_x >= target->m_width) { max_x = target->m_width - 1; }
-
-    if(min_y < 0) { min_y = 0; }
-    if(max_y >= target->m_height) { max_y = target->m_height - 1; }
-
-    if(min_x > max_x || min_y > max_y) { return; }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Determine tile range.
-    //---------------------------------------------------------------------------------------------------------------------//
-    int tile_x_min = (min_x * m_tile_split) / target->m_width;
-    int tile_x_max = (max_x * m_tile_split) / target->m_width;
-
-    int tile_y_min = (min_y * m_tile_split) / target->m_height;
-    int tile_y_max = (max_y * m_tile_split) / target->m_height;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Submit polygon to overlapping tiles.
-    //---------------------------------------------------------------------------------------------------------------------//
-    std::shared_ptr<const Math::Geometry::Polygon> polygon_shared_pointer = std::make_shared<const Math::Geometry::Polygon>(polygon);
-    for(int tile_y = tile_y_min; tile_y <= tile_y_max; tile_y++)
+    
+    inline void increment()
     {
-        for(int tile_x = tile_x_min; tile_x <= tile_x_max; tile_x++)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_count++;
+    }
+
+    inline void decrement()
+    {
+        bool should_notify = false;
+
         {
-            m_tile_renderers_total_jobs_counter.increment();
-            TileRendererJob tile_renderer_job(target, polygon_shared_pointer, material, draw_filled);
-            m_tile_renderer_workers[tile_y][tile_x]->m_job_queue.insertTileRendererJob(tile_renderer_job);
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if(m_count >  0) { m_count--; }
+            if(m_count == 0) { should_notify = true; }
+        }
+
+        if(should_notify == true)
+        {
+            m_condition_variable.notify_all();
         }
     }
     //---------------------------------------------------------------------------------------------------------------------//
-}
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Wait until counter reaches zero.
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void waitUntilZero()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        m_condition_variable.wait
+        (
+            lock,
+            [this]()
+            {
+                return (m_count == 0);
+            }
+        );
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

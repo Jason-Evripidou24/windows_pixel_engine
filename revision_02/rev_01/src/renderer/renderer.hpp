@@ -21,8 +21,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderers_total_jobs_counter.hpp"
-#include "tile_renderer/tile_renderer_worker.hpp"
+#include "tile_renderer/tile_renderer_system.hpp"
 
 #include "../window/backbuffer/backbuffer.hpp"
 
@@ -55,27 +54,16 @@
 */
 struct Renderer
 {
-    TileRenderersTotalJobsCounter m_tile_renderers_total_jobs_counter;
-    int m_tile_split;
-    std::vector<std::vector<std::unique_ptr<TileRendererWorker>>> m_tile_renderer_workers;
+    TileRendererSystem m_tile_renderer_system;
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(int tile_split);
+    Renderer(int tile_split)
+    :   m_tile_renderer_system(tile_split)
+    {
+    }
     ~Renderer() = default;
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices, Triangles and Polygons here are in Normalised Device Coordinates space.
-    //---------------------------------------------------------------------------------------------------------------------//
-    void sendNDCSpacePolygonToTileRenderers
-    (
-        std::shared_ptr<Backbuffer>     target      ,
-        const Math::Geometry::Polygon&  polygon     ,
-        std::shared_ptr<const Material> material    ,
-        const bool                      draw_filled
-    );
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -95,8 +83,8 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawLocalSpaceModel
     (
-        std::shared_ptr<Backbuffer> target                ,
-        const Model&                model                 ,
+        std::shared_ptr<Backbuffer> target          ,
+        const Model&                model           ,
         const Math::Core::Mat4_f&   proj_view_matrix,
         const bool                  draw_filled
     );

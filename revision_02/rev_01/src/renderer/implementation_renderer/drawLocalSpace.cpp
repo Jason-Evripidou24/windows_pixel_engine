@@ -25,8 +25,8 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawLocalSpaceModel
 (
-    std::shared_ptr<Backbuffer> target                ,
-    const Model&                model                 ,
+    std::shared_ptr<Backbuffer> target          ,
+    const Model&                model           ,
     const Math::Core::Mat4_f&   proj_view_matrix,
     const bool                  draw_filled
 )
