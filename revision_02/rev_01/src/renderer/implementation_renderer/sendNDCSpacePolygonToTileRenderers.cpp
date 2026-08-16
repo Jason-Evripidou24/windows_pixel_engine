@@ -13,9 +13,9 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
+#include "../renderer.hpp"
 
-#include "../../../math/geometry/math_geometry.hpp"
+#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -23,10 +23,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::sendNDCSpacePolygonToTileRenderers
 (
-    std::shared_ptr<Backbuffer>    target     ,
-    const Math::Geometry::Polygon& polygon    ,
-    std::shared_ptr<Material>      material   ,
-    const bool                     draw_filled
+    std::shared_ptr<Backbuffer>     target     ,
+    const Math::Geometry::Polygon&  polygon    ,
+    std::shared_ptr<const Material> material   ,
+    const bool                      draw_filled
 )
 {
     size_t num_vertices = polygon.m_num_vertices;

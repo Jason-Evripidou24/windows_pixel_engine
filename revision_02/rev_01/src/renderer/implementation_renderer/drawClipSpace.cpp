@@ -13,10 +13,10 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../renderer.hpp"
+#include "../renderer.hpp"
 
-#include "../../../math/core/math_core.hpp"
-#include "../../../math/geometry/math_geometry.hpp"
+#include "../../math/core/math_core.hpp"
+#include "../../math/geometry/math_geometry.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -24,10 +24,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawClipSpacePolygon
 (
-    std::shared_ptr<Backbuffer>    target     ,
-    const Math::Geometry::Polygon& polygon    ,
-    std::shared_ptr<Material>      material   ,
-    const bool                     draw_filled
+    std::shared_ptr<Backbuffer>     target     ,
+    const Math::Geometry::Polygon&  polygon    ,
+    std::shared_ptr<const Material> material   ,
+    const bool                      draw_filled
 )
 {
     Math::Geometry::Polygon polygon_clipped;

@@ -17,8 +17,6 @@ Math::Camera camera
     100.0f,
     Math::Core::Vec3_f(0.0f, 1.0f, 0.0f)
 );
-float camera_move_speed = 5.0f;
-float camera_look_speed = 0.002f;
 
 static float rotate_angle_axis_x = 0.0f;
 static float rotate_angle_axis_y = 0.0f;
@@ -85,36 +83,36 @@ void processInput(Window& window, float delta_time)
     //---------------------------------------------------------------------------------------------------------------------//
     // Keyboard, rotating object.
     //---------------------------------------------------------------------------------------------------------------------//
-    //const float speed = 1.0f;
+    const float camera_speed = 20.0f;
     bool curr_w_key = window.m_input.isKeyDown('W');
     if(curr_w_key == true)
     {
-        camera.moveForward(speed * delta_time);
+        camera.moveForward(camera_speed * delta_time);
     }
     bool curr_s_key = window.m_input.isKeyDown('S');
     if(curr_s_key == true)
     {
-        camera.moveForward(-speed * delta_time);
+        camera.moveForward(-camera_speed * delta_time);
     }
     bool curr_a_key = window.m_input.isKeyDown('A');
     if(curr_a_key == true)
     {
-        camera.moveRight(-speed * delta_time);
+        camera.moveRight(-camera_speed * delta_time);
     }
     bool curr_d_key = window.m_input.isKeyDown('D');
     if(curr_d_key == true)
     {
-        camera.moveRight(speed * delta_time);
+        camera.moveRight(camera_speed * delta_time);
     }
     bool curr_q_key = window.m_input.isKeyDown('Q');
     if(curr_q_key == true)
     {
-        camera.moveUp(speed * delta_time);
+        camera.moveUp(camera_speed * delta_time);
     }
     bool curr_e_key = window.m_input.isKeyDown('E');
     if(curr_e_key == true)
     {
-        camera.moveUp(-speed * delta_time);
+        camera.moveUp(-camera_speed * delta_time);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -156,6 +154,8 @@ void processInput(Window& window, float delta_time)
     //---------------------------------------------------------------------------------------------------------------------//
     // Mouse.
     //---------------------------------------------------------------------------------------------------------------------//
+    float camera_look_speed = 0.002f;
+
     float curr_mouse_pos_x = (float)window.m_input.m_mouse_x;
     float curr_mouse_pos_y = (float)window.m_input.m_mouse_y;
 
@@ -183,38 +183,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     std::shared_ptr<Mesh> test_mesh = std::make_shared<Mesh>(0, "test_mesh");
     test_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
 
-    Math::Geometry::Vertex top_left;
-    top_left.m_position = Math::Core::Vec4_f(-0.5f, 0.5f, 0.0f, 1.0f);
-    top_left.m_tex_coords = Math::Core::Vec2_f(0.0f, 0.0f);
-    top_left.m_normal = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
-    top_left.m_color = Math::Core::Vec4_f(1.0f, 1.0f, 0.0f, 1.0f);
-
-    Math::Geometry::Vertex top_right;
-    top_right.m_position = Math::Core::Vec4_f(0.5f, 0.5f, 0.0f, 1.0f);
-    top_right.m_tex_coords = Math::Core::Vec2_f(0.0f, 0.0f);
-    top_right.m_normal = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
-    top_right.m_color = Math::Core::Vec4_f(1.0f, 1.0f, 0.0f, 1.0f);
-
-    Math::Geometry::Vertex bot_left;
-    bot_left.m_position = Math::Core::Vec4_f(-0.5f, -0.5f, 0.0f, 1.0f);
-    bot_left.m_tex_coords = Math::Core::Vec2_f(0.0f, 0.0f);
-    bot_left.m_normal = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
-    bot_left.m_color = Math::Core::Vec4_f(1.0f, 0.0f, 1.0f, 1.0f);
-
-    Math::Geometry::Vertex bot_right;
-    bot_right.m_position = Math::Core::Vec4_f(0.5f, -0.5f, 0.0f, 1.0f);
-    bot_right.m_tex_coords = Math::Core::Vec2_f(0.0f, 0.0f);
-    bot_right.m_normal = Math::Core::Vec3_f(0.0f, 0.0f, 0.0f);
-    bot_right.m_color = Math::Core::Vec4_f(1.0f, 0.0f, 1.0f, 1.0f);
-
-    Math::Geometry::Polygon polygon;
-    polygon.addVertex(top_left);
-    polygon.addVertex(bot_left);
-    polygon.addVertex(bot_right);
-    polygon.addVertex(top_right);
-
-    Math::Geometry::Polygon polygon_transformed;
-
     Renderer renderer(20);
 
     while(window.processMessages())
@@ -233,6 +201,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Render time.
         //-----------------------------------------------------------------------------------------------------------------//
+        renderer.m_tile_renderers_total_jobs_counter.resetCount();
+
         for(size_t i = 0; i < test_mesh->m_render_wireframes.size(); i++)
         {
             const MeshWireframe& mesh_wireframe = test_mesh->m_render_wireframes[i];

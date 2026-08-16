@@ -31,14 +31,14 @@ struct TileRendererJob
 {
     std::shared_ptr<Backbuffer>                    m_target;
     std::shared_ptr<const Math::Geometry::Polygon> m_polygon;
-    std::shared_ptr<Material>                      m_material;
+    std::shared_ptr<const Material>                m_material;
     bool                                           m_draw_filled;
 
     TileRendererJob
     (
         std::shared_ptr<Backbuffer>                    target     ,
         std::shared_ptr<const Math::Geometry::Polygon> polygon    ,
-        std::shared_ptr<Material>                      material   ,
+        std::shared_ptr<const Material>                material   ,
         bool                                           draw_filled
     )
         : m_target(target)

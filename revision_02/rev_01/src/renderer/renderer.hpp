@@ -28,6 +28,7 @@
 
 #include "../math/geometry/math_geometry.hpp"
 
+#include "../model/model.hpp"
 #include "../model/material/material.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -68,22 +69,22 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void sendNDCSpacePolygonToTileRenderers
     (
-        std::shared_ptr<Backbuffer>    target     ,
-        const Math::Geometry::Polygon& polygon    ,
-        std::shared_ptr<Material>      material   ,
-        const bool                     draw_filled
+        std::shared_ptr<Backbuffer>     target      ,
+        const Math::Geometry::Polygon&  polygon     ,
+        std::shared_ptr<const Material> material    ,
+        const bool                      draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in world space.
+    // Vertices here are in clip space.
     //---------------------------------------------------------------------------------------------------------------------//
     void drawClipSpacePolygon
     (
-        std::shared_ptr<Backbuffer>    target     ,
-        const Math::Geometry::Polygon& polygon    ,
-        std::shared_ptr<Material>      material   ,
-        const bool                     draw_filled
+        std::shared_ptr<Backbuffer>     target      ,
+        const Math::Geometry::Polygon&  polygon     ,
+        std::shared_ptr<const Material> material    ,
+        const bool                      draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -92,11 +93,11 @@ struct Renderer
     //---------------------------------------------------------------------------------------------------------------------//
     void drawLocalSpacePolygon
     (
-        std::shared_ptr<Backbuffer>    target                ,
-        const Math::Geometry::Polygon& polygon               ,
-        std::shared_ptr<Material>      material              ,
-        const Math::Core::Mat4_f&      proj_view_model_matrix,
-        const bool                     draw_filled
+        std::shared_ptr<Backbuffer>     target                ,
+        const Math::Geometry::Polygon&  polygon               ,
+        std::shared_ptr<const Material> material              ,
+        const Math::Core::Mat4_f&       proj_view_model_matrix,
+        const bool                      draw_filled
     );
     //---------------------------------------------------------------------------------------------------------------------//
 };
