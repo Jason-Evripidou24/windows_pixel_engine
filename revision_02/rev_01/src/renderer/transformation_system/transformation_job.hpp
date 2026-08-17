@@ -1,8 +1,13 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef TRANSFORMATION_JOB_HPP
+#define TRANSFORMATION_JOB_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cmath>
 #include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -14,51 +19,42 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
-
+#include "../../window/backbuffer/backbuffer.hpp"
 #include "../../math/core/math_core.hpp"
 #include "../../math/geometry/math_geometry.hpp"
+#include "../../model/material/material.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawLocalSpaceModel
-(
-    std::shared_ptr<Backbuffer> target          ,
-    const Model&                model           ,
-    const Math::Core::Mat4_f&   proj_view_matrix,
-    const bool                  draw_filled
-)
+struct TransformationJob
 {
-    const Math::Core::Mat4_f proj_view_model_matrix = proj_view_matrix * model.calcModelMatrix();
+    std::shared_ptr<Backbuffer>                      m_target;
+    const Math::Geometry::Wireframe*                 m_wireframe;
+    Math::Core::Mat4_f                               m_proj_view_model_matrix;
+    std::shared_ptr<const Material>                  m_material;
+    bool                                             m_draw_filled;
 
-    const MaterialLibrary& material_library = model.m_mesh->m_material_library;
-
-    for(size_t i = 0; i < model.m_mesh->m_render_wireframes.size(); i++)
+    TransformationJob
+    (
+        std::shared_ptr<Backbuffer>                      target                ,
+        const Math::Geometry::Wireframe*                 wireframe             ,
+        Math::Core::Mat4_f                               proj_view_model_matrix,
+        std::shared_ptr<const Material>                  material              ,
+        bool                                             draw_filled
+    )
+        :   m_target(target)
+        ,   m_wireframe(wireframe)
+        ,   m_proj_view_model_matrix(proj_view_model_matrix)
+        ,   m_material(material)
+        ,   m_draw_filled(draw_filled)
     {
-        const Math::Geometry::Wireframe& wireframe = model.m_mesh->m_render_wireframes[i].m_wireframe;
-        const std::string& material_name = model.m_mesh->m_render_wireframes[i].m_wireframe_material_name;
-
-        std::shared_ptr<const Material> material   = nullptr;
-        auto it = material_library.m_materials.find(material_name);
-        if(it != material_library.m_materials.end())
-        {
-            material = it->second;
-        }
-        else
-        {
-            material = std::make_shared<Material>();
-        }
-
-        m_transformation_system.sendLocalSpaceWireframeToTransformers
-        (
-            target,
-            wireframe,
-            proj_view_model_matrix,
-            material,
-            draw_filled
-        );
     }
-}
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

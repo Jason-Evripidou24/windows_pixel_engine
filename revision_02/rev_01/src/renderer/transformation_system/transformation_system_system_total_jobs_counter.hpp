@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef TRANSFORMATION_SYSTEM_TOTAL_JOBS_COUNTER_HPP
+#define TRANSFORMATION_SYSTEM_TOTAL_JOBS_COUNTER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,9 +8,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
-#include <memory>
-#include <vector>
+#include <mutex>
+#include <condition_variable>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -21,64 +20,73 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer_system/tile_renderer_system.hpp"
-#include "transformation_system/transformation_system.hpp"
-
-#include "../window/backbuffer/backbuffer.hpp"
-
-#include "../math/geometry/math_geometry.hpp"
-
-#include "../model/material/material.hpp"
-#include "../model/material/material_library.hpp"
-#include "../model/mesh/mesh_wireframe.hpp"
-#include "../model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Renderer pipeline:
-    1.  Local/Object Space (Vec3, Vec4 with 1.0f as the homogenious coordinate)
-    |   Model Matrix
-    2.  World Space (Vec4)
-    |   View Matrix
-    3.  View Space
-    |   Projection Matrix
-    4.  Clip Space (Vec4)
-    |   Homogeneous Clipping
-    |   Perspective Divide
-    5.  Normalized Device Coordinates (NDC)
-    |   Viewport Transform
-    6.  Screen Space
-    |   Rasterization, Depth Test, Framebuffer
-*/
-struct Renderer
+struct TransformationSystemTotalJobsCounter
 {
-    TileRendererSystem   m_tile_renderer_system;
-    TransformationSystem m_transformation_system;
+    int m_count;
+
+    std::mutex m_mutex;
+    std::condition_variable m_condition_variable;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and destructor.
+    // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(int tile_split, int num_transformer_workers)
-        :   m_tile_renderer_system(tile_split)
-        ,   m_transformation_system(m_tile_renderer_system, num_transformer_workers)
+    TransformationSystemTotalJobsCounter() { m_count = 0; }
+    TransformationSystemTotalJobsCounter(int count) { m_count = count; }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Increment and Decrement.
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void resetCount()
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_count = 0;
     }
-    ~Renderer() = default;
+    
+    inline void increment()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_count++;
+    }
+
+    inline void decrement()
+    {
+        bool should_notify = false;
+
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if(m_count >  0) { m_count--; }
+            if(m_count == 0) { should_notify = true; }
+        }
+
+        if(should_notify == true)
+        {
+            m_condition_variable.notify_all();
+        }
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in local space.
+    // Wait until counter reaches zero.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawLocalSpaceModel
-    (
-        std::shared_ptr<Backbuffer> target          ,
-        const Model&                model           ,
-        const Math::Core::Mat4_f&   proj_view_matrix,
-        const bool                  draw_filled
-    );
+    inline void waitUntilZero()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        m_condition_variable.wait
+        (
+            lock,
+            [this]()
+            {
+                return (m_count == 0);
+            }
+        );
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

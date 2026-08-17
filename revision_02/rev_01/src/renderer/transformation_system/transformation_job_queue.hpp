@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef TRANSFORMATION_JOB_QUEUE_HPP
+#define TRANSFORMATION_JOB_QUEUE_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,9 +8,9 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
-#include <memory>
-#include <vector>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -21,64 +21,74 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer_system/tile_renderer_system.hpp"
-#include "transformation_system/transformation_system.hpp"
-
-#include "../window/backbuffer/backbuffer.hpp"
-
-#include "../math/geometry/math_geometry.hpp"
-
-#include "../model/material/material.hpp"
-#include "../model/material/material_library.hpp"
-#include "../model/mesh/mesh_wireframe.hpp"
-#include "../model/model.hpp"
+#include "transformation_job.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Renderer pipeline:
-    1.  Local/Object Space (Vec3, Vec4 with 1.0f as the homogenious coordinate)
-    |   Model Matrix
-    2.  World Space (Vec4)
-    |   View Matrix
-    3.  View Space
-    |   Projection Matrix
-    4.  Clip Space (Vec4)
-    |   Homogeneous Clipping
-    |   Perspective Divide
-    5.  Normalized Device Coordinates (NDC)
-    |   Viewport Transform
-    6.  Screen Space
-    |   Rasterization, Depth Test, Framebuffer
-*/
-struct Renderer
+struct TransformationJobQueue
 {
-    TileRendererSystem   m_tile_renderer_system;
-    TransformationSystem m_transformation_system;
+    bool m_shutdown = false;
+    std::queue<TransformationJob> m_queue;
 
+    std::mutex m_mutex;
+    std::condition_variable m_condition_variable;
+    
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and destructor.
+    // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(int tile_split, int num_transformer_workers)
-        :   m_tile_renderer_system(tile_split)
-        ,   m_transformation_system(m_tile_renderer_system, num_transformer_workers)
+    TransformationJobQueue() = default;
+    ~TransformationJobQueue() = default;
+
+    inline void shutdown()
     {
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_shutdown = true;
+        }
+
+        m_condition_variable.notify_all();
     }
-    ~Renderer() = default;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in local space.
+    // Insert and Retrieve jobs.
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawLocalSpaceModel
-    (
-        std::shared_ptr<Backbuffer> target          ,
-        const Model&                model           ,
-        const Math::Core::Mat4_f&   proj_view_matrix,
-        const bool                  draw_filled
-    );
+    inline bool insertTransformationJob(const TransformationJob& transformation_job)
+    {
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+
+            if(m_shutdown) { return false; }
+
+            m_queue.push(transformation_job);
+        }
+        
+        m_condition_variable.notify_one();
+        return true;
+    }
+
+    inline bool getTransformationJob(TransformationJob& output)
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        m_condition_variable.wait
+        (
+            lock,
+            [this]()
+            {
+                return m_shutdown || !m_queue.empty();
+            }
+        );
+
+        if(m_shutdown && m_queue.empty()) { return false; }
+
+        output = std::move(m_queue.front());
+        m_queue.pop();
+
+        return true;
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

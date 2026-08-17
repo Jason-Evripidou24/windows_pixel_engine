@@ -160,9 +160,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
+    int model_id = 0;
+    Model backpack_model
+    (
+        model_id++,
+        "backpack_model",
+        backpack_mesh,
+        Math::Core::Vec3_f(0.0f, 5.0f, 0.0f),
+        Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, 0.0f),
+        Math::Core::Vec3_f(1.0f, 1.0f, 1.0f)
+    );
+
     Model ground_model
     (
-        0,
+        model_id++,
         "ground_model",
         ground_mesh,
         Math::Core::Vec3_f(0.0f, 0.0f, 0.0f),
@@ -172,7 +183,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Model house_001_model
     (
-        1,
+        model_id++,
         "house_001_model",
         house_001_mesh,
         Math::Core::Vec3_f(-30.0f, 0.0f, 30.0f),
@@ -182,7 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Model house_002_model
     (
-        2,
+        model_id++,
         "house_002_model",
         house_002_mesh,
         Math::Core::Vec3_f(-30.0f, 0.0f, -30.0f),
@@ -192,7 +203,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     Model house_003_model
     (
-        3,
+        model_id++,
         "house_003_model",
         house_003_mesh,
         Math::Core::Vec3_f(20.0f, 1.5f, 20.0f),
@@ -201,7 +212,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Renderer renderer(20);
+    Renderer renderer(20, 20);
 
     while(window.processMessages())
     {
@@ -216,16 +227,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Render time.
         //-----------------------------------------------------------------------------------------------------------------//
+        renderer.m_transformation_system.m_transformation_system_total_jobs_counter.resetCount();
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.resetCount();
 
         renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, proj_view_matrix, g_draw_filled);
+        std::thread t0( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, backpack_model, proj_view_matrix, g_draw_filled); } );
+        std::thread t1( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled); } );
+        std::thread t2( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, proj_view_matrix, g_draw_filled); } );
+        std::thread t3( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, proj_view_matrix, g_draw_filled); } );
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+        
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
 
+        renderer.m_transformation_system.m_transformation_system_total_jobs_counter.waitUntilZero();
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.waitUntilZero();
         //-----------------------------------------------------------------------------------------------------------------//
         

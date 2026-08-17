@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef TRANSFORMER_WORKER_HPP
+#define TRANSFORMER_WORKER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,9 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cstdint>
-#include <memory>
-#include <vector>
+#include <thread>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -21,64 +19,95 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer_system/tile_renderer_system.hpp"
-#include "transformation_system/transformation_system.hpp"
+#include "transformation_system_system_total_jobs_counter.hpp"
+#include "transformation_job_queue.hpp"
+#include "transformation_job.hpp"
+#include "transformer.hpp"
 
-#include "../window/backbuffer/backbuffer.hpp"
-
-#include "../math/geometry/math_geometry.hpp"
-
-#include "../model/material/material.hpp"
-#include "../model/material/material_library.hpp"
-#include "../model/mesh/mesh_wireframe.hpp"
-#include "../model/model.hpp"
+#include "../tile_renderer_system/tile_renderer_system.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-/*
--   Renderer pipeline:
-    1.  Local/Object Space (Vec3, Vec4 with 1.0f as the homogenious coordinate)
-    |   Model Matrix
-    2.  World Space (Vec4)
-    |   View Matrix
-    3.  View Space
-    |   Projection Matrix
-    4.  Clip Space (Vec4)
-    |   Homogeneous Clipping
-    |   Perspective Divide
-    5.  Normalized Device Coordinates (NDC)
-    |   Viewport Transform
-    6.  Screen Space
-    |   Rasterization, Depth Test, Framebuffer
-*/
-struct Renderer
+struct TransformerWorker
 {
-    TileRendererSystem   m_tile_renderer_system;
-    TransformationSystem m_transformation_system;
+    TileRendererSystem& m_tile_renderer_system;
+
+    TransformationSystemTotalJobsCounter& m_total_jobs_counter;
+    TransformationJobQueue& m_job_queue;
+
+    Transformer m_transformer;
+
+    std::thread m_worker_thread;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and destructor.
+    // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    Renderer(int tile_split, int num_transformer_workers)
-        :   m_tile_renderer_system(tile_split)
-        ,   m_transformation_system(m_tile_renderer_system, num_transformer_workers)
+    TransformerWorker
+    (
+        TileRendererSystem&                   tile_renderer_system,
+        TransformationJobQueue&               job_queue           ,
+        TransformationSystemTotalJobsCounter& total_jobs_counter
+    )
+        :   m_job_queue(job_queue)
+        ,   m_total_jobs_counter(total_jobs_counter)
+        ,   m_tile_renderer_system(tile_renderer_system)
     {
     }
-    ~Renderer() = default;
+
+    ~TransformerWorker()
+    {
+        this->stop();
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Vertices here are in local space.
+    inline void start()
+    {
+        if(m_worker_thread.joinable()) { return; }
+
+        m_worker_thread = std::thread(&TransformerWorker::workerFunction, this);
+    }
+
+    inline void stop()
+    {
+        m_job_queue.shutdown();
+
+        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
+    }
     //---------------------------------------------------------------------------------------------------------------------//
-    void drawLocalSpaceModel
-    (
-        std::shared_ptr<Backbuffer> target          ,
-        const Model&                model           ,
-        const Math::Core::Mat4_f&   proj_view_matrix,
-        const bool                  draw_filled
-    );
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline void workerFunction()
+    {
+        TransformationJob transformation_job(nullptr, nullptr, Math::Core::Mat4_f(), nullptr, false);
+
+        while(true)
+        {
+            if(m_job_queue.getTransformationJob(transformation_job) == false) { break; }
+
+            if
+            (
+                (transformation_job.m_target    != nullptr) &&
+                (transformation_job.m_wireframe != nullptr) &&
+                (transformation_job.m_material  != nullptr)
+            )
+            {
+                m_transformer.drawLocalSpaceWireframe
+                (
+                    m_tile_renderer_system,
+                    transformation_job.m_target,
+                    *(transformation_job.m_wireframe),
+                    transformation_job.m_proj_view_model_matrix,
+                    transformation_job.m_material,
+                    transformation_job.m_draw_filled
+                );
+            }
+
+            m_total_jobs_counter.decrement();
+        }
+    }
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

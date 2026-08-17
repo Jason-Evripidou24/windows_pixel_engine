@@ -1,8 +1,14 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef TRANSFORMER_HPP
+#define TRANSFORMER_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <cmath>
+#include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -13,50 +19,32 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../renderer.hpp"
+#include "../tile_renderer_system/tile_renderer_system.hpp"
 
 #include "../../math/core/math_core.hpp"
 #include "../../math/geometry/math_geometry.hpp"
+#include "../../model/material/material.hpp"
+#include "../../window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void Renderer::drawClipSpacePolygon
-(
-    std::shared_ptr<Backbuffer>     target     ,
-    const Math::Geometry::Polygon&  polygon    ,
-    std::shared_ptr<const Material> material   ,
-    const bool                      draw_filled
-)
+struct Transformer
 {
-    Math::Geometry::Polygon polygon_clipped;
-    Math::Geometry::Polygon buffer = polygon;
+    void drawLocalSpaceWireframe
+    (
+        TileRendererSystem&              m_tile_renderer_system,
+        std::shared_ptr<Backbuffer>      target                ,
+        const Math::Geometry::Wireframe& wireframe             ,
+        const Math::Core::Mat4_f&        proj_view_model_matrix,
+        std::shared_ptr<const Material>  material              ,
+        const bool                       draw_filled
+    );
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
-    Math::Geometry::clipPolygonAgainstPlaneMinXClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxXClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMinYClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxYClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMinZClipSpace(polygon_clipped, buffer);
-    std::swap(buffer, polygon_clipped);
-    Math::Geometry::clipPolygonAgainstPlaneMaxZClipSpace(polygon_clipped, buffer);
 
-    polygon_clipped.perspectiveDivide();
-
-    for(size_t i = 0; i < polygon_clipped.m_num_vertices; i++)
-    {
-        if( std::abs(polygon_clipped.m_vertices[i].m_position.m_data[3]) < 0.0001f )
-        {
-            polygon_clipped.clear();
-            break;
-        }
-    }
-    if(polygon_clipped.m_num_vertices < 3) { return; }
-
-    m_tile_renderer_system.sendNDCSpacePolygonToTileRenderers(target, polygon_clipped, material, draw_filled);
-}
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
