@@ -134,33 +134,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     timer.init();
 
     //---------------------------------------------------------------------------------------------------------------------//
-    std::shared_ptr<Mesh> backpack_mesh = std::make_shared<Mesh>(0, "backpack_mesh");
+    int mesh_id = 0;
+
+    std::shared_ptr<Mesh> backpack_mesh = std::make_shared<Mesh>(mesh_id++, "backpack_mesh");
     backpack_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
 
-    std::shared_ptr<Mesh> cube_mesh = std::make_shared<Mesh>(1, "cube_mesh");
+    std::shared_ptr<Mesh> cube_mesh = std::make_shared<Mesh>(mesh_id++, "cube_mesh");
     cube_mesh->loadMesh("../assets/cube/", "obj.obj", "mtl.mtl", "obj.obj");
 
-    std::shared_ptr<Mesh> ground_mesh = std::make_shared<Mesh>(2, "ground_mesh");
+    std::shared_ptr<Mesh> ground_mesh = std::make_shared<Mesh>(mesh_id++, "ground_mesh");
     ground_mesh->loadMesh("../assets/ground/", "obj.obj", "mtl.mtl", "obj.obj");
 
-    std::shared_ptr<Mesh> house_001_mesh = std::make_shared<Mesh>(3, "house_001_mesh");
+    std::shared_ptr<Mesh> house_001_mesh = std::make_shared<Mesh>(mesh_id++, "house_001_mesh");
     house_001_mesh->loadMesh("../assets/house_001/", "obj.obj", "mtl.mtl", "");
 
-    std::shared_ptr<Mesh> house_002_mesh = std::make_shared<Mesh>(4, "house_002_mesh");
+    std::shared_ptr<Mesh> house_002_mesh = std::make_shared<Mesh>(mesh_id++, "house_002_mesh");
     house_002_mesh->loadMesh("../assets/house_002/", "obj.obj", "Bambo_House.mtl", "");
 
-    std::shared_ptr<Mesh> house_003_mesh = std::make_shared<Mesh>(5, "house_003_mesh");
+    std::shared_ptr<Mesh> house_003_mesh = std::make_shared<Mesh>(mesh_id++, "house_003_mesh");
     house_003_mesh->loadMesh("../assets/house_003/", "obj.obj", "building_04.mtl", "");
 
-    std::shared_ptr<Mesh> tree_mesh = std::make_shared<Mesh>(6, "tree_mesh");
+    std::shared_ptr<Mesh> tree_mesh = std::make_shared<Mesh>(mesh_id++, "tree_mesh");
     tree_mesh->loadMesh("../assets/tree_001/", "obj.obj", "Lowpoly_tree_sample.mtl", "obj.obj");
 
-    std::shared_ptr<Mesh> truck_001_mesh = std::make_shared<Mesh>(7, "truck_001_mesh");
+    std::shared_ptr<Mesh> truck_001_mesh = std::make_shared<Mesh>(mesh_id++, "truck_001_mesh");
     truck_001_mesh->loadMesh("../assets/truck_001/", "rig.obj", "rig.mtl", "rig.obj");
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     int model_id = 0;
+
     Model backpack_model
     (
         model_id++,
@@ -210,6 +213,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, Math::Core::convertDegreesToRadians(220.0f)),
         Math::Core::Vec3_f(3.0f, 3.0f, 3.0f)
     );
+
+    Model truck_001_model
+    (
+        model_id++,
+        "truck_001_model",
+        truck_001_mesh,
+        Math::Core::Vec3_f(30.0f, 0.0f, -30.0f),
+        Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, Math::Core::convertDegreesToRadians(0.0f)),
+        Math::Core::Vec3_f(1.0f, 1.0f, 1.0f)
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 
     Renderer renderer(20, 20);
@@ -231,18 +244,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.resetCount();
 
         renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model, proj_view_matrix, g_draw_filled);
-        std::thread t0( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, backpack_model, proj_view_matrix, g_draw_filled); } );
-        std::thread t1( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled); } );
-        std::thread t2( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, proj_view_matrix, g_draw_filled); } );
-        std::thread t3( [&]() { renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, proj_view_matrix, g_draw_filled); } );
+        renderer.drawLocalSpaceModel(window.m_backbuffer, backpack_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, truck_001_model, proj_view_matrix, g_draw_filled);
 
         std::string info_string = std::to_string(timer.fps);
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
-        
-        t0.join();
-        t1.join();
-        t2.join();
-        t3.join();
 
         renderer.m_transformation_system.m_transformation_system_total_jobs_counter.waitUntilZero();
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.waitUntilZero();
