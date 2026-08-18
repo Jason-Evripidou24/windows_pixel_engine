@@ -38,7 +38,9 @@ void TransformationSystem::sendLocalSpaceWireframeToTransformers
         if(end_polygon >= num_polygons) { end_polygon = num_polygons - 1; }
 
         m_transformation_system_total_jobs_counter.increment();
-        m_transformation_job_queue.insertTransformationJob
+
+        static int send_to_transformer_worker = 0;
+        m_transformer_workers[send_to_transformer_worker]->m_job_queue.insertTransformationJob
         (
             TransformationJob
             (
@@ -51,6 +53,7 @@ void TransformationSystem::sendLocalSpaceWireframeToTransformers
                 draw_filled
             )
         );
+        send_to_transformer_worker = (send_to_transformer_worker + 1) % m_num_transformer_workers;
     }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

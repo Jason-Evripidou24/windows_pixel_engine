@@ -35,7 +35,8 @@ struct TransformerWorker
     TileRendererSystem& m_tile_renderer_system;
 
     TransformationSystemTotalJobsCounter& m_total_jobs_counter;
-    TransformationJobQueue& m_job_queue;
+
+    TransformationJobQueue m_job_queue;
 
     Transformer m_transformer;
 
@@ -47,11 +48,9 @@ struct TransformerWorker
     TransformerWorker
     (
         TileRendererSystem&                   tile_renderer_system,
-        TransformationJobQueue&               job_queue           ,
         TransformationSystemTotalJobsCounter& total_jobs_counter
     )
-        :   m_job_queue(job_queue)
-        ,   m_total_jobs_counter(total_jobs_counter)
+        :   m_total_jobs_counter(total_jobs_counter)
         ,   m_tile_renderer_system(tile_renderer_system)
     {
     }

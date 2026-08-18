@@ -227,7 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Renderer renderer(20, 20);
+    Renderer renderer(20, 100);
 
     while(window.processMessages())
     {
@@ -247,7 +247,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.m_transformation_system.m_transformation_system_total_jobs_counter.resetCount();
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.resetCount();
 
-        static size_t polygon_max_chunk_size = 500;
+        static size_t polygon_max_chunk_size = 100;
         if(window.m_input.isKeyDown('I'))
         {
             polygon_max_chunk_size += 10;

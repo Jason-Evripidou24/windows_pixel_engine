@@ -38,9 +38,9 @@
 struct TransformationSystem
 {
     TransformationSystemTotalJobsCounter m_transformation_system_total_jobs_counter;
-    std::vector<std::unique_ptr<TransformerWorker>> m_transformer_workers;
 
-    TransformationJobQueue m_transformation_job_queue;
+    int m_num_transformer_workers;
+    std::vector<std::unique_ptr<TransformerWorker>> m_transformer_workers;
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and destructor.
@@ -49,13 +49,13 @@ struct TransformationSystem
     {
         m_transformation_system_total_jobs_counter.resetCount();
 
+        m_num_transformer_workers = num_transformer_workers;
         m_transformer_workers.resize(num_transformer_workers);
         for(int i = 0; i < num_transformer_workers; i++)
         {
             m_transformer_workers[i] = std::make_unique<TransformerWorker>
             (
                 tile_renderer_system,
-                m_transformation_job_queue,
                 m_transformation_system_total_jobs_counter
             );
             m_transformer_workers[i]->start();
