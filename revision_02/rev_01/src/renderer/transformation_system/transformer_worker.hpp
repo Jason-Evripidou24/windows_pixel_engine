@@ -81,7 +81,7 @@ struct TransformerWorker
     //---------------------------------------------------------------------------------------------------------------------//
     inline void workerFunction()
     {
-        TransformationJob transformation_job(nullptr, nullptr, Math::Core::Mat4_f(), nullptr, false);
+        TransformationJob transformation_job(nullptr, nullptr, 0, 0, Math::Core::Mat4_f(), nullptr, false);
 
         while(true)
         {
@@ -99,6 +99,8 @@ struct TransformerWorker
                     m_tile_renderer_system,
                     transformation_job.m_target,
                     *(transformation_job.m_wireframe),
+                    transformation_job.m_start_polygon,
+                    transformation_job.m_end_polygon,
                     transformation_job.m_proj_view_model_matrix,
                     transformation_job.m_material,
                     transformation_job.m_draw_filled

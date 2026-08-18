@@ -25,9 +25,10 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void Renderer::drawLocalSpaceModel
 (
-    std::shared_ptr<Backbuffer> target          ,
-    const Model&                model           ,
-    const Math::Core::Mat4_f&   proj_view_matrix,
+    std::shared_ptr<Backbuffer> target                ,
+    const Model&                model                 ,
+    size_t                      polygon_max_chunk_size,
+    const Math::Core::Mat4_f&   proj_view_matrix      ,
     const bool                  draw_filled
 )
 {
@@ -53,10 +54,11 @@ void Renderer::drawLocalSpaceModel
 
         m_transformation_system.sendLocalSpaceWireframeToTransformers
         (
-            target,
-            wireframe,
+            target                ,
+            wireframe             ,
+            polygon_max_chunk_size,
             proj_view_model_matrix,
-            material,
+            material              ,
             draw_filled
         );
     }

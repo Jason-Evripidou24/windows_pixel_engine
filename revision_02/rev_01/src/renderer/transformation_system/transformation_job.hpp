@@ -30,22 +30,28 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TransformationJob
 {
-    std::shared_ptr<Backbuffer>                      m_target;
-    const Math::Geometry::Wireframe*                 m_wireframe;
-    Math::Core::Mat4_f                               m_proj_view_model_matrix;
-    std::shared_ptr<const Material>                  m_material;
-    bool                                             m_draw_filled;
+    std::shared_ptr<Backbuffer>      m_target                ;
+    const Math::Geometry::Wireframe* m_wireframe             ;
+    size_t                           m_start_polygon         ;
+    size_t                           m_end_polygon           ;
+    Math::Core::Mat4_f               m_proj_view_model_matrix;
+    std::shared_ptr<const Material>  m_material              ;
+    bool                             m_draw_filled           ;
 
     TransformationJob
     (
-        std::shared_ptr<Backbuffer>                      target                ,
-        const Math::Geometry::Wireframe*                 wireframe             ,
-        Math::Core::Mat4_f                               proj_view_model_matrix,
-        std::shared_ptr<const Material>                  material              ,
-        bool                                             draw_filled
+        std::shared_ptr<Backbuffer>      target                ,
+        const Math::Geometry::Wireframe* wireframe             ,
+        size_t                           start_polygon         ,
+        size_t                           end_polygon           ,
+        Math::Core::Mat4_f               proj_view_model_matrix,
+        std::shared_ptr<const Material>  material              ,
+        bool                             draw_filled
     )
         :   m_target(target)
         ,   m_wireframe(wireframe)
+        ,   m_start_polygon(start_polygon)
+        ,   m_end_polygon(end_polygon)
         ,   m_proj_view_model_matrix(proj_view_model_matrix)
         ,   m_material(material)
         ,   m_draw_filled(draw_filled)

@@ -6,6 +6,8 @@
 #include "../model/mesh/mesh.hpp"
 #include "../model/model.hpp"
 
+#include <chrono>
+
 Math::Camera camera
 (
     Math::Core::Vec3_f(0.0f, 1.7f, 0.0f),
@@ -136,8 +138,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     //---------------------------------------------------------------------------------------------------------------------//
     int mesh_id = 0;
 
-    std::shared_ptr<Mesh> backpack_mesh = std::make_shared<Mesh>(mesh_id++, "backpack_mesh");
-    backpack_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
+    std::shared_ptr<Mesh> backpack_001_mesh = std::make_shared<Mesh>(mesh_id++, "backpack_001_mesh");
+    backpack_001_mesh->loadMesh("../assets/backpack/", "obj.obj", "mtl.mtl", "");
 
     std::shared_ptr<Mesh> cube_mesh = std::make_shared<Mesh>(mesh_id++, "cube_mesh");
     cube_mesh->loadMesh("../assets/cube/", "obj.obj", "mtl.mtl", "obj.obj");
@@ -164,11 +166,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     //---------------------------------------------------------------------------------------------------------------------//
     int model_id = 0;
 
-    Model backpack_model
+    Model backpack_001_model
     (
         model_id++,
-        "backpack_model",
-        backpack_mesh,
+        "backpack_001_model",
+        backpack_001_mesh,
         Math::Core::Vec3_f(0.0f, 5.0f, 0.0f),
         Math::Core::Quaternion::fromAxisAngle(0.0f, 1.0f, 0.0f, 0.0f),
         Math::Core::Vec3_f(1.0f, 1.0f, 1.0f)
@@ -225,7 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Renderer renderer(20, 20);
+    Renderer renderer(20, 100);
 
     while(window.processMessages())
     {
@@ -240,21 +242,51 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         //-----------------------------------------------------------------------------------------------------------------//
         // Render time.
         //-----------------------------------------------------------------------------------------------------------------//
+        auto transform_start = std::chrono::high_resolution_clock::now();
+
         renderer.m_transformation_system.m_transformation_system_total_jobs_counter.resetCount();
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.resetCount();
 
-        renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, backpack_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, truck_001_model, proj_view_matrix, g_draw_filled);
+        static size_t polygon_max_chunk_size = 1000;
+        if(window.m_input.isKeyDown('I'))
+        {
+            polygon_max_chunk_size++;
+        }
+        if(window.m_input.isKeyDown('K'))
+        {
+            polygon_max_chunk_size--;
+            if(polygon_max_chunk_size == 0) { polygon_max_chunk_size = 1; }
+        }
+        renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model      , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, backpack_001_model, polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model   , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model   , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model   , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, truck_001_model   , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
 
-        std::string info_string = std::to_string(timer.fps);
-        window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+        auto transform_submit_end = std::chrono::high_resolution_clock::now();
 
         renderer.m_transformation_system.m_transformation_system_total_jobs_counter.waitUntilZero();
+        auto transform_end = std::chrono::high_resolution_clock::now();
+
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.waitUntilZero();
+        auto render_end = std::chrono::high_resolution_clock::now();
+
+        double submit_ms               = std::chrono::duration<double, std::milli>(transform_submit_end - transform_start).count();
+        double transform_ms            = std::chrono::duration<double, std::milli>(transform_end        - transform_start).count();
+        double tile_after_transform_ms = std::chrono::duration<double, std::milli>(render_end           - transform_end).count();
+        double total_ms                = std::chrono::duration<double, std::milli>(render_end           - transform_start).count();
+
+        std::string info_string =
+            "FPS: "           + std::to_string(timer.fps)               +         "\n" +
+            " | Submit: "     + std::to_string(submit_ms)               + " ms" + "\n" +
+            " | Transform: "  + std::to_string(transform_ms)            + " ms" + " (polygon chunk size " + std::to_string(polygon_max_chunk_size)  + " )" + "\n" +
+            " | Tile: "       + std::to_string(tile_after_transform_ms) + " ms" + "\n" +
+            " | Total: "      + std::to_string(total_ms)                + " ms";
+        window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
+
+        info_string = house_001_model.toString();
+        window.m_backbuffer->setText(10, 100, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
         //-----------------------------------------------------------------------------------------------------------------//
         
         window.presentBackbuffer();

@@ -25,12 +25,14 @@ void Transformer::drawLocalSpaceWireframe
     TileRendererSystem&              m_tile_renderer_system,
     std::shared_ptr<Backbuffer>      target                ,
     const Math::Geometry::Wireframe& wireframe             ,
+    size_t                           start_polygon         ,
+    size_t                           end_polygon           ,
     const Math::Core::Mat4_f&        proj_view_model_matrix,
     std::shared_ptr<const Material>  material              ,
     const bool                       draw_filled
 )
 {
-    for(size_t i = 0; i < wireframe.m_num_polygons; i++)
+    for(size_t i = start_polygon; i <= end_polygon; i++)
     {
         Math::Geometry::Polygon polygon_transform_and_clip;
         Math::Geometry::transformPolygon(polygon_transform_and_clip, wireframe.m_polygons[i], proj_view_model_matrix);

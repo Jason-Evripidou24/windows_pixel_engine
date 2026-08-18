@@ -22,22 +22,35 @@ void TransformationSystem::sendLocalSpaceWireframeToTransformers
 (
     std::shared_ptr<Backbuffer>      target                ,
     const Math::Geometry::Wireframe& wireframe             ,
+    size_t                           polygon_max_chunk_size,
     const Math::Core::Mat4_f&        proj_view_model_matrix,
     std::shared_ptr<const Material>  material              ,
     const bool                       draw_filled
 )
 {
-    m_transformation_system_total_jobs_counter.increment();
-    m_transformation_job_queue.insertTransformationJob
-    (
-        TransformationJob
+    const size_t num_polygons = wireframe.m_num_polygons;
+
+    if( (num_polygons == 0) || (polygon_max_chunk_size == 0) ) { return; }
+
+    for(size_t start_polygon = 0; start_polygon < num_polygons; start_polygon += polygon_max_chunk_size)
+    {
+        size_t end_polygon = start_polygon + polygon_max_chunk_size - 1;
+        if(end_polygon >= num_polygons) { end_polygon = num_polygons - 1; }
+
+        m_transformation_system_total_jobs_counter.increment();
+        m_transformation_job_queue.insertTransformationJob
         (
-            target,
-            &wireframe,
-            proj_view_model_matrix,
-            material,
-            draw_filled
-        )
-    );
+            TransformationJob
+            (
+                target                ,
+                &wireframe            ,
+                start_polygon         ,
+                end_polygon           ,
+                proj_view_model_matrix,
+                material              ,
+                draw_filled
+            )
+        );
+    }
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

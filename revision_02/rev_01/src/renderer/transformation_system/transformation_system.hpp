@@ -65,11 +65,12 @@ struct TransformationSystem
 
     void sendLocalSpaceWireframeToTransformers
     (
-        std::shared_ptr<Backbuffer>     target                ,
-        const Math::Geometry::Wireframe& wireframe            ,
-        const Math::Core::Mat4_f&       proj_view_model_matrix,
-        std::shared_ptr<const Material> material              ,
-        const bool                      draw_filled
+        std::shared_ptr<Backbuffer>      target                ,
+        const Math::Geometry::Wireframe& wireframe             ,
+        size_t                           polygon_chunk_size    ,
+        const Math::Core::Mat4_f&        proj_view_model_matrix,
+        std::shared_ptr<const Material>  material              ,
+        const bool                       draw_filled
     );
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
