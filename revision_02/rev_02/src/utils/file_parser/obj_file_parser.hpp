@@ -24,6 +24,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 #include "../../math/core/math_core.hpp"
 #include "../../math/geometry/math_geometry.hpp"
+
+#include "../../model/mesh/mesh_polygon.hpp"
 #include "../../model/mesh/mesh_wireframe.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -59,11 +61,9 @@ struct ObjFileParser
         const std::vector<Math::Core::Vec3_f>&                                vertex_normals
     );
 
-    static std::vector<MeshWireframe> loadMeshWireframes
-    (
-        const std::string& file_folder,
-        const std::string& filename
-    );
+    //static std::vector<MeshWireframe> loadMeshWireframes(const std::string& file_folder, const std::string& filename);
+
+    static std::vector<MeshPolygon> loadMeshPolygons(const std::string& file_folder, const std::string& filename);
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

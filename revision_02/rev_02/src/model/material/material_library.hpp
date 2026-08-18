@@ -30,7 +30,7 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct MaterialLibrary
 {
-    std::unordered_map<std::string, std::shared_ptr<Material>> m_materials;
+    std::unordered_map<size_t, std::shared_ptr<Material>> m_materials;
     std::unordered_map<std::string, std::shared_ptr<Texture>> m_diffuse_textures;
 
     //---------------------------------------------------------------------------------------------------------------------//

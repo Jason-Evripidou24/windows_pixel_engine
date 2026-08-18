@@ -28,7 +28,7 @@
 struct MeshPolygon
 {
     Math::Geometry::Polygon m_polygon;
-    std::string             m_polygon_material_name;
+    size_t                  m_polygon_material_name_hash;
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructors.
@@ -36,7 +36,7 @@ struct MeshPolygon
     MeshPolygon()
     {
         m_polygon.clear();
-        m_polygon_material_name.clear();
+        m_polygon_material_name_hash = 0;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -46,7 +46,7 @@ struct MeshPolygon
     MeshPolygon(const MeshPolygon& other)
     {
         m_polygon = other.m_polygon;
-        m_polygon_material_name = other.m_polygon_material_name;
+        m_polygon_material_name_hash = other.m_polygon_material_name_hash;
     }
 
     MeshPolygon& operator=(const MeshPolygon& other)
@@ -54,7 +54,7 @@ struct MeshPolygon
         if(this != &other)
         {
             m_polygon = other.m_polygon;
-            m_polygon_material_name = other.m_polygon_material_name;
+            m_polygon_material_name_hash = other.m_polygon_material_name_hash;
         }
         return *this;
     }
@@ -62,7 +62,7 @@ struct MeshPolygon
     MeshPolygon(MeshPolygon&& other) noexcept
     {
         m_polygon = std::move(other.m_polygon);
-        m_polygon_material_name = std::move(other.m_polygon_material_name);
+        m_polygon_material_name_hash = other.m_polygon_material_name_hash;
     }
 
     MeshPolygon& operator=(MeshPolygon&& other) noexcept
@@ -70,7 +70,7 @@ struct MeshPolygon
         if(this != &other)
         {
             m_polygon = std::move(other.m_polygon);
-            m_polygon_material_name = std::move(other.m_polygon_material_name);
+            m_polygon_material_name_hash = other.m_polygon_material_name_hash;
         }
         return *this;
     }

@@ -218,11 +218,8 @@ Math::Geometry::Polygon ObjFileParser::createPolygon
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-std::vector<MeshWireframe> ObjFileParser::loadMeshWireframes
-(
-    const std::string& file_folder,
-    const std::string& filename
-)
+/*
+std::vector<MeshWireframe> ObjFileParser::loadMeshWireframes(const std::string& file_folder, const std::string& filename)
 {
     std::vector<MeshWireframe> mesh_wireframes;
 
@@ -322,5 +319,106 @@ std::vector<MeshWireframe> ObjFileParser::loadMeshWireframes
     }
 
     return mesh_wireframes;
+}
+*/
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+std::vector<MeshPolygon> ObjFileParser::loadMeshPolygons(const std::string& file_folder, const std::string& filename)
+{
+    std::vector<MeshPolygon> mesh_polygons;
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    std::vector<std::pair<Math::Core::Vec4_f, Math::Core::Vec4_f>> vertex_positions_and_colors;
+    std::vector<Math::Core::Vec2_f> vertex_tex_coords;
+    std::vector<Math::Core::Vec3_f> vertex_normals;
+
+    std::ifstream file(file_folder + filename);
+    if(!file.is_open()) { return mesh_polygons; }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    MeshPolygon curr_mesh_polygon;
+    curr_mesh_polygon.m_polygon.clear();
+    curr_mesh_polygon.m_polygon_material_name_hash = 0;
+
+    std::string line;
+    while(std::getline(file, line))
+    {
+        std::stringstream ss(line);
+
+        std::string prefix;
+        ss >> prefix;
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Comment.
+        //-----------------------------------------------------------------------------------------------------------------//
+        if(prefix == "#") { continue; }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Vertex position.
+        //-----------------------------------------------------------------------------------------------------------------//
+        if(prefix == "v")
+        {
+            vertex_positions_and_colors.push_back(ObjFileParser::parseVertexPositionAndColor(ss));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Vertex tex coord.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "vt")
+        {
+            vertex_tex_coords.push_back(ObjFileParser::parseVertexTexCoord(ss));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Vertex normal.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "vn")
+        {
+            vertex_normals.push_back(ObjFileParser::parseVertexNormal(ss));
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // New material name to be used with the following triangles.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "usemtl")
+        {
+            curr_mesh_polygon.m_polygon.clear();
+            curr_mesh_polygon.m_polygon_material_name_hash = 0;
+
+            std::string new_name;
+            ss >> new_name;
+
+            curr_mesh_polygon.m_polygon_material_name_hash = Math::Core::hashString(new_name);
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+
+        //-----------------------------------------------------------------------------------------------------------------//
+        // Triangle.
+        //-----------------------------------------------------------------------------------------------------------------//
+        else if(prefix == "f")
+        {
+            std::vector<ObjFileParser::ObjVertexInfo> face_indices = ObjFileParser::parsePolygonInfo(ss);
+
+            Math::Geometry::Polygon new_polygon = ObjFileParser::createPolygon
+            (
+                face_indices,
+                vertex_positions_and_colors,
+                vertex_tex_coords,
+                vertex_normals
+            );
+
+            curr_mesh_polygon.m_polygon = new_polygon;
+            mesh_polygons.push_back(curr_mesh_polygon);
+        }
+        //-----------------------------------------------------------------------------------------------------------------//
+    }
+
+    return mesh_polygons;
 }
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

@@ -27,7 +27,8 @@
 
 #include "../../math/core/math_core.hpp"
 #include "../../math/geometry/math_geometry.hpp"
-#include "../../model/material/material.hpp"
+#include "../../model/material/material_library.hpp"
+#include "../../model/mesh/mesh_polygon.hpp"
 #include "../../window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -65,12 +66,12 @@ struct TransformationSystem
 
     void sendLocalSpaceWireframeToTransformers
     (
-        Backbuffer*                      target                ,
-        const Math::Geometry::Wireframe* wireframe             ,
-        size_t                           polygon_max_chunk_size,
-        const Math::Core::Mat4_f&        proj_view_model_matrix,
-        const Material*                  material              ,
-        const bool                       draw_filled
+        Backbuffer*                     target                ,
+        const std::vector<MeshPolygon>* mesh_polygons         ,
+        size_t                          polygon_max_chunk_size,
+        const Math::Core::Mat4_f&       proj_view_model_matrix,
+        const MaterialLibrary*          material_library      ,
+        const bool                      draw_filled
     );
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

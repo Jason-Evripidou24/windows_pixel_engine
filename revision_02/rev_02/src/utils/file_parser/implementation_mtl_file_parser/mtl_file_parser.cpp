@@ -55,7 +55,7 @@ MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folde
     //---------------------------------------------------------------------------------------------------------------------//
 
     std::shared_ptr<Material> curr_material = nullptr;
-    std::string curr_material_name = std::string("DEFAULT");
+    size_t curr_material_name_hash = 0;
 
     std::string line;
     while(std::getline(file, line))
@@ -78,14 +78,16 @@ MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folde
         {
             if(curr_material != nullptr)
             {
-                if( material_library.m_materials.find(curr_material_name) == material_library.m_materials.end() )
+                if( material_library.m_materials.find(curr_material_name_hash) == material_library.m_materials.end() )
                 {
-                    material_library.m_materials[curr_material_name] = curr_material;
+                    material_library.m_materials[curr_material_name_hash] = curr_material;
                 }
             }
 
             curr_material = std::make_shared<Material>();
-            curr_material_name = parseName(ss);
+            std::string curr_material_name = parseName(ss);
+
+            curr_material_name_hash = Math::Core::hashString(curr_material_name);
         }
         //-----------------------------------------------------------------------------------------------------------------//
 
@@ -131,9 +133,9 @@ MaterialLibrary MtlFileParser::loadMaterialLibrary(const std::string& file_folde
 
     if(curr_material != nullptr)
     {
-        if( material_library.m_materials.find(curr_material_name) == material_library.m_materials.end() )
+        if( material_library.m_materials.find(curr_material_name_hash) == material_library.m_materials.end() )
         {
-            material_library.m_materials[curr_material_name] = curr_material;
+            material_library.m_materials[curr_material_name_hash] = curr_material;
         }
     }
 

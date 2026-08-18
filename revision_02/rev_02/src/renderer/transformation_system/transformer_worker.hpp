@@ -89,20 +89,20 @@ struct TransformerWorker
 
             if
             (
-                (transformation_job.m_target    != nullptr) &&
-                (transformation_job.m_wireframe != nullptr) &&
-                (transformation_job.m_material  != nullptr)
+                (transformation_job.m_target           != nullptr) &&
+                (transformation_job.m_mesh_polygons    != nullptr) &&
+                (transformation_job.m_material_library != nullptr)
             )
             {
                 m_transformer.drawLocalSpaceWireframe
                 (
                     &m_tile_renderer_system,
                     transformation_job.m_target,
-                    transformation_job.m_wireframe,
+                    transformation_job.m_mesh_polygons,
                     transformation_job.m_start_polygon,
                     transformation_job.m_end_polygon,
                     &(transformation_job.m_proj_view_model_matrix),
-                    transformation_job.m_material,
+                    transformation_job.m_material_library,
                     transformation_job.m_draw_filled
                 );
             }

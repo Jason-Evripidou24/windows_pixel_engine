@@ -23,7 +23,8 @@
 
 #include "../../math/core/math_core.hpp"
 #include "../../math/geometry/math_geometry.hpp"
-#include "../../model/material/material.hpp"
+#include "../../model/material/material_library.hpp"
+#include "../../model/mesh/mesh_polygon.hpp"
 #include "../../window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
@@ -34,14 +35,14 @@ struct Transformer
 {
     void drawLocalSpaceWireframe
     (
-        TileRendererSystem*              m_tile_renderer_system,
-        Backbuffer*                      target                ,
-        const Math::Geometry::Wireframe* wireframe             ,
-        size_t                           start_polygon         ,
-        size_t                           end_polygon           ,
-        const Math::Core::Mat4_f*        proj_view_model_matrix,
-        const Material*                  material              ,
-        const bool                       draw_filled
+        TileRendererSystem*             m_tile_renderer_system,
+        Backbuffer*                     target                ,
+        const std::vector<MeshPolygon>* mesh_polygons         ,
+        size_t                          start_polygon         ,
+        size_t                          end_polygon           ,
+        const Math::Core::Mat4_f*       proj_view_model_matrix,
+        const MaterialLibrary*          material_library      ,
+        const bool                      draw_filled
     );
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

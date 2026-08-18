@@ -227,7 +227,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Renderer renderer(20, 100);
+    Renderer renderer(20, 20);
 
     while(window.processMessages())
     {
@@ -247,15 +247,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         renderer.m_transformation_system.m_transformation_system_total_jobs_counter.resetCount();
         renderer.m_tile_renderer_system.m_tile_renderer_system_total_jobs_counter.resetCount();
 
-        static size_t polygon_max_chunk_size = 1000;
+        static size_t polygon_max_chunk_size = 500;
         if(window.m_input.isKeyDown('I'))
         {
-            polygon_max_chunk_size++;
+            polygon_max_chunk_size += 10;
         }
         if(window.m_input.isKeyDown('K'))
         {
-            polygon_max_chunk_size--;
-            if(polygon_max_chunk_size == 0) { polygon_max_chunk_size = 1; }
+            polygon_max_chunk_size -= 10;
+            if(polygon_max_chunk_size <= 0) { polygon_max_chunk_size = 1; }
         }
         renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model      , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
         renderer.drawLocalSpaceModel(window.m_backbuffer, backpack_001_model, polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
@@ -285,7 +285,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             " | Total: "      + std::to_string(total_ms)                + " ms";
         window.m_backbuffer->setText(10, 10, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
 
-        info_string = house_001_model.toString();
+        info_string = backpack_001_model.toString();
         window.m_backbuffer->setText(10, 100, info_string.c_str(), static_cast<int>(info_string.size()), 0xFFFFFFFF);
         //-----------------------------------------------------------------------------------------------------------------//
         

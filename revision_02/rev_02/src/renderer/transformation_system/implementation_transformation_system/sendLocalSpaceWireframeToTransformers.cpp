@@ -20,15 +20,15 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 void TransformationSystem::sendLocalSpaceWireframeToTransformers
 (
-    Backbuffer*                      target                ,
-    const Math::Geometry::Wireframe* wireframe             ,
-    size_t                           polygon_max_chunk_size,
-    const Math::Core::Mat4_f&        proj_view_model_matrix,
-    const Material*                  material              ,
-    const bool                       draw_filled
+    Backbuffer*                     target                ,
+    const std::vector<MeshPolygon>* mesh_polygons         ,
+    size_t                          polygon_max_chunk_size,
+    const Math::Core::Mat4_f&       proj_view_model_matrix,
+    const MaterialLibrary*          material_library      ,
+    const bool                      draw_filled
 )
 {
-    const size_t num_polygons = wireframe->m_num_polygons;
+    const size_t num_polygons = mesh_polygons->size();
 
     if( (num_polygons == 0) || (polygon_max_chunk_size == 0) ) { return; }
 
@@ -43,11 +43,11 @@ void TransformationSystem::sendLocalSpaceWireframeToTransformers
             TransformationJob
             (
                 target                ,
-                wireframe            ,
+                mesh_polygons         ,
                 start_polygon         ,
                 end_polygon           ,
                 proj_view_model_matrix,
-                material              ,
+                material_library      ,
                 draw_filled
             )
         );

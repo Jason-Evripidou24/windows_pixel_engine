@@ -22,7 +22,8 @@
 #include "../../window/backbuffer/backbuffer.hpp"
 #include "../../math/core/math_core.hpp"
 #include "../../math/geometry/math_geometry.hpp"
-#include "../../model/material/material.hpp"
+#include "../../model/material/material_library.hpp"
+#include "../../model/mesh/mesh_polygon.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
@@ -30,30 +31,30 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 struct TransformationJob
 {
-    Backbuffer*                      m_target                ;
-    const Math::Geometry::Wireframe* m_wireframe             ;
-    size_t                           m_start_polygon         ;
-    size_t                           m_end_polygon           ;
-    Math::Core::Mat4_f               m_proj_view_model_matrix;
-    const Material*                  m_material              ;
-    bool                             m_draw_filled           ;
+    Backbuffer*                     m_target                ;
+    const std::vector<MeshPolygon>* m_mesh_polygons         ;
+    size_t                          m_start_polygon         ;
+    size_t                          m_end_polygon           ;
+    Math::Core::Mat4_f              m_proj_view_model_matrix;
+    const MaterialLibrary*          m_material_library      ;
+    bool                            m_draw_filled           ;
 
     TransformationJob
     (
-        Backbuffer*                      target                ,
-        const Math::Geometry::Wireframe* wireframe             ,
-        size_t                           start_polygon         ,
-        size_t                           end_polygon           ,
-        const Math::Core::Mat4_f         proj_view_model_matrix,
-        const Material*                  material              ,
-        bool                             draw_filled
+        Backbuffer*                     target                ,
+        const std::vector<MeshPolygon>* mesh_polygons         ,
+        size_t                          start_polygon         ,
+        size_t                          end_polygon           ,
+        const Math::Core::Mat4_f        proj_view_model_matrix,
+        const MaterialLibrary*          material_library      ,
+        bool                            draw_filled
     )
         :   m_target(target)
-        ,   m_wireframe(wireframe)
+        ,   m_mesh_polygons(mesh_polygons)
         ,   m_start_polygon(start_polygon)
         ,   m_end_polygon(end_polygon)
         ,   m_proj_view_model_matrix(proj_view_model_matrix)
-        ,   m_material(material)
+        ,   m_material_library(material_library)
         ,   m_draw_filled(draw_filled)
     {
     }

@@ -20,7 +20,9 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include "mesh_polygon.hpp"
 #include "mesh_wireframe.hpp"
+
 #include "../material/material_library.hpp"
 #include "../../utils/file_parser/mtl_file_parser.hpp"
 #include "../../utils/file_parser/obj_file_parser.hpp"
@@ -42,13 +44,13 @@ struct Mesh
     // Drawing/Rendering information.
     //---------------------------------------------------------------------------------------------------------------------//
     MaterialLibrary m_material_library;
-    std::vector<MeshWireframe> m_render_wireframes;
+    std::vector<MeshPolygon> m_render_polygons;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Collision and Selection detection.
     //---------------------------------------------------------------------------------------------------------------------//
-    std::vector<MeshWireframe> m_hitbox_wireframes;
+    //std::vector<MeshWireframe> m_hitbox_wireframes;
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
@@ -57,24 +59,24 @@ struct Mesh
         m_mesh_id = -1;
         m_mesh_name.clear();
         m_material_library.clear();
-        m_render_wireframes.clear();
-        m_hitbox_wireframes.clear();
+        m_render_polygons.clear();
+        //m_hitbox_wireframes.clear();
     }
     Mesh(int mesh_id, const std::string& mesh_name)
     {
         m_mesh_id = mesh_id;
         m_mesh_name = mesh_name;
         m_material_library.clear();
-        m_render_wireframes.clear();
-        m_hitbox_wireframes.clear();
+        m_render_polygons.clear();
+        //m_hitbox_wireframes.clear();
     }
     ~Mesh()
     {
         m_mesh_id = -1;
         m_mesh_name.clear();
         m_material_library.clear();
-        m_render_wireframes.clear();
-        m_hitbox_wireframes.clear();
+        m_render_polygons.clear();
+        //m_hitbox_wireframes.clear();
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -87,9 +89,9 @@ struct Mesh
         const std::string& hitbox_file_name
     )
     {
-        m_render_wireframes = ObjFileParser::loadMeshWireframes(folder,  render_wireframe_file_name);
-        m_material_library  = MtlFileParser::loadMaterialLibrary(folder, material_library_file_name);
-        m_hitbox_wireframes = ObjFileParser::loadMeshWireframes(folder,  hitbox_file_name);
+        m_render_polygons  = ObjFileParser::loadMeshPolygons(folder, render_wireframe_file_name);
+        m_material_library = MtlFileParser::loadMaterialLibrary(folder, material_library_file_name);
+        //m_hitbox_wireframes = ObjFileParser::loadMeshWireframes(folder,  hitbox_file_name);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
@@ -97,16 +99,10 @@ struct Mesh
     inline std::string toString() const
     {
         std::string output = std::string("");
-        output += std::string("MESH DETAILS:")                                                            + std::string("\n");
-        output += std::string("    ID                   : ") + std::to_string(m_mesh_id)                  + std::string("\n");
-        output += std::string("    NAME                 : ") + m_mesh_name                                + std::string("\n");
-        output += std::string("    NUM_RENDER_WIREFRAMES: ") + std::to_string(m_render_wireframes.size()) + std::string("\n");
-        for(size_t i = 0; i < m_render_wireframes.size(); i++)
-        {
-            output +=
-                std::string("        ") + std::to_string(i) + std::string(" NUM_POLYGONS: ") +
-                std::string("        ") + std::to_string(m_render_wireframes[i].m_wireframe.m_num_polygons) + std::string("\n");
-        }
+        output += std::string("MESH DETAILS:")                                                         + std::string("\n");
+        output += std::string("    ID                 : ") + std::to_string(m_mesh_id)                 + std::string("\n");
+        output += std::string("    NAME               : ") + m_mesh_name                               + std::string("\n");
+        output += std::string("    NUM_RENDER_POLYGONS: ") + std::to_string(m_render_polygons.size());
         return output;
     }
     //---------------------------------------------------------------------------------------------------------------------//
