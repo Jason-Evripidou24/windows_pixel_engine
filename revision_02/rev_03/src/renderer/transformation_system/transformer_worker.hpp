@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERER_WORKER_HPP
-#define TILE_RENDERER_WORKER_HPP
+#ifndef TRANSFORMER_WORKER_HPP
+#define TRANSFORMER_WORKER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -19,45 +19,43 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer.hpp"
-#include "tile_renderer_job.hpp"
-#include "tile_renderer_job_queue.hpp"
-#include "tile_renderer_system_total_jobs_counter.hpp"
+#include "transformation_system_system_total_jobs_counter.hpp"
+#include "transformation_job_queue.hpp"
+#include "transformation_job.hpp"
+#include "transformer.hpp"
+
+#include "../tile_renderer_system/tile_renderer_system.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRendererWorker
+struct TransformerWorker
 {
-    TileRendererSystemTotalJobsCounter& m_total_jobs_counter;
+    TileRendererSystem& m_tile_renderer_system;
 
-    TileRenderer m_tile_renderer;
-    TileRendererJobQueue m_job_queue;
+    TransformationSystemTotalJobsCounter& m_total_jobs_counter;
+
+    TransformationJobQueue m_job_queue;
+
+    Transformer m_transformer;
 
     std::thread m_worker_thread;
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRendererWorker
+    TransformerWorker
     (
-        int tile_x,
-        int tile_y,
-        int tile_split,
-        TileRendererSystemTotalJobsCounter& total_jobs_counter
+        TileRendererSystem&                   tile_renderer_system,
+        TransformationSystemTotalJobsCounter& total_jobs_counter
     )
         :   m_total_jobs_counter(total_jobs_counter)
-        ,   m_tile_renderer
-            (
-                tile_x,
-                tile_y,
-                tile_split
-            )
+        ,   m_tile_renderer_system(tile_renderer_system)
     {
     }
 
-    ~TileRendererWorker()
+    ~TransformerWorker()
     {
         this->stop();
     }
@@ -68,7 +66,7 @@ struct TileRendererWorker
     {
         if(m_worker_thread.joinable()) { return; }
 
-        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
+        m_worker_thread = std::thread(&TransformerWorker::workerFunction, this);
     }
 
     inline void stop()
@@ -82,24 +80,29 @@ struct TileRendererWorker
     //---------------------------------------------------------------------------------------------------------------------//
     inline void workerFunction()
     {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
+        TransformationJob transformation_job(nullptr, nullptr, 0, 0, Math::Core::Mat4_f(), nullptr, false);
 
         while(true)
         {
-            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
+            if(m_job_queue.getTransformationJob(transformation_job) == false) { break; }
 
             if
             (
-                (tile_renderer_job.m_target != nullptr)  &&
-                (tile_renderer_job.m_polygon != nullptr)
+                (transformation_job.m_target            != nullptr) &&
+                (transformation_job.m_material_polygons != nullptr) &&
+                (transformation_job.m_material_library  != nullptr)
             )
             {
-                m_tile_renderer.drawNDCSpacePolygon
+                m_transformer.drawLocalSpaceWireframe
                 (
-                    tile_renderer_job.m_target,
-                    tile_renderer_job.m_polygon.get(),
-                    tile_renderer_job.m_material,
-                    tile_renderer_job.m_draw_filled
+                    &m_tile_renderer_system,
+                    transformation_job.m_target,
+                    transformation_job.m_material_polygons,
+                    transformation_job.m_start_polygon,
+                    transformation_job.m_end_polygon,
+                    &(transformation_job.m_proj_view_model_matrix),
+                    transformation_job.m_material_library,
+                    transformation_job.m_draw_filled
                 );
             }
 

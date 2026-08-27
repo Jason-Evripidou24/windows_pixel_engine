@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERER_WORKER_HPP
-#define TILE_RENDERER_WORKER_HPP
+#ifndef RENDERER_HPP
+#define RENDERER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,9 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <thread>
+#include <cstdint>
+#include <memory>
+#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,93 +21,64 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer.hpp"
-#include "tile_renderer_job.hpp"
-#include "tile_renderer_job_queue.hpp"
-#include "tile_renderer_system_total_jobs_counter.hpp"
+#include "tile_renderer_system/tile_renderer_system.hpp"
+#include "transformation_system/transformation_system.hpp"
+
+#include "../window/backbuffer/backbuffer.hpp"
+
+#include "../math/geometry/math_geometry.hpp"
+
+#include "../model/material/material.hpp"
+#include "../model/material/material_library.hpp"
+#include "../model/model.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRendererWorker
+/*
+-   Renderer pipeline:
+    1.  Local/Object Space (Vec3, Vec4 with 1.0f as the homogenious coordinate)
+    |   Model Matrix
+    2.  World Space (Vec4)
+    |   View Matrix
+    3.  View Space
+    |   Projection Matrix
+    4.  Clip Space (Vec4)
+    |   Homogeneous Clipping
+    |   Perspective Divide
+    5.  Normalized Device Coordinates (NDC)
+    |   Viewport Transform
+    6.  Screen Space
+    |   Rasterization, Depth Test, Framebuffer
+*/
+struct Renderer
 {
-    TileRendererSystemTotalJobsCounter& m_total_jobs_counter;
-
-    TileRenderer m_tile_renderer;
-    TileRendererJobQueue m_job_queue;
-
-    std::thread m_worker_thread;
+    TileRendererSystem   m_tile_renderer_system;
+    TransformationSystem m_transformation_system;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and Destructor.
+    // Constructor and destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRendererWorker
+    Renderer(int tile_split, int num_transformer_workers)
+        :   m_tile_renderer_system(tile_split)
+        ,   m_transformation_system(m_tile_renderer_system, num_transformer_workers)
+    {
+    }
+    ~Renderer() = default;
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Vertices here are in local space.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void drawLocalSpaceModel
     (
-        int tile_x,
-        int tile_y,
-        int tile_split,
-        TileRendererSystemTotalJobsCounter& total_jobs_counter
-    )
-        :   m_total_jobs_counter(total_jobs_counter)
-        ,   m_tile_renderer
-            (
-                tile_x,
-                tile_y,
-                tile_split
-            )
-    {
-    }
-
-    ~TileRendererWorker()
-    {
-        this->stop();
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void start()
-    {
-        if(m_worker_thread.joinable()) { return; }
-
-        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
-    }
-
-    inline void stop()
-    {
-        m_job_queue.shutdown();
-
-        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void workerFunction()
-    {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
-
-        while(true)
-        {
-            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
-
-            if
-            (
-                (tile_renderer_job.m_target != nullptr)  &&
-                (tile_renderer_job.m_polygon != nullptr)
-            )
-            {
-                m_tile_renderer.drawNDCSpacePolygon
-                (
-                    tile_renderer_job.m_target,
-                    tile_renderer_job.m_polygon.get(),
-                    tile_renderer_job.m_material,
-                    tile_renderer_job.m_draw_filled
-                );
-            }
-
-            m_total_jobs_counter.decrement();
-        }
-    }
+        std::shared_ptr<Backbuffer> target                ,
+        const Model&                model                 ,
+        size_t                      polygon_max_chunk_size,
+        const Math::Core::Mat4_f&   proj_view_matrix      ,
+        const bool                  draw_filled
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

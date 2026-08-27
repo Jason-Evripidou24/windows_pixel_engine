@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERER_WORKER_HPP
-#define TILE_RENDERER_WORKER_HPP
+#ifndef TRANSFORMATION_SYSTEM_HPP
+#define TRANSFORMATION_SYSTEM_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,7 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <thread>
+#include <memory>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,94 +19,60 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer.hpp"
-#include "tile_renderer_job.hpp"
-#include "tile_renderer_job_queue.hpp"
-#include "tile_renderer_system_total_jobs_counter.hpp"
+#include "transformation_system_system_total_jobs_counter.hpp"
+#include "transformer_worker.hpp"
+#include "transformation_job_queue.hpp"
+
+#include "../tile_renderer_system/tile_renderer_system.hpp"
+
+#include "../../math/core/math_core.hpp"
+#include "../../math/geometry/math_geometry.hpp"
+#include "../../model/material/material_library.hpp"
+#include "../../model/mesh/material_polygon.hpp"
+#include "../../window/backbuffer/backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRendererWorker
+struct TransformationSystem
 {
-    TileRendererSystemTotalJobsCounter& m_total_jobs_counter;
+    TransformationSystemTotalJobsCounter m_transformation_system_total_jobs_counter;
 
-    TileRenderer m_tile_renderer;
-    TileRendererJobQueue m_job_queue;
-
-    std::thread m_worker_thread;
+    int m_num_transformer_workers;
+    std::vector<std::unique_ptr<TransformerWorker>> m_transformer_workers;
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and Destructor.
+    // Constructor and destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRendererWorker
-    (
-        int tile_x,
-        int tile_y,
-        int tile_split,
-        TileRendererSystemTotalJobsCounter& total_jobs_counter
-    )
-        :   m_total_jobs_counter(total_jobs_counter)
-        ,   m_tile_renderer
-            (
-                tile_x,
-                tile_y,
-                tile_split
-            )
+    TransformationSystem(TileRendererSystem& tile_renderer_system, int num_transformer_workers)
     {
-    }
+        m_transformation_system_total_jobs_counter.resetCount();
 
-    ~TileRendererWorker()
-    {
-        this->stop();
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void start()
-    {
-        if(m_worker_thread.joinable()) { return; }
-
-        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
-    }
-
-    inline void stop()
-    {
-        m_job_queue.shutdown();
-
-        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void workerFunction()
-    {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
-
-        while(true)
+        m_num_transformer_workers = num_transformer_workers;
+        m_transformer_workers.resize(num_transformer_workers);
+        for(int i = 0; i < num_transformer_workers; i++)
         {
-            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
-
-            if
+            m_transformer_workers[i] = std::make_unique<TransformerWorker>
             (
-                (tile_renderer_job.m_target != nullptr)  &&
-                (tile_renderer_job.m_polygon != nullptr)
-            )
-            {
-                m_tile_renderer.drawNDCSpacePolygon
-                (
-                    tile_renderer_job.m_target,
-                    tile_renderer_job.m_polygon.get(),
-                    tile_renderer_job.m_material,
-                    tile_renderer_job.m_draw_filled
-                );
-            }
-
-            m_total_jobs_counter.decrement();
+                tile_renderer_system,
+                m_transformation_system_total_jobs_counter
+            );
+            m_transformer_workers[i]->start();
         }
     }
+    ~TransformationSystem() = default;
     //---------------------------------------------------------------------------------------------------------------------//
+
+    void sendLocalSpaceWireframeToTransformers
+    (
+        Backbuffer*                         target                ,
+        const std::vector<MaterialPolygon>* material_polygons     ,
+        size_t                              polygon_max_chunk_size,
+        const Math::Core::Mat4_f&           proj_view_model_matrix,
+        const MaterialLibrary*              material_library      ,
+        const bool                          draw_filled
+    );
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 

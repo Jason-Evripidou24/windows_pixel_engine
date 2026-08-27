@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERER_WORKER_HPP
-#define TILE_RENDERER_WORKER_HPP
+#ifndef TILE_RENDERER_HPP
+#define TILE_RENDERER_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,6 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <thread>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,93 +18,80 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer.hpp"
-#include "tile_renderer_job.hpp"
-#include "tile_renderer_job_queue.hpp"
-#include "tile_renderer_system_total_jobs_counter.hpp"
+#include "../../window/backbuffer/backbuffer.hpp"
+#include "../../math/geometry/math_geometry.hpp"
+#include "../../model/material/material.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRendererWorker
+struct TileRenderer
 {
-    TileRendererSystemTotalJobsCounter& m_total_jobs_counter;
-
-    TileRenderer m_tile_renderer;
-    TileRendererJobQueue m_job_queue;
-
-    std::thread m_worker_thread;
+    //---------------------------------------------------------------------------------------------------------------------//
+    // The bounding box (tile) in screen space that the TileRenderer object is responsible for drawing within.
+    int m_tile_x;
+    int m_tile_y;
+    int m_tile_split;
+    //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
     // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRendererWorker
+    TileRenderer(int tile_x, int tile_y, int tile_split);
+    ~TileRenderer() = default;
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Vertices, Triangles and Polygons here are in Normalised Device Coordinates space.
+    //---------------------------------------------------------------------------------------------------------------------//
+    void drawNDCSpaceLine
     (
-        int tile_x,
-        int tile_y,
-        int tile_split,
-        TileRendererSystemTotalJobsCounter& total_jobs_counter
-    )
-        :   m_total_jobs_counter(total_jobs_counter)
-        ,   m_tile_renderer
-            (
-                tile_x,
-                tile_y,
-                tile_split
-            )
-    {
-    }
+        Backbuffer*                   target  ,
+        const Math::Geometry::Vertex* v0      ,
+        const Math::Geometry::Vertex* v1      ,
+        const Material*               material
+    );
 
-    ~TileRendererWorker()
-    {
-        this->stop();
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
+    void drawNDCSpaceTriangleWireframe
+    (
+        Backbuffer*                   target  ,
+        const Math::Geometry::Vertex* v0      ,
+        const Math::Geometry::Vertex* v1      ,
+        const Math::Geometry::Vertex* v2      ,
+        const Material*               material
+    );
 
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void start()
-    {
-        if(m_worker_thread.joinable()) { return; }
+    void drawNDCSpaceTriangleFill
+    (
+        Backbuffer*                   target  ,
+        const Math::Geometry::Vertex* v0      ,
+        const Math::Geometry::Vertex* v1      ,
+        const Math::Geometry::Vertex* v2      ,
+        const Material*               material
+    );
 
-        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
-    }
+    void drawNDCSpacePolygonWireframe
+    (
+        Backbuffer*                    target  ,
+        const Math::Geometry::Polygon* polygon ,
+        const Material*                material
+    );
 
-    inline void stop()
-    {
-        m_job_queue.shutdown();
+    void drawNDCSpacePolygonFill
+    (
+        Backbuffer*                    target  ,
+        const Math::Geometry::Polygon* polygon ,
+        const Material*                material
+    );
 
-        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void workerFunction()
-    {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
-
-        while(true)
-        {
-            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
-
-            if
-            (
-                (tile_renderer_job.m_target != nullptr)  &&
-                (tile_renderer_job.m_polygon != nullptr)
-            )
-            {
-                m_tile_renderer.drawNDCSpacePolygon
-                (
-                    tile_renderer_job.m_target,
-                    tile_renderer_job.m_polygon.get(),
-                    tile_renderer_job.m_material,
-                    tile_renderer_job.m_draw_filled
-                );
-            }
-
-            m_total_jobs_counter.decrement();
-        }
-    }
+    void drawNDCSpacePolygon
+    (
+        Backbuffer*                    target     ,
+        const Math::Geometry::Polygon* polygon    ,
+        const Material*                material   ,
+        const bool                     draw_filled
+    );
     //---------------------------------------------------------------------------------------------------------------------//
 };
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //

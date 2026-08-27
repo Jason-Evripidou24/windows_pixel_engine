@@ -2,80 +2,74 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <cstdint>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Third party.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <windows.h>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../tile_renderer.hpp"
+#include "../backbuffer.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::drawNDCSpaceLine
-(
-    Backbuffer*                   target  ,
-    const Math::Geometry::Vertex* v0      ,
-    const Math::Geometry::Vertex* v1      ,
-    const Material*               material
-)
+void Backbuffer::resize(int width, int height)
 {
     //---------------------------------------------------------------------------------------------------------------------//
-    // Calculate the backbuffer pixel width and height that will be required.
+    if( (width <= 0) || (height <= 0) ) { return; }
     //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x0 = target->toBackbufferCoordX(v0->m_position.m_data[0]);
-    int backbuffer_y0 = target->toBackbufferCoordY(v0->m_position.m_data[1]);
+    
+    this->freeBuffers();
 
-    int backbuffer_x1 = target->toBackbufferCoordX(v1->m_position.m_data[0]);
-    int backbuffer_y1 = target->toBackbufferCoordY(v1->m_position.m_data[1]);
+    //---------------------------------------------------------------------------------------------------------------------//
+    m_width  = width;
+    m_height = height;
+    m_pitch  = m_width * sizeof(uint32_t);
 
-    int dx = backbuffer_x1 - backbuffer_x0;
-    int dy = backbuffer_y1 - backbuffer_y0;
+    m_bitmapinfo = {};
+    m_bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    m_bitmapinfo.bmiHeader.biWidth = m_width;
+    m_bitmapinfo.bmiHeader.biHeight = -m_height; // top-down
+    m_bitmapinfo.bmiHeader.biPlanes = 1;
+    m_bitmapinfo.bmiHeader.biBitCount = 32;
+    m_bitmapinfo.bmiHeader.biCompression = BI_RGB;
+    //---------------------------------------------------------------------------------------------------------------------//
 
-    int abs_dx = dx; if(abs_dx < 0) { abs_dx *= -1; }
-    int abs_dy = dy; if(abs_dy < 0) { abs_dy *= -1; }
+    //---------------------------------------------------------------------------------------------------------------------//
+    size_t pixel_count = static_cast<size_t>(m_width) * static_cast<size_t>(m_height);
 
-    int steps = abs_dx; if(abs_dy > steps) { steps = abs_dy; }
+    size_t color_buffer_size = pixel_count * sizeof(uint32_t);
+    m_color_buffer = (uint32_t*)VirtualAlloc
+    (
+        0,
+        color_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
 
-    if(steps == 0)
+    size_t depth_buffer_size = pixel_count * sizeof(float);
+    m_depth_buffer = (float*)VirtualAlloc
+    (
+        0,
+        depth_buffer_size,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_READWRITE
+    );
+
+    if( (m_color_buffer == nullptr) || (m_depth_buffer == nullptr) )
     {
-        uint32_t output_color = Math::Core::convertVec4fToColor(v0->m_color);
-        if(material != nullptr)
-        {
-            output_color = material->calcMaterialColor(v0->m_tex_coords.m_data[0], v0->m_tex_coords.m_data[1]);
-        }
-        target->setPixel(backbuffer_x0, backbuffer_y0, v0->m_position.m_data[2], output_color);
-        return;
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    for(int i = 0; i <= steps; i++)
-    {
-        float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
-
-        Math::Geometry::Vertex vertex_interpolated;
-        Math::Geometry::interpolateVertex(vertex_interpolated, *v0, *v1, t);
-
-        int x = target->toBackbufferCoordX(vertex_interpolated.m_position.m_data[0]);
-        int y = target->toBackbufferCoordY(vertex_interpolated.m_position.m_data[1]);
-        float z = vertex_interpolated.m_position.m_data[2];
-
-        Math::Core::Vec2_f tex_coord = (v0->m_tex_coords * t) + (v1->m_tex_coords * (1.0f - t));
-
-        uint32_t output_color = Math::Core::convertVec4fToColor(vertex_interpolated.m_color);
-        if(material != nullptr)
-        {
-            output_color = material->calcMaterialColor(tex_coord.m_data[0], tex_coord.m_data[1]);
-        }
-
-        target->setPixel(x, y, z, output_color);
+        this->freeBuffers();
+        m_width = 0;
+        m_height = 0;
+        m_pitch = 0;
+        m_bitmapinfo = {};
     }
     //---------------------------------------------------------------------------------------------------------------------//
 }

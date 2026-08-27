@@ -1,6 +1,6 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-#ifndef TILE_RENDERER_WORKER_HPP
-#define TILE_RENDERER_WORKER_HPP
+#ifndef MESH_HPP
+#define MESH_HPP
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
@@ -8,7 +8,8 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include <thread>
+#include <string>
+#include <vector>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -19,92 +20,79 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "tile_renderer.hpp"
-#include "tile_renderer_job.hpp"
-#include "tile_renderer_job_queue.hpp"
-#include "tile_renderer_system_total_jobs_counter.hpp"
+#include "material_polygon.hpp"
+
+#include "../material/material_library.hpp"
+#include "../../utils/file_parser/mtl_file_parser.hpp"
+#include "../../utils/file_parser/obj_file_parser.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-struct TileRendererWorker
+struct Mesh
 {
-    TileRendererSystemTotalJobsCounter& m_total_jobs_counter;
-
-    TileRenderer m_tile_renderer;
-    TileRendererJobQueue m_job_queue;
-
-    std::thread m_worker_thread;
+    //---------------------------------------------------------------------------------------------------------------------//
+    // Identifiers.
+    //---------------------------------------------------------------------------------------------------------------------//
+    int         m_mesh_id;
+    std::string m_mesh_name;
+    //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    // Constructor and Destructor.
+    // Drawing/Rendering information.
     //---------------------------------------------------------------------------------------------------------------------//
-    TileRendererWorker
+    MaterialLibrary              m_material_library;
+    std::vector<MaterialPolygon> m_material_polygons;
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    Mesh()
+    {
+        m_mesh_id = -1;
+        m_mesh_name.clear();
+        m_material_library.clear();
+        m_material_polygons.clear();
+    }
+    Mesh(int mesh_id, const std::string& mesh_name)
+    {
+        m_mesh_id = mesh_id;
+        m_mesh_name = mesh_name;
+        m_material_library.clear();
+        m_material_polygons.clear();
+    }
+    ~Mesh()
+    {
+        m_mesh_id = -1;
+        m_mesh_name.clear();
+        m_material_library.clear();
+        m_material_polygons.clear();
+    }
+    //---------------------------------------------------------------------------------------------------------------------//
+
+    //---------------------------------------------------------------------------------------------------------------------//
+    void loadMesh
     (
-        int tile_x,
-        int tile_y,
-        int tile_split,
-        TileRendererSystemTotalJobsCounter& total_jobs_counter
+        const std::string& folder,
+        const std::string& render_wireframe_file_name,
+        const std::string& material_library_file_name,
+        const std::string& hitbox_file_name
     )
-        :   m_total_jobs_counter(total_jobs_counter)
-        ,   m_tile_renderer
-            (
-                tile_x,
-                tile_y,
-                tile_split
-            )
     {
-    }
-
-    ~TileRendererWorker()
-    {
-        this->stop();
+        m_material_library = MtlFileParser::loadMaterialLibrary(folder, material_library_file_name);
+        m_material_polygons = ObjFileParser::loadMaterialPolygons(folder, render_wireframe_file_name, m_material_library);
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    inline void start()
+    inline std::string toString() const
     {
-        if(m_worker_thread.joinable()) { return; }
-
-        m_worker_thread = std::thread(&TileRendererWorker::workerFunction, this);
-    }
-
-    inline void stop()
-    {
-        m_job_queue.shutdown();
-
-        if(m_worker_thread.joinable()) { m_worker_thread.join(); }
-    }
-    //---------------------------------------------------------------------------------------------------------------------//
-
-    //---------------------------------------------------------------------------------------------------------------------//
-    inline void workerFunction()
-    {
-        TileRendererJob tile_renderer_job(nullptr, nullptr, nullptr, false);
-
-        while(true)
-        {
-            if(m_job_queue.getTileRendererJob(tile_renderer_job) == false) { break; }
-
-            if
-            (
-                (tile_renderer_job.m_target != nullptr)  &&
-                (tile_renderer_job.m_polygon != nullptr)
-            )
-            {
-                m_tile_renderer.drawNDCSpacePolygon
-                (
-                    tile_renderer_job.m_target,
-                    tile_renderer_job.m_polygon.get(),
-                    tile_renderer_job.m_material,
-                    tile_renderer_job.m_draw_filled
-                );
-            }
-
-            m_total_jobs_counter.decrement();
-        }
+        std::string output = std::string("");
+        output += std::string("MESH DETAILS:")                                                             + std::string("\n");
+        output += std::string("    ID                   : ") + std::to_string(m_mesh_id)                   + std::string("\n");
+        output += std::string("    NAME                 : ") + m_mesh_name                                 + std::string("\n");
+        output += std::string("    NUM_MATERIAL_POLYGONS: ") + std::to_string(m_material_polygons.size());
+        return output;
     }
     //---------------------------------------------------------------------------------------------------------------------//
 };

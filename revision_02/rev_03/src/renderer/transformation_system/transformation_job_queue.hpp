@@ -1,7 +1,16 @@
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#ifndef TRANSFORMATION_JOB_QUEUE_HPP
+#define TRANSFORMATION_JOB_QUEUE_HPP
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 //-------------------------------------------------------------------------------------------------------------------------//
 // Standard library.
 //-------------------------------------------------------------------------------------------------------------------------//
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 //-------------------------------------------------------------------------------------------------------------------------//
 
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -12,71 +21,79 @@
 //-------------------------------------------------------------------------------------------------------------------------//
 // Internal.
 //-------------------------------------------------------------------------------------------------------------------------//
-#include "../../tile_renderer.hpp"
+#include "transformation_job.hpp"
 //-------------------------------------------------------------------------------------------------------------------------//
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
 
 
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
-void TileRenderer::drawNDCSpaceLine
-(
-    Backbuffer*                   target  ,
-    const Math::Geometry::Vertex* v0      ,
-    const Math::Geometry::Vertex* v1      ,
-    const Material*               material
-)
+struct TransformationJobQueue
 {
+    bool m_shutdown = false;
+    std::queue<TransformationJob> m_queue;
+
+    std::mutex m_mutex;
+    std::condition_variable m_condition_variable;
+    
     //---------------------------------------------------------------------------------------------------------------------//
-    // Calculate the backbuffer pixel width and height that will be required.
+    // Constructor and Destructor.
     //---------------------------------------------------------------------------------------------------------------------//
-    int backbuffer_x0 = target->toBackbufferCoordX(v0->m_position.m_data[0]);
-    int backbuffer_y0 = target->toBackbufferCoordY(v0->m_position.m_data[1]);
+    TransformationJobQueue() = default;
+    ~TransformationJobQueue() = default;
 
-    int backbuffer_x1 = target->toBackbufferCoordX(v1->m_position.m_data[0]);
-    int backbuffer_y1 = target->toBackbufferCoordY(v1->m_position.m_data[1]);
-
-    int dx = backbuffer_x1 - backbuffer_x0;
-    int dy = backbuffer_y1 - backbuffer_y0;
-
-    int abs_dx = dx; if(abs_dx < 0) { abs_dx *= -1; }
-    int abs_dy = dy; if(abs_dy < 0) { abs_dy *= -1; }
-
-    int steps = abs_dx; if(abs_dy > steps) { steps = abs_dy; }
-
-    if(steps == 0)
+    inline void shutdown()
     {
-        uint32_t output_color = Math::Core::convertVec4fToColor(v0->m_color);
-        if(material != nullptr)
         {
-            output_color = material->calcMaterialColor(v0->m_tex_coords.m_data[0], v0->m_tex_coords.m_data[1]);
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_shutdown = true;
         }
-        target->setPixel(backbuffer_x0, backbuffer_y0, v0->m_position.m_data[2], output_color);
-        return;
+
+        m_condition_variable.notify_all();
     }
     //---------------------------------------------------------------------------------------------------------------------//
 
     //---------------------------------------------------------------------------------------------------------------------//
-    for(int i = 0; i <= steps; i++)
+    // Insert and Retrieve jobs.
+    //---------------------------------------------------------------------------------------------------------------------//
+    inline bool insertTransformationJob(const TransformationJob& transformation_job)
     {
-        float t = (1.0f) - (static_cast<float>(i) / static_cast<float>(steps));
-
-        Math::Geometry::Vertex vertex_interpolated;
-        Math::Geometry::interpolateVertex(vertex_interpolated, *v0, *v1, t);
-
-        int x = target->toBackbufferCoordX(vertex_interpolated.m_position.m_data[0]);
-        int y = target->toBackbufferCoordY(vertex_interpolated.m_position.m_data[1]);
-        float z = vertex_interpolated.m_position.m_data[2];
-
-        Math::Core::Vec2_f tex_coord = (v0->m_tex_coords * t) + (v1->m_tex_coords * (1.0f - t));
-
-        uint32_t output_color = Math::Core::convertVec4fToColor(vertex_interpolated.m_color);
-        if(material != nullptr)
         {
-            output_color = material->calcMaterialColor(tex_coord.m_data[0], tex_coord.m_data[1]);
-        }
+            std::lock_guard<std::mutex> lock(m_mutex);
 
-        target->setPixel(x, y, z, output_color);
+            if(m_shutdown) { return false; }
+
+            m_queue.push(transformation_job);
+        }
+        
+        m_condition_variable.notify_one();
+        return true;
+    }
+
+    inline bool getTransformationJob(TransformationJob& output)
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        m_condition_variable.wait
+        (
+            lock,
+            [this]()
+            {
+                return m_shutdown || !m_queue.empty();
+            }
+        );
+
+        if(m_shutdown && m_queue.empty()) { return false; }
+
+        output = std::move(m_queue.front());
+        m_queue.pop();
+
+        return true;
     }
     //---------------------------------------------------------------------------------------------------------------------//
-}
+};
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+
+
+// ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
+#endif
 // ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### //
