@@ -240,7 +240,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     );
     //---------------------------------------------------------------------------------------------------------------------//
 
-    Renderer renderer(20, 200);
+    Renderer renderer(20, 100);
 
     while(window.processMessages())
     {
@@ -271,7 +271,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
             if(polygon_max_chunk_size <= 0) { polygon_max_chunk_size = 1; }
         }
         renderer.drawLocalSpaceModel(window.m_backbuffer, ground_model   , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
-        renderer.drawLocalSpaceModel(window.m_backbuffer, car_003_model, polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
+        renderer.drawLocalSpaceModel(window.m_backbuffer, car_003_model  , polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
         renderer.drawLocalSpaceModel(window.m_backbuffer, house_001_model, polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
         renderer.drawLocalSpaceModel(window.m_backbuffer, house_002_model, polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
         renderer.drawLocalSpaceModel(window.m_backbuffer, house_003_model, polygon_max_chunk_size, proj_view_matrix, g_draw_filled);
