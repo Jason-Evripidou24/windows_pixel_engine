@@ -1,0 +1,73 @@
+# r32.mtl
+
+newmtl car_paint
+Kd 1.0 0.0 0.0
+
+newmtl nothing.
+Kd 0.0 0.0 0.0
+
+newmtl clear_glass
+Kd 1.0 1.0 1.0
+
+newmtl orange_glass
+Kd 1.0, 0.549, 0.0
+
+newmtl chrome
+Kd 0.753, 0.753, 0.753
+
+newmtl misc
+Kd 1.0, 1.0, 1.0
+
+newmtl plastic
+Kd 0.0 0.0 0.0
+
+newmtl plastic.003
+Kd 0.0 0.0 0.0
+
+newmtl red_glass
+Kd 1.0 0.0 0.0
+
+newmtl dark_red_glass
+Kd 0.545, 0.0, 0.0
+
+newmtl interior
+Kd 0.3, 0.3, 0.3
+
+newmtl backlight_chrome
+Kd 0.7, 0.7, 0.7
+
+newmtl backlight
+Kd 0.8, 0.8, 0.8
+
+newmtl mirror
+Kd 1.0, 1.0, 1.0
+
+newmtl metal
+Kd 1.0, 1.0, 1.0
+
+newmtl logo1
+Kd 1.0, 1.0, 1.0
+
+newmtl logo2
+Kd 1.0, 1.0, 1.0
+
+newmtl logo3
+Kd 1.0, 1.0, 1.0
+
+newmtl logo4
+Kd 1.0, 1.0, 1.0
+
+newmtl wheel_metal
+Kd 0.8, 0.8, 0.8
+
+newmtl rubber.001
+Kd 0.2, 0.2, 0.2
+
+newmtl brake_disc.001
+Kd 0.8, 0.2, 0.2
+
+newmtl brake_disc1.001
+Kd 0.8, 0.2, 0.2
+
+newmtl numberplate.001
+Kd 1.0, 1.0, 1.0
