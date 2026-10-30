@@ -12,32 +12,29 @@ The renderer is responsible for the complete process of transforming 3D geometry
 Currently this project only supports 64-bit Windows operating systems (specifically Windows 10 and 11).
 </br>
 
-The most up to date revision of the project can be found at "/revision_02/rev_03". All previous revisions are also included in this repository in case that anybody wishes to see the progression.
+The most up to date revision of the project can be found in the "application" folder. All previous revisions are also included in this repository withing the "superceeded" in case that anybody wishes to see the progression.
 </br>
 </br>
 
 
 ## Building the Application
 
-An included build.bat file is included for each project revision. This utilises the Microsoft Visual Studio compiler and thus it must be installed on your machine.
+A <code>build.bat</code> batch file is included to help build the application on your local machine. This file utilises the Microsoft Visual Studio compiler and thus it must be installed on your machine.
+</br>
+
+You must update the <code>call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"</code> line to point to where your Visual Studio installation is located.
 </br>
 
 The build script automatically configures the Visual Studio development environment, compiles the source files, and links the resulting executable.
 </br>
 
-The application can be built from the command line using:
+The application can be built from the command line or through the windows GUI using by executing <code>build.bat</code> while within the <code>application</code> folder.
 </br>
 
-<code>build.bat</code>
+The build script also supports cleaning the build output via the command <code>build.bat clean</code> within the <code>application</code> folder.
 </br>
 
-The build script also supports cleaning the build output:
-</br>
-
-<code>build.bat clean</code>
-</br>
-
-The output executable file can be found at "/build/app.exe".
+The output executable file can be found at "/application/build/app.exe".
 </br>
 
 The project does not use CMake or another external build system. It is compiled directly using the Microsoft Visual C++ compiler provided by Visual Studio.
